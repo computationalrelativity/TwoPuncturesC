@@ -140,6 +140,5 @@ enum{
 #define npointsx (50)
 #define npointsy (50)
 #define npointsz (50)
-#define GFINDEX3D (i, j, k) ( i + npointsx*j + npointsx*npointsz*k )
 
 #endif

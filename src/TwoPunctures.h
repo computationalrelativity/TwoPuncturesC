@@ -27,6 +27,9 @@
 #include <gsl/gsl_linalg.h>
 
 #include "parameters.h"
+#define GFINDEX3D (i, j, k) ( (i) + (npointsx)*(j) + (npointsx)*(npointsy)*(k) )
+#define ERROR(s) {printf(s); exit(0);}
+#define DBGSTOP(s) {printf("DEBUGSTOP: %s",s); exit(0);}
 
 #define Pi  3.14159265358979323846264338328
 #define Pih 1.57079632679489661923132169164	/* Pi/2*/
@@ -46,9 +49,6 @@
 #define free_imatrix TP_free_imatrix
 #define free_dmatrix TP_free_dmatrix
 #define free_d3tensor TP_free_d3tensor
-
-#define ERROR(s) {printf(s); exit(0);}
-#define DBGSTOP(s) {printf("DEBUGSTOP: %s",s); exit(0);}
 
 void nrerror (char error_text[]);
 int *ivector (long nl, long nh);
