@@ -1,14 +1,14 @@
 # TwoPunctures
 
-Create initial for two puncture black holes using a single domain
+Create initial data for two puncture black holes using a single domain
 spectral method following
 
 Marcus Ansorg, Bernd Brügmann, Wolfgang Tichy,
 "A single-domain spectral method for black hole puncture data",
-PRD 70, 064011 (2004),
-arXiv:gr-qc/0404056.
+PRD 70, 064011 (2004), arXiv:gr-qc/0404056.
 
-Stand-alone version of `Cactus`/`EinsteinToolkit` code:
+
+This is a stand-alone version of `Cactus`/`EinsteinToolkit` C code:
 
 ```
 https://bitbucket.org/einsteintoolkit/einsteininitialdata/src/master/TwoPunctures/
