@@ -47,12 +47,6 @@ typedef struct {
   //parameters *next;
 } parameters;
 
-// some globals arrays needed in TwoPunctures and Equations
-double par_P_plus[3]; 
-double par_P_minus[3];
-double par_S_plus[3]; 
-double par_S_minus[3]; 
-
 // interp options
 enum{
   taylor_expansion,// use a Taylor expansion about the nearest collocation point (fast, but might be inaccurate)
@@ -141,6 +135,8 @@ double norm1 (double *v, int n);
 double norm2 (double *v, int n);
 double scalarproduct (double *v, double *w, int n);
 
+void params_alloc();
+void params_free();
 void params_read(char *fname);
 void params_write(char * fname);
 double params_getd(char * key);

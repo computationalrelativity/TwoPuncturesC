@@ -212,6 +212,9 @@ void TwoPunctures (
 		   )
 {
 
+  // alloc mem for parameters
+  params_alloc();
+
   /* Add parameters here */
 
   params_add("par_b",REAL,1.0); // x coordinate of the m+ puncture
@@ -267,14 +270,16 @@ void TwoPunctures (
   */
   
   const int verbose = params_geti("verbose"); 
-  
-  /* Set globals arrays */
+
+  double par_P_plus[3], par_P_minus[3];
   par_P_plus[0] = params_getd("par_P_plus1");
   par_P_plus[1] = params_getd("par_P_plus2");
   par_P_plus[2] = params_getd("par_P_plus3");
   par_P_minus[0] = params_getd("par_P_minus1");
   par_P_minus[1] = params_getd("par_P_minus2");
   par_P_minus[2] = params_getd("par_P_minus3");
+
+  double par_S_plus[3], par_S_minus[3];
   par_S_plus[0] = params_getd("par_S_plus1");
   par_S_plus[1] = params_getd("par_S_plus2");
   par_S_plus[2] = params_getd("par_S_plus3");
@@ -313,7 +318,7 @@ void TwoPunctures (
 #endif
   static double *F = NULL;
   static derivs u, v, cf_v;
-  
+
   if (! F) {
     double up, um;
 
@@ -439,7 +444,7 @@ void TwoPunctures (
     J3 = -(center_offset[1]*par_P_minus[0]) + center_offset[0]*par_P_minus[1] - par_b*par_P_minus[1] - center_offset[1]*par_P_plus[0] + center_offset[0]*par_P_plus[1] + par_b*par_P_plus[1] + par_S_minus[2] + par_S_plus[2];
 
   }
-
+  
 #if (CARTESIAN_INTERP)
   
   /* ************************************* */
@@ -761,6 +766,9 @@ void TwoPunctures (
   free_derivs (&v, ntotal);
   free_derivs (&cf_v, ntotal);
 
+  // free mem for parameters
+  params_free();
+  
 }
 
 /* */
@@ -770,25 +778,26 @@ void main(int argc, char* argv[])
   char * inputfile = NULL;
   if (argc == 2) inputfile = argv[1]; 
 
-  /*
-  void TwoPunctures (
-		   char * inputfile, // file to set input parameters
-		   int * imin, int * imax, // min/max indexes of Cartesian grid in the 3 directions
-		   int * nxyz, 
-		   double * x, double * y, double * z, // Catersian coords
-		   double * alp, // lapse
-		   double * psi, // conf factor, and drvts:
-		   double * psix, double * psiy, double * psiz,
-		   double * psixx, double * psixy, double * psixz,
-		   double * psiyy, double * psiyz, double * psizz,
-		   // metric
-		   double * gxx, double * gxy, double * gxz,
-		   double * gyy, double * gyz, double * gzz,
-		   // curv
-		   double * kxx, double * kxy, double * kxz,
-		   double * kyy, double * kyz, double * kzz
-		   );
-  */
+#if(CARTESIAN_INTERP)
+
+  // example how to call it, does not work here
+  TwoPunctures (inputfile, // file to set input parameters
+		imin,imax, // min/max indexes of Cartesian grid in the 3 directions
+		nxyz, 
+		x,   y,   z, // Catersian coords
+		alp, // lapse
+		psi, // conf factor, and drvts:
+		psix,   psiy,   psiz,
+		psixx,   psixy,   psixz,
+		psiyy,   psiyz,   psizz,
+		// metric
+		gxx,   gxy,   gxz,
+		gyy,   gyz,   gzz,
+		// curv
+		kxx,   kxy,   kxz,
+		kyy,   kyz,   kzz);
+
+#else
 
   // interpolation is turned off, see TwoPunctures.h
   TwoPunctures (inputfile, // file to set input parameters
@@ -810,5 +819,6 @@ void main(int argc, char* argv[])
 		NULL, NULL, NULL
 		);
 
+#endif
   
 }

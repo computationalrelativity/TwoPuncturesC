@@ -18,6 +18,23 @@ BY_KKofxyz (double x, double y, double z)
 {
 
   double par_b = params_getd("par_b");
+
+  double par_P_plus[3], par_P_minus[3];
+  double par_S_plus[3], par_S_minus[3];
+
+  par_P_plus[0] = params_getd("par_P_plus1");
+  par_P_plus[1] = params_getd("par_P_plus2");
+  par_P_plus[2] = params_getd("par_P_plus3");
+  par_P_minus[0] = params_getd("par_P_minus1");
+  par_P_minus[1] = params_getd("par_P_minus2");
+  par_P_minus[2] = params_getd("par_P_minus3");
+  
+  par_S_plus[0] = params_getd("par_S_plus1");
+  par_S_plus[1] = params_getd("par_S_plus2");
+  par_S_plus[2] = params_getd("par_S_plus3");
+  par_S_minus[0] = params_getd("par_S_minus1");
+  par_S_minus[1] = params_getd("par_S_minus2");
+  par_S_minus[2] = params_getd("par_S_minus3");
   
   int i, j;
   double r_plus, r2_plus, r3_plus, r_minus, r2_minus, r3_minus, np_Pp, nm_Pm,
@@ -80,6 +97,23 @@ BY_Aijofxyz (double x, double y, double z, double Aij[3][3])
   double par_b = params_getd("par_b");
   double TP_epsilon = params_getd("TP_epsilon");
   double TP_Tiny = params_getd("TP_Tiny");
+
+  double par_P_plus[3], par_P_minus[3];
+  double par_S_plus[3], par_S_minus[3];
+
+  par_P_plus[0] = params_getd("par_P_plus1");
+  par_P_plus[1] = params_getd("par_P_plus2");
+  par_P_plus[2] = params_getd("par_P_plus3");
+  par_P_minus[0] = params_getd("par_P_minus1");
+  par_P_minus[1] = params_getd("par_P_minus2");
+  par_P_minus[2] = params_getd("par_P_minus3");
+  
+  par_S_plus[0] = params_getd("par_S_plus1");
+  par_S_plus[1] = params_getd("par_S_plus2");
+  par_S_plus[2] = params_getd("par_S_plus3");
+  par_S_minus[0] = params_getd("par_S_minus1");
+  par_S_minus[1] = params_getd("par_S_minus2");
+  par_S_minus[2] = params_getd("par_S_minus3");
   
   int i, j;
   double r_plus, r2_plus, r3_plus, r_minus, r2_minus, r3_minus, np_Pp, nm_Pm,

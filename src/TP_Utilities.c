@@ -527,8 +527,18 @@ scalarproduct (double *v, double *w, int n)
    '# comment'
 */
 
-parameters paramsdb;
-parameters *params = &paramsdb;
+parameters *params; 
+
+/* alloc/free  */
+void params_alloc() 
+{
+  params = calloc(sizeof(parameters), 1);
+  params->n=0;
+}
+void params_free()
+{
+  free(params);
+}
 
 /* parse parameter file */
 void params_read(char *fname) {
