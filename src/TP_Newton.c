@@ -480,7 +480,8 @@ Newton (int const nvar, int const n1, int const n2, int const n3,
 	derivs v,
         double const tol, int const itmax)
 {
-
+  int verbose = params_geti("verbose");
+  
   int ntotal = n1 * n2 * n3 * nvar, ii, it;
   double *F, dmax, normres;
   derivs u, dv;
@@ -503,9 +504,10 @@ Newton (int const nvar, int const n1, int const n2, int const n3,
     for (int j = 0; j < ntotal; j++)
       dv.d0[j] = 0;
 
-    if(verbose==1){
+    if(verbose){
       printf ("Newton: it=%d \t |F|=%e\n", it, (double)dmax);
-      printf ("bare mass: mp=%g \t mm=%g\n", (double) par_m_plus, (double) par_m_minus);
+      printf ("bare mass: mp=%g \t mm=%g\n",
+	      params_getd("par_m_plus"), params_getd("par_m_minus"));
     }
 
     fflush(stdout);

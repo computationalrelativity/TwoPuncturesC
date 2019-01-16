@@ -1,4 +1,5 @@
 /* TP_utilities.c */
+/* Includes routines for managing params */
 
 #include "TwoPunctures.h"
 
@@ -514,5 +515,129 @@ scalarproduct (double *v, double *w, int n)
     result += v[i] * w[i];
 
   return result;
+}
+
+/* -------------------------------------------------------------------------*/
+
+/* Dummy/minimal stuff for managing parameters 
+   - Params are stored as double and can be retrived only as int or real 
+   - Input file parser assumes input file is correctly written with lines
+   'key=val\n'
+   or 
+   '# comment'
+*/
+
+parameters paramsdb;
+parameters *params = &paramsdb;
+
+/* parse parameter file */
+void params_read(char *fname) {
+  
+#define verbose (1)
+  
+  FILE *fp;
+  char line[STRLEN], key[STRLEN], val[STRLEN];
+  char *s;
+  
+  fp = fopen(fname, "r");
+  if (fp == NULL)
+    ERROR("[params_read] Failed to open input file");
+  while ( fgets(line,sizeof line,fp) != NULL ) {
+    /* TODO: better parsing */ 
+    if (line[0]=='#') continue;
+    
+    ERROR("[params_read] This routine is unfinished...")
+    //s = strtok(strcpy(key, line), "=");
+    //val = strtok(NULL, "\r\n");
+    
+    // Do not add parameters from input file, make sure they exist already
+    for (int i =0; i < params->n; i++) {
+      if (STREQL(key,params->key[i])) {
+	if (params->type[i]==INTEGER) 
+	  params->val[i] = (double)atoi(val);
+	else
+	  params->val[i] = atof(val); 
+	if (verbose) printf("[params_read] read: %s = %s\n",key,val);
+      }
+    }
+
+  }
+  fclose(fp);
+}
+
+/* dump parameters to file */
+void params_write(char * fname)
+{
+  FILE *fp;
+  fp = fopen(fname, "w");
+  if (fp == NULL)
+    ERROR("[params_write] Failed to open file\n");
+  for (int i =0; i < params->n; i++) {
+    if (params->type[i]==INTEGER)
+      fprintf(fp,"%s=%d\n",params->key[i],(int)params->val[i]);
+    else
+      fprintf(fp,"%s=%.12e\n",params->key[i],params->val[i]);
+  }
+  fclose(fp);
+}
+
+/* get double */
+double params_getd(char * key)
+{
+  for (int i =0; i < params->n; i++)  {
+    if (STREQL(key,params->key[i])) {
+      if (params->type[i]==REAL) 
+	return params->val[i];
+      else
+	ERROR("[params_get] parameter is not of type REAL\n");
+    }
+  }
+  ERROR("[params_get] parameter not found");
+}
+
+/* get int */
+int params_geti(char * key) 
+{
+  for (int i =0; i < params->n; i++)  {
+    if (STREQL(key,params->key[i])) {
+      if (params->type[i]==INTEGER) 
+	return (int) params->val[i];
+      else
+	ERROR("[params_get] parameter is not of type INTEGER\n");
+    }
+  }
+  ERROR("[params_get] parameter not found");
+}
+
+/* set parameter */
+void params_setadd(char * key, int type, double val, int addpar)
+{
+  
+  if (addpar) {
+    int i = params->n;
+    if (i>=NPARAMS) ERROR("Increase NPARAMS.");
+    strcpy(params->key[i],key);    
+    params->type[i] = type;
+    params->val[i] = val;
+    params->n++;
+    if (0) printf ("Add parameter: %s TYPE=%d VALUE=%g (%d)\n",key,type,val,params->n);
+    return;
+  }
+  
+  for (int i =0; i < params->n; i++)  {
+    if (STREQL(key,params->key[i])) {
+      params->val[i] = val;
+      return;
+    }
+  }
+  ERROR("[params_set] parameter not found\n");
+}
+
+void params_set(char * key, double val) {
+  params_setadd(key, 42, val, 0); // addpar=0 does not set the type
+}
+
+void params_add(char * key, int type, double val) {
+  params_setadd(key, type, val, 1);
 }
 

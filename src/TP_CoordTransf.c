@@ -47,6 +47,8 @@ C_To_c (int nvar, double X, double R, double *x, double *r,
 /*                          U.d11[]=U[]_xx; U.d12[]=U[]_xr; U.d13[]=U[]_x3; */
 /*                          U.d22[]=U[]_rr; U.d23[]=U[]_r3; U.d33[]=U[]_33; */
 {
+  double par_b = params_getd("par_b");
+  
   double C_c2, U_cb, U_CB;
   gsl_complex C, C_c, C_cc, c, c_C, c_CC, U_c, U_cc, U_C, U_CC;
   int ivar;

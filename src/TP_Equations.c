@@ -16,6 +16,9 @@
 double
 BY_KKofxyz (double x, double y, double z)
 {
+
+  double par_b = params_getd("par_b");
+  
   int i, j;
   double r_plus, r2_plus, r3_plus, r_minus, r2_minus, r3_minus, np_Pp, nm_Pm,
     Aij, AijAij, n_plus[3], n_minus[3], np_Sp[3], nm_Sm[3];
@@ -73,6 +76,11 @@ BY_KKofxyz (double x, double y, double z)
 void
 BY_Aijofxyz (double x, double y, double z, double Aij[3][3])
 {
+
+  double par_b = params_getd("par_b");
+  double TP_epsilon = params_getd("TP_epsilon");
+  double TP_Tiny = params_getd("TP_Tiny");
+  
   int i, j;
   double r_plus, r2_plus, r3_plus, r_minus, r2_minus, r3_minus, np_Pp, nm_Pm,
     n_plus[3], n_minus[3], np_Sp[3], nm_Sm[3];
@@ -138,6 +146,10 @@ NonLinEquations (double rho_adm,
 		 double x, double r, double phi,
 		 double y, double z, derivs U, double *values)
 {
+  double par_b = params_getd("par_b");
+  double par_m_plus = params_getd("par_m_plus");
+  double par_m_minus = params_getd("par_m_minus");
+
   double r_plus, r_minus, psi, psi2, psi4, psi7;
   double mu;
 
@@ -164,6 +176,10 @@ LinEquations (double A, double B, double X, double R,
 	      double x, double r, double phi,
 	      double y, double z, derivs dU, derivs U, double *values)
 {
+  double par_b = params_getd("par_b");
+  double par_m_plus = params_getd("par_m_plus");
+  double par_m_minus = params_getd("par_m_minus");
+  
   double r_plus, r_minus, psi, psi2, psi4, psi8;
   
   r_plus = sqrt ((x - par_b) * (x - par_b) + y * y + z * z);

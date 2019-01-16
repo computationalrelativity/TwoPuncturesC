@@ -180,6 +180,11 @@ void
 F_of_v (int nvar, int n1, int n2, int n3, derivs v, double *F,
         derivs u)
 {
+
+  double par_b = params_getd("par_b");
+  double par_m_plus = params_getd("par_m_plus");
+  double par_m_minus = params_getd("par_m_minus");
+  
   /*      Calculates the left hand sides of the non-linear equations F_m(v_n)=0*/
   /*      and the function u (u.d0[]) as well as its derivatives*/
   /*      (u.d1[], u.d2[], u.d3[], u.d11[], u.d12[], u.d13[], u.d22[], u.d23[], u.d33[])*/
@@ -254,7 +259,7 @@ F_of_v (int nvar, int n1, int n2, int n3, derivs v, double *F,
   Derivatives_AB3 (nvar, n1, n2, n3, v);
   double psi, psi2, psi4, psi7, r_plus, r_minus;
   FILE *debugfile = NULL;
-  if (do_residuum_debug_output)
+  if (params_geti("do_residuum_debug_output"))
     {
       debugfile = fopen("res.dat", "w");
       assert(debugfile);
@@ -755,6 +760,9 @@ PunctTaylorExpandAtArbitPosition (int ivar, int nvar, int n1,
                                   int n2, int n3, derivs v, double x, double y,
                                   double z)
 {
+
+  double par_b = params_getd("par_b");
+  
   double xs, ys, zs, rs2, phi, X, R, A, B, al, be, aux1, aux2, a, b, c,
     result, Ui;
   int i, j, k;
@@ -812,6 +820,8 @@ PunctIntPolAtArbitPosition (int ivar, int nvar, int n1,
 			    int n2, int n3, derivs v, double x, double y,
 			    double z)
 {
+  double par_b = params_getd("par_b");
+
   double xs, ys, zs, rs2, phi, X, R, A, B, aux1, aux2, result, Ui;
 
   xs = x / par_b;
@@ -896,9 +906,11 @@ PunctEvalAtArbitPositionFast (double *v, int ivar, double A, double B, double ph
 /* --------------------------------------------------------------------------*/
 double
 PunctIntPolAtArbitPositionFast (int ivar, int nvar, int n1,
-			    int n2, int n3, derivs v, double x, double y,
-			    double z)
+				int n2, int n3, derivs v, double x, double y,
+				double z)
 {
+  double par_b = params_getd("par_b");
+  
   double xs, ys, zs, rs2, phi, X, R, A, B, aux1, aux2, result, Ui;
   // VASILIS: Here the struct derivs v refers to the spectral coeffiecients of variable v not the variable v itself
 

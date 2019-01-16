@@ -26,10 +26,57 @@
 #include <gsl/gsl_complex_math.h>
 #include <gsl/gsl_linalg.h>
 
-#include "parameters.h"
-#define GFINDEX3D (i, j, k) ( (i) + (npointsx)*(j) + (npointsx)*(npointsy)*(k) )
+#define GFINDEX3D (i, j, k, n, nn) ( (i) + (n)*(j) + (nn)*(k) )
 #define ERROR(s) {printf(s); exit(0);}
 #define DBGSTOP(s) {printf("DEBUGSTOP: %s",s); exit(0);}
+
+/* params routines are in TP_Utilities.c */
+#define NPARAMS (100)
+#define STRLEN (256)
+#define STREQL(s1,s2) ((strcmp((s1),(s2))==0))
+enum{
+  INTEGER,
+  REAL,
+  PARAMSTYPES,
+};
+typedef struct {
+  int type[NPARAMS];
+  char key[NPARAMS][STRLEN];
+  double val[NPARAMS];
+  int n;
+  //parameters *next;
+} parameters;
+
+// some globals arrays needed in TwoPunctures and Equations
+double par_P_plus[3]; 
+double par_P_minus[3];
+double par_S_plus[3]; 
+double par_S_minus[3]; 
+
+// interp options
+enum{
+  taylor_expansion,// use a Taylor expansion about the nearest collocation point (fast, but might be inaccurate)
+  evaluation, // evaluate using all spectral coefficients (slow)
+};
+// lapse options 
+enum{
+  antisymmetric, // antisymmetric lapse for two puncture black holes, -1 <= alpha <= +1
+  averaged, // averaged lapse for two puncture black holes, 0 <= alpha <= +1"
+  psin, // Based on the initial conformal factor
+  brownsville, // See Phys. Rev. D 74, 041501 (2006)
+};
+// conformalfactor options
+enum{
+  NONSTATIC, // conformal_state = 0 (?)
+  FACTOR0, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor")
+  FACTOR1, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs")
+  FACTOR2, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs+2nd derivs")
+};
+#define use_sources (0) // do not add the source terms
+#define rescale_sources (1) // If sources are used - rescale them after solving?
+
+// Turn on the interpolation ?
+#define CARTESIAN_INTERP (0)
 
 #define Pi  3.14159265358979323846264338328
 #define Pih 1.57079632679489661923132169164	/* Pi/2*/
@@ -38,6 +85,17 @@
 #define TINY 1.0e-20
 #define SWAP(a,b) {temp=(a);(a)=(b);(b)=temp;}
 
+#define StencilSize 19
+#define N_PlaneRelax 1
+#define NRELAX 200
+#define Step_Relax 1
+
+typedef struct DERIVS
+{
+  double *d0, *d1, *d2, *d3, *d11, *d12, *d13, *d22, *d23, *d33;
+} derivs;
+
+/* TP_Utilies.c */
 #define nrerror TP_nrerror
 #define ivector TP_ivector
 #define dvector TP_dvector
@@ -83,19 +141,32 @@ double norm1 (double *v, int n);
 double norm2 (double *v, int n);
 double scalarproduct (double *v, double *w, int n);
 
-#define StencilSize 19
-#define N_PlaneRelax 1
-#define NRELAX 200
-#define Step_Relax 1
-
-typedef struct DERIVS
-{
-  double *d0, *d1, *d2, *d3, *d11, *d12, *d13, *d22, *d23, *d33;
-} derivs;
+void params_read(char *fname);
+void params_write(char * fname);
+double params_getd(char * key);
+int params_geti(char * key);
+void params_set(char * key, double val);
+void params_add(char * key, int type, double val);
 
 /* TwoPunctures.c */
-double TestSolution (double A, double B, double X, double R, double phi);
-void TestVector_w (double *par, int nvar, int n1, int n2, int n3, double *w);
+static void set_initial_guess(derivs v);
+void TwoPunctures (
+		   char * inputfile, // file to set input parameters
+		   int * imin, int * imax, // min/max indexes of Cartesian grid in the 3 directions
+		   int * nxyz, 
+		   double * x, double * y, double * z, // Catersian coords
+		   double * alp, // lapse
+		   double * psi, // conf factor, and drvts:
+		   double * psix, double * psiy, double * psiz,
+		   double * psixx, double * psixy, double * psixz,
+		   double * psiyy, double * psiyz, double * psizz,
+		   // metric
+		   double * gxx, double * gxy, double * gxz,
+		   double * gyy, double * gyz, double * gzz,
+		   // curv
+		   double * kxx, double * kxy, double * kxz,
+		   double * kyy, double * kyz, double * kzz
+		   );
 
 /* TP_FuncAndJacobian.c */
 int Index (int ivar, int i, int j, int k, int nvar, int n1, int n2, int n3);

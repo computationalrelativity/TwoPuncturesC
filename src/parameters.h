@@ -1,4 +1,6 @@
-/* Parameters are temporary set ths way */
+/* 
+   --- USED FOR AN INITIAL VERSIN - NOT USED ANYMORE ---
+   Parameters are temporary set ths way */
 
 #ifndef TP_PARAMS_H
 #define TP_PARAMS_H
@@ -128,17 +130,5 @@ enum{
 
 //
 #define verbose (0)
-
-// ---------------------------------------------
-// Additional parameters
-// ---------------------------------------------
-
-// Want to test the interpolation ?
-#define TEST_CARTESIAN_INTERP (0)
-
-// Cartesian grid parameters
-#define npointsx (50)
-#define npointsy (50)
-#define npointsz (50)
 
 #endif
