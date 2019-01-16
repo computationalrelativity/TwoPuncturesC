@@ -264,11 +264,10 @@ void TwoPunctures (
   params_add("verbose",INTEGER,1); 
   
   /* Set parameters from input file */ 
-  /*
-  if (inputfile!=NULL)
+  if (inputfile!=NULL) {
     params_read(inputfile);  
-  */
-  
+  }
+
   const int verbose = params_geti("verbose"); 
 
   double par_P_plus[3], par_P_minus[3];
@@ -777,7 +776,7 @@ void main(int argc, char* argv[])
 
   char * inputfile = NULL;
   if (argc == 2) inputfile = argv[1]; 
-
+  
 #if(CARTESIAN_INTERP)
 
   // example how to call it, does not work here

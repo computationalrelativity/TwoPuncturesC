@@ -543,7 +543,7 @@ void params_free()
 /* parse parameter file */
 void params_read(char *fname) {
   
-#define verbose (1)
+#define verbose (0)
   
   FILE *fp;
   char line[STRLEN], key[STRLEN], val[STRLEN];
@@ -555,11 +555,11 @@ void params_read(char *fname) {
   while ( fgets(line,sizeof line,fp) != NULL ) {
     /* TODO: better parsing */ 
     if (line[0]=='#') continue;
-    
-    ERROR("[params_read] This routine is unfinished...")
-    //s = strtok(strcpy(key, line), "=");
-    //val = strtok(NULL, "\r\n");
-    
+    s = strtok(line, "=");
+    strcpy(key,s);
+    s = strtok(NULL, s);
+    strcpy(val,s);
+    //printf("%s %s\n",key,val);
     // Do not add parameters from input file, make sure they exist already
     for (int i =0; i < params->n; i++) {
       if (STREQL(key,params->key[i])) {
