@@ -11,7 +11,7 @@ ivector (long nl, long nh)
   int *retval;
 
   retval = malloc(sizeof(int)*(nh-nl+1));
-  if(retval == NULL) 
+  if(retval == NULL)
     ERROR ("allocation failure in ivector()");
   return retval - nl;
 }
@@ -353,9 +353,9 @@ chebev (double a, double b, double c[], int m, double x)
 
   dj = djp1 = 0;
   for(j = m-1 ; j >= 1; j--)
-  { 
+  {
     /* advance the coefficients */
-    djp2 = djp1; 
+    djp2 = djp1;
     djp1 = dj;
     dj   = 2*y*djp1 - djp2 + c[j];
   }
@@ -519,18 +519,18 @@ scalarproduct (double *v, double *w, int n)
 
 /* -------------------------------------------------------------------------*/
 
-/* Dummy/minimal stuff for managing parameters 
-   - Params are stored as double and can be retrived only as int or real 
+/* Dummy/minimal stuff for managing parameters
+   - Params are stored as double and can be retrived only as int or real
    - Input file parser assumes input file is correctly written with lines
    'key=val\n'
-   or 
+   or
    '# comment'
 */
 
-parameters *params; 
+parameters *params;
 
 /* alloc/free  */
-void params_alloc() 
+void params_alloc()
 {
   params = calloc(sizeof(parameters), 1);
   params->n=0;
@@ -542,18 +542,18 @@ void params_free()
 
 /* parse parameter file */
 void params_read(char *fname) {
-  
+
 #define verbose (0)
-  
+
   FILE *fp;
   char line[STRLEN], key[STRLEN], val[STRLEN];
   char *s;
-  
+
   fp = fopen(fname, "r");
   if (fp == NULL)
     ERROR("[params_read] Failed to open input file");
   while ( fgets(line,sizeof line,fp) != NULL ) {
-    /* TODO: better parsing */ 
+    /* TODO: better parsing */
     if (line[0]=='#') continue;
     s = strtok(line, "=");
     strcpy(key,s);
@@ -563,10 +563,10 @@ void params_read(char *fname) {
     // Do not add parameters from input file, make sure they exist already
     for (int i =0; i < params->n; i++) {
       if (STREQL(key,params->key[i])) {
-	if (params->type[i]==INTEGER) 
+	if (params->type[i]==INTEGER)
 	  params->val[i] = (double)atoi(val);
 	else
-	  params->val[i] = atof(val); 
+	  params->val[i] = atof(val);
 	if (verbose) printf("[params_read] read: %s = %s\n",key,val);
       }
     }
@@ -596,7 +596,7 @@ double params_getd(char * key)
 {
   for (int i =0; i < params->n; i++)  {
     if (STREQL(key,params->key[i])) {
-      if (params->type[i]==REAL) 
+      if (params->type[i]==REAL)
 	return params->val[i];
       else
 	ERROR("[params_get] parameter is not of type REAL\n");
@@ -606,11 +606,11 @@ double params_getd(char * key)
 }
 
 /* get int */
-int params_geti(char * key) 
+int params_geti(char * key)
 {
   for (int i =0; i < params->n; i++)  {
     if (STREQL(key,params->key[i])) {
-      if (params->type[i]==INTEGER) 
+      if (params->type[i]==INTEGER)
 	return (int) params->val[i];
       else
 	ERROR("[params_get] parameter is not of type INTEGER\n");
@@ -622,18 +622,18 @@ int params_geti(char * key)
 /* set parameter */
 void params_setadd(char * key, int type, double val, int addpar)
 {
-  
+
   if (addpar) {
     int i = params->n;
     if (i>=NPARAMS) ERROR("Increase NPARAMS.");
-    strcpy(params->key[i],key);    
+    strcpy(params->key[i],key);
     params->type[i] = type;
     params->val[i] = val;
     params->n++;
     if (0) printf ("Add parameter: %s TYPE=%d VALUE=%g (%d)\n",key,type,val,params->n);
     return;
   }
-  
+
   for (int i =0; i < params->n; i++)  {
     if (STREQL(key,params->key[i])) {
       params->val[i] = val;
@@ -650,4 +650,3 @@ void params_set(char * key, double val) {
 void params_add(char * key, int type, double val) {
   params_setadd(key, type, val, 1);
 }
-

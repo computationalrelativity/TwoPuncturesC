@@ -30,15 +30,15 @@ LineRelax_al (double * restrict const dv,
               int const j, int const k, int const nvar,
               int const n1, int const n2, int const n3,
 	      double const * restrict const rhs,
-              int * ncols, 
-              int ** cols, 
+              int * ncols,
+              int ** cols,
               double ** JFD);
 static void
 LineRelax_be (double * restrict const dv,
               int const i, int const k, int const nvar,
               int const n1, int const n2, int const n3,
 	      double const * restrict const rhs,
-              int * ncols, 
+              int * ncols,
               int ** cols,
               double ** JFD);
 /* --------------------------------------------------------------------------*/
@@ -481,7 +481,7 @@ Newton (int const nvar, int const n1, int const n2, int const n3,
         double const tol, int const itmax)
 {
   int verbose = params_geti("verbose");
-  
+
   int ntotal = n1 * n2 * n3 * nvar, ii, it;
   double *F, dmax, normres;
   derivs u, dv;
@@ -535,4 +535,3 @@ Newton (int const nvar, int const n1, int const n2, int const n3,
   free_derivs (&dv, ntotal);
   free_derivs (&u, ntotal);
 }
-

@@ -28,18 +28,18 @@ BY_KKofxyz (double x, double y, double z)
   par_P_minus[0] = params_getd("par_P_minus1");
   par_P_minus[1] = params_getd("par_P_minus2");
   par_P_minus[2] = params_getd("par_P_minus3");
-  
+
   par_S_plus[0] = params_getd("par_S_plus1");
   par_S_plus[1] = params_getd("par_S_plus2");
   par_S_plus[2] = params_getd("par_S_plus3");
   par_S_minus[0] = params_getd("par_S_minus1");
   par_S_minus[1] = params_getd("par_S_minus2");
   par_S_minus[2] = params_getd("par_S_minus3");
-  
+
   int i, j;
   double r_plus, r2_plus, r3_plus, r_minus, r2_minus, r3_minus, np_Pp, nm_Pm,
     Aij, AijAij, n_plus[3], n_minus[3], np_Sp[3], nm_Sm[3];
-  
+
   r2_plus = (x - par_b) * (x - par_b) + y * y + z * z;
   r2_minus = (x + par_b) * (x + par_b) + y * y + z * z;
   r_plus = sqrt (r2_plus);
@@ -107,14 +107,14 @@ BY_Aijofxyz (double x, double y, double z, double Aij[3][3])
   par_P_minus[0] = params_getd("par_P_minus1");
   par_P_minus[1] = params_getd("par_P_minus2");
   par_P_minus[2] = params_getd("par_P_minus3");
-  
+
   par_S_plus[0] = params_getd("par_S_plus1");
   par_S_plus[1] = params_getd("par_S_plus2");
   par_S_plus[2] = params_getd("par_S_plus3");
   par_S_minus[0] = params_getd("par_S_minus1");
   par_S_minus[1] = params_getd("par_S_minus2");
   par_S_minus[2] = params_getd("par_S_minus3");
-  
+
   int i, j;
   double r_plus, r2_plus, r3_plus, r_minus, r2_minus, r3_minus, np_Pp, nm_Pm,
     n_plus[3], n_minus[3], np_Sp[3], nm_Sm[3];
@@ -213,12 +213,12 @@ LinEquations (double A, double B, double X, double R,
   double par_b = params_getd("par_b");
   double par_m_plus = params_getd("par_m_plus");
   double par_m_minus = params_getd("par_m_minus");
-  
+
   double r_plus, r_minus, psi, psi2, psi4, psi8;
-  
+
   r_plus = sqrt ((x - par_b) * (x - par_b) + y * y + z * z);
   r_minus = sqrt ((x + par_b) * (x + par_b) + y * y + z * z);
-  
+
   psi =
     1. + 0.5 * par_m_plus / r_plus + 0.5 * par_m_minus / r_minus + U.d0[0];
   psi2 = psi * psi;
@@ -228,4 +228,3 @@ LinEquations (double A, double B, double X, double R,
   values[0] = dU.d11[0] + dU.d22[0] + dU.d33[0]
     - 0.875 * BY_KKofxyz (x, y, z) / psi8 * dU.d0[0];
 }
-

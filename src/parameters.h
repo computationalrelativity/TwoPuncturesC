@@ -1,4 +1,4 @@
-/* 
+/*
    --- USED FOR AN INITIAL VERSIN - NOT USED ANYMORE ---
    Parameters are temporary set ths way */
 
@@ -16,7 +16,7 @@
 #define par_m_minus (1.0)
 
 // x coordinate of the m+ puncture
-#define par_b (1.0) 
+#define par_b (1.0)
 
 // target ADM mass for m+
 #define target_M_plus (0.5)
@@ -28,13 +28,13 @@
 #define par_P_plus1 (0.)
 #define par_P_plus2 (0.)
 #define par_P_plus3 (0.)
-extern double par_P_plus[3]; 
+extern double par_P_plus[3];
 
 // momentum of the m- puncture
 #define par_P_minus1 (0.)
 #define par_P_minus2 (0.)
 #define par_P_minus3 (0.)
-extern double par_P_minus[3]; 
+extern double par_P_minus[3];
 
 // spin of the m+ puncture
 #define par_S_plus1 (0.)
@@ -58,16 +58,16 @@ extern double center_offset[3];
 #define give_bare_mass (1)  // 1/0 = yes/no
 
 // Tolerance of ADM masses when give_bare_mass=no
-#define adm_tol (1e-10) 
+#define adm_tol (1e-10)
 
-// How to fill the 3D grid from the spectral grid ? 
+// How to fill the 3D grid from the spectral grid ?
 enum{
   taylor_expansion,// use a Taylor expansion about the nearest collocation point (fast, but might be inaccurate)
   evaluation, // evaluate using all spectral coefficients (slow)
 };
-#define grid_setup_method (taylor_expansion) 
+#define grid_setup_method (taylor_expansion)
 
-// How to set lapse 
+// How to set lapse
 enum{
   antisymmetric, // antisymmetric lapse for two puncture black holes, -1 <= alpha <= +1
   averaged, // averaged lapse for two puncture black holes, 0 <= alpha <= +1"
@@ -97,8 +97,8 @@ enum{
 // A small number to smooth out singularities at the puncture locations
 #define TP_epsilon (0.0)
 
-// Tiny number to avoid nans near or at the pucture locations 
-#define TP_Tiny (0.0) 
+// Tiny number to avoid nans near or at the pucture locations
+#define TP_Tiny (0.0)
 
 // Radius of an extended spacetime instead of the puncture
 #define TP_Extend_Radius (0.0)
@@ -120,7 +120,7 @@ enum{
 #define do_residuum_debug_output (0)
 
 // Output debug information about initial guess
-#define do_initial_debug_output (0) 
+#define do_initial_debug_output (0)
 
 // Multiply the old lapse with the new one
 #define multiply_old_lapse (0)

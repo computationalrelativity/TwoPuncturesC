@@ -1,5 +1,5 @@
-/* TwoPunctures.h 
-   
+/* TwoPunctures.h
+
    Files of "TwoPunctures":
 
    TwoPunctures.c
@@ -7,7 +7,7 @@
    TP_CoordTransf.c
    TP_Equations.c
    TP_Newton.c
-   TP_utilities.c 
+   TP_utilities.c
 */
 
 #ifndef TP_HEADER_H
@@ -52,7 +52,7 @@ enum{
   taylor_expansion,// use a Taylor expansion about the nearest collocation point (fast, but might be inaccurate)
   evaluation, // evaluate using all spectral coefficients (slow)
 };
-// lapse options 
+// lapse options
 enum{
   antisymmetric, // antisymmetric lapse for two puncture black holes, -1 <= alpha <= +1
   averaged, // averaged lapse for two puncture black holes, 0 <= alpha <= +1"
@@ -145,24 +145,32 @@ void params_set(char * key, double val);
 void params_add(char * key, int type, double val);
 
 /* TwoPunctures.c */
-static void set_initial_guess(derivs v);
-void TwoPunctures (
-		   char * inputfile, // file to set input parameters
-		   int * imin, int * imax, // min/max indexes of Cartesian grid in the 3 directions
-		   int * nxyz, 
-		   double * x, double * y, double * z, // Catersian coords
-		   double * alp, // lapse
-		   double * psi, // conf factor, and drvts:
-		   double * psix, double * psiy, double * psiz,
-		   double * psixx, double * psixy, double * psixz,
-		   double * psiyy, double * psiyz, double * psizz,
-		   // metric
-		   double * gxx, double * gxy, double * gxz,
-		   double * gyy, double * gyz, double * gzz,
-		   // curv
-		   double * kxx, double * kxy, double * kxz,
-		   double * kyy, double * kyz, double * kzz
-		   );
+// Expose for C++ intefacing
+#ifdef __cplusplus
+extern "C" {
+#endif
+  static void set_initial_guess(derivs v);
+  void TwoPunctures (
+                     char * inputfile, // file to set input parameters
+                     int * imin, int * imax, // min/max indexes of Cartesian grid in the 3 directions
+                     int * nxyz,
+                     double * x, double * y, double * z, // Catersian coords
+                     double * alp, // lapse
+                     double * psi, // conf factor, and drvts:
+                     double * psix, double * psiy, double * psiz,
+                     double * psixx, double * psixy, double * psixz,
+                     double * psiyy, double * psiyz, double * psizz,
+                     // metric
+                     double * gxx, double * gxy, double * gxz,
+                     double * gyy, double * gyz, double * gzz,
+                     // curv
+                     double * kxx, double * kxy, double * kxz,
+                     double * kyy, double * kyz, double * kzz
+                     );
+
+#ifdef __cplusplus
+}
+#endif
 
 /* TP_FuncAndJacobian.c */
 int Index (int ivar, int i, int j, int k, int nvar, int n1, int n2, int n3);
@@ -170,54 +178,54 @@ void allocate_derivs (derivs * v, int n);
 void free_derivs (derivs * v, int n);
 void Derivatives_AB3 (int nvar, int n1, int n2, int n3, derivs v);
 void F_of_v (int nvar, int n1, int n2, int n3, derivs v,
-	     double *F, derivs u);
+             double *F, derivs u);
 void J_times_dv (int nvar, int n1, int n2, int n3, derivs dv,
-		 double *Jdv, derivs u);
+                 double *Jdv, derivs u);
 void JFD_times_dv (int i, int j, int k, int nvar, int n1,
-		   int n2, int n3, derivs dv, derivs u, double *values);
+                   int n2, int n3, derivs dv, derivs u, double *values);
 void SetMatrix_JFD (int nvar, int n1, int n2, int n3,
-		    derivs u, int *ncols, int **cols, double **Matrix);
+                    derivs u, int *ncols, int **cols, double **Matrix);
 double PunctEvalAtArbitPosition (double *v, int ivar, double A, double B, double phi,
-				 int nvar, int n1, int n2, int n3);
+                                 int nvar, int n1, int n2, int n3);
 void calculate_derivs (int i, int j, int k, int ivar, int nvar, int n1,
-		       int n2, int n3, derivs v, derivs vv);
+                       int n2, int n3, derivs v, derivs vv);
 double interpol (double a, double b, double c, derivs v);
 double PunctTaylorExpandAtArbitPosition (int ivar, int nvar, int n1,
                                          int n2, int n3, derivs v, double x,
                                          double y, double z);
 double PunctIntPolAtArbitPosition (int ivar, int nvar, int n1,
-				   int n2, int n3, derivs v, double x,
-				   double y, double z);
+                                   int n2, int n3, derivs v, double x,
+                                   double y, double z);
 void SpecCoef(int n1, int n2, int n3, int ivar, double *v, double *cf);
 double PunctEvalAtArbitPositionFast (double *v, int ivar, double A, double B, double phi,
-				     int nvar, int n1, int n2, int n3);
+                                     int nvar, int n1, int n2, int n3);
 double PunctIntPolAtArbitPositionFast (int ivar, int nvar, int n1,
-				       int n2, int n3, derivs v, double x,
-				       double y, double z);
+                                       int n2, int n3, derivs v, double x,
+                                       double y, double z);
 
 /* TP_CoordTransf.c */
 void AB_To_XR (int nvar, double A, double B, double *X,
-	       double *R, derivs U);
+               double *R, derivs U);
 void C_To_c (int nvar, double X, double R, double *x,
-	     double *r, derivs U);
+             double *r, derivs U);
 void rx3_To_xyz (int nvar, double x, double r, double phi, double *y,
-		 double *z, derivs U);
+                 double *z, derivs U);
 
 /* TP_Equations.c */
 double BY_KKofxyz (double x, double y, double z);
 void BY_Aijofxyz (double x, double y, double z, double Aij[3][3]);
 void NonLinEquations (double rho_adm,
-		      double A, double B, double X, double R,
-		      double x, double r, double phi,
-		      double y, double z, derivs U, double *values);
+                      double A, double B, double X, double R,
+                      double x, double r, double phi,
+                      double y, double z, derivs U, double *values);
 void LinEquations (double A, double B, double X, double R,
-		   double x, double r, double phi,
-		   double y, double z, derivs dU, derivs U, double *values);
+                   double x, double r, double phi,
+                   double y, double z, derivs dU, derivs U, double *values);
 
 /* TP_Newton.c */
 void TestRelax (int nvar, int n1, int n2, int n3, derivs v, double *dv);
 void Newton (int nvar, int n1, int n2, int n3, derivs v,
-	     double tol, int itmax);
+             double tol, int itmax);
 
 // -------------------------------------------------------------------------
 #endif /* TP_HEADER_H */

@@ -1,0 +1,5 @@
+# ignore compiled
+obj
+*.x
+*.o
+*.dat
