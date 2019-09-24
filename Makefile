@@ -1,19 +1,19 @@
-# Makefile for TEOBResumS
+# Makefile for TwoPunctures
 
 BASE=$(shell /bin/pwd)
 SRCD=$(BASE)/src
 OBJD=$(BASE)/obj
 LIBD=$(BASE)/lib
 
-NAME=TwoPunctures
+NAME=TwoPuncturesRun
 EXE=$(NAME).x
 SRC=$(wildcard $(SRCD)/*.c)
 OBJ=$(patsubst $(SRCD)/%.c,$(OBJD)/%.o,$(SRC))
 LIB=$(LIBD)/lib$(NAME).a
 
-CC=gcc
-#CFLAGS=-g -std=c99 `gsl-config --cflags`
-CFLAGS=-O3 -std=c99 `gsl-config --cflags`
+CC=gcc-9
+CFLAGS=-g -std=c99 `gsl-config --cflags`
+#CFLAGS=-O3 -std=c99 `gsl-config --cflags`
 LFLAGS=`gsl-config --libs`
 LDLFLAGS=-lgsl -lgslcblas -lm 
 
