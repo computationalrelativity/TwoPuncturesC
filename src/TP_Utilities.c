@@ -647,6 +647,12 @@ void params_set(char * key, double val) {
   params_setadd(key, 42, val, 0); // addpar=0 does not set the type
 }
 
-void params_add(char * key, int type, double val) {
-  params_setadd(key, type, val, 1);
+#ifdef __cplusplus
+extern "C" {
+#endif
+  void params_add(char * key, int type, double val) {
+    params_setadd(key, type, val, 1);
+  }
+#ifdef __cplusplus
 }
+#endif

@@ -17,6 +17,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
@@ -70,7 +71,7 @@ enum{
 #define rescale_sources (1) // If sources are used - rescale them after solving?
 
 // Turn on the interpolation ?
-#define CARTESIAN_INTERP (0)
+#define CARTESIAN_INTERP (1)
 
 #define Pi  3.14159265358979323846264338328
 #define Pih 1.57079632679489661923132169164	/* Pi/2*/
@@ -142,31 +143,85 @@ void params_write(char * fname);
 double params_getd(char * key);
 int params_geti(char * key);
 void params_set(char * key, double val);
+
 void params_add(char * key, int type, double val);
 
 /* TwoPunctures.c */
+static void set_initial_guess(derivs v);
+
+typedef struct {
+  double *F;
+  derivs *u;
+  derivs *v;
+  derivs *cf_v;
+  int ntotal;
+} ini_data;
+
+
 // Expose for C++ intefacing
 #ifdef __cplusplus
 extern "C" {
 #endif
-  static void set_initial_guess(derivs v);
-  void TwoPunctures (
-                     char * inputfile, // file to set input parameters
-                     int * imin, int * imax, // min/max indexes of Cartesian grid in the 3 directions
-                     int * nxyz,
-                     double * x, double * y, double * z, // Catersian coords
-                     double * alp, // lapse
-                     double * psi, // conf factor, and drvts:
-                     double * psix, double * psiy, double * psiz,
-                     double * psixx, double * psixy, double * psixz,
-                     double * psiyy, double * psiyz, double * psizz,
-                     // metric
-                     double * gxx, double * gxy, double * gxz,
-                     double * gyy, double * gyz, double * gzz,
-                     // curv
-                     double * kxx, double * kxy, double * kxz,
-                     double * kyy, double * kyz, double * kzz
-                     );
+  // set default parameters
+  void TwoPunctures_params_set_default();
+  // set based on input file
+  void TwoPunctures_params_set_inputfile(char *inputfile);
+
+  void TwoPunctures_params_set(bool verbose);
+
+  ini_data TwoPunctures_make_initial_data();
+
+  void TwoPunctures_Cartesian_interpolation
+  (ini_data data,     // struct containing the previously calculated solution
+   int *imin,         // min, max idxs of Cartesian Grid in the three directions
+   int *imax,         // in the three dirs
+   int *nxyz,
+   double *x,         // Cartesian coordinates
+   double *y,
+   double *z,
+   double *alp,       // lapse
+   double *psi,       // conformal factor and derivatives
+   double *psix,
+   double *psiy,
+   double *psiz,
+   double *psixx,
+   double *psixy,
+   double *psixz,
+   double *psiyy,
+   double *psiyz,
+   double *psizz,
+   double *gxx,       // metric components
+   double *gxy,
+   double *gxz,
+   double *gyy,
+   double *gyz,
+   double *gzz,
+   double *kxx,       // extrinsic curvature components
+   double *kxy,
+   double *kxz,
+   double *kyy,
+   double *kyz,
+   double *kzz);
+
+  /*
+    void TwoPunctures (int * imin, int * imax, // min/max indexes of Cartesian grid in the 3 directions
+    int * nxyz,
+    double * x, double * y, double * z, // Catersian coords
+    double * alp, // lapse
+    double * psi, // conf factor, and drvts:
+    double * psix, double * psiy, double * psiz,
+    double * psixx, double * psixy, double * psixz,
+    double * psiyy, double * psiyz, double * psizz,
+    // metric
+    double * gxx, double * gxy, double * gxz,
+    double * gyy, double * gyz, double * gzz,
+    // curv
+    double * kxx, double * kxy, double * kxz,
+    double * kyy, double * kyz, double * kzz
+    );
+  */
+  // for cleanup purposes
+  void TwoPunctures_finalise();
 
 #ifdef __cplusplus
 }

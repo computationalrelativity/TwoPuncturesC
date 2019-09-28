@@ -1,6 +1,7 @@
 /* TwoPunctures.c */
 
 #include "TwoPunctures.h"
+#include "stdbool.h"
 
 /* Swap two variables */
 static inline
@@ -11,9 +12,28 @@ void swap (double * restrict const a, double * restrict const b)
 #undef SWAP
 #define SWAP(a,b) (swap(&(a),&(b)))
 
+
+
+/* fairly dirty way to manage memory internally */
+static bool allocated_params = false;
+
+static void _alloc_params_mem_if_req(){
+  if(!allocated_params){
+    params_alloc();
+    allocated_params = true;
+  }
+}
+
+static void _dealloc_params_mem_if_req(){
+  if(allocated_params){
+    params_free();
+    allocated_params = false;
+  }
+}
+
+
 /* */
-static
-void set_initial_guess(derivs v)
+static void set_initial_guess(derivs v)
 {
   int nvar = 1,
     n1 = params_geti("npoints_A"),
@@ -192,82 +212,9 @@ void set_initial_guess(derivs v)
   free_derivs (&U, nvar);
 }
 
-/* Solve & Interp */
-void TwoPunctures (
-		   char * inputfile, // file to set input parameters
-		   int * imin, int * imax, // min/max indexes of Cartesian grid in the 3 directions
-		   int * nxyz,
-		   double * x, double * y, double * z, // Catersian coords
-		   double * alp, // lapse
-		   double * psi, // conf factor, and drvts:
-		   double * psix, double * psiy, double * psiz,
-		   double * psixx, double * psixy, double * psixz,
-		   double * psiyy, double * psiyz, double * psizz,
-		   // metric
-		   double * gxx, double * gxy, double * gxz,
-		   double * gyy, double * gyz, double * gzz,
-		   // curv
-		   double * kxx, double * kxy, double * kxz,
-		   double * kyy, double * kyz, double * kzz
-		   )
-{
 
-  // alloc mem for parameters
-  params_alloc();
-
-  /* Add parameters here */
-
-  params_add("par_b",REAL,1.0); // x coordinate of the m+ puncture
-  params_add("par_m_plus",REAL,1.0); // mass of the m+ puncture
-  params_add("par_m_minus",REAL,1.0); // mass of the m- puncture
-  params_add("target_M_plus",REAL,0.5); // target ADM mass for m+
-  params_add("target_M_minus",REAL,0.5); // target ADM mass for m-
-  params_add("par_P_plus1",REAL,0.); // momentum of the m+ puncture
-  params_add("par_P_plus2",REAL,0.);
-  params_add("par_P_plus3",REAL,0.);
-  params_add("par_P_minus1",REAL,0.); // momentum of the m- puncture
-  params_add("par_P_minus2",REAL,0.);
-  params_add("par_P_minus3",REAL,0.);
-  params_add("par_S_plus1",REAL,0.); // spin of the m+ puncture
-  params_add("par_S_plus2",REAL,0.);
-  params_add("par_S_plus3",REAL,0.);
-  params_add("par_S_minus1",REAL,0.); // spin of the m- puncture
-  params_add("par_S_minus2",REAL,0.);
-  params_add("par_S_minus3",REAL,0.);
-  params_add("center_offset1",REAL,0.); // offset b=0 to position (x,y,z)
-  params_add("center_offset2",REAL,0.);
-  params_add("center_offset3",REAL,0.);
-  params_add("give_bare_mass",INTEGER,1); // User provides bare masses rather than target ADM masses
-  params_add("npoints_A",INTEGER,30); // Number of coefficients in the compactified radial direction
-  params_add("npoints_B",INTEGER,30); // Number of coefficients in the angular direction
-  params_add("npoints_phi",INTEGER,16); // Number of coefficients in the phi direction
-  params_add("Newton_tol",REAL,1e-10); // Tolerance for Newton solver
-  params_add("Newton_maxit",INTEGER,5); // Maximum number of Newton iterations
-  params_add("TP_epsilon",REAL,0.);  // A small number to smooth out singularities at the puncture locations
-  params_add("TP_Tiny",REAL,0.);  // Tiny number to avoid nans near or at the pucture locations
-  params_add("TP_Extend_Radius",REAL,0.); // Radius of an extended spacetime instead of the puncture
-  params_add("adm_tol",REAL,1e-10); // Tolerance of ADM masses when give_bare_mass=no
-  params_add("do_residuum_debug_output",INTEGER,0); // Output debug information about the residuum
-  params_add("do_initial_debug_output",INTEGER,0); // Output debug information about initial guess
-  params_add("use_external_initial_guess",INTEGER,0); // Set initial guess by external function?
-  params_add("solve_momentum_constraint",INTEGER,0); // Solve for momentum constraint?
-
-  // Interpolation
-
-  params_add("grid_setup_method",INTEGER,taylor_expansion); // How to fill the 3D grid from the spectral grid ?
-  params_add("initial_lapse",INTEGER,psin); // How to set the lapse ?
-  params_add("initial_lapse_psi_exponent",REAL,-2.0); // Exponent n for psi^-n initial lapse profile (<0)
-  params_add("conformal_state",INTEGER,1); // Ways to set the conformal factor
-  params_add("swap_xz",INTEGER,0); // Swap x and z coordinates when interpolating, // so that the black holes are separated in the z direction
-  params_add("multiply_old_lapse",INTEGER,0); // Multiply the old lapse with the new one
-
-  params_add("verbose",INTEGER,1);
-
-  /* Set parameters from input file */
-  if (inputfile!=NULL) {
-    params_read(inputfile);
-  }
-
+ini_data TwoPunctures_make_initial_data(){
+  // Prepare initial data based on internal settings
   const int verbose = params_geti("verbose");
 
   double par_P_plus[3], par_P_minus[3];
@@ -302,9 +249,6 @@ void TwoPunctures (
   double admMass;
 
   // ---------------------------------------------------
-
-  enum GRID_SETUP_METHOD { GSM_Taylor_expansion, GSM_evaluation };
-  enum GRID_SETUP_METHOD gsm;
 
   int const nvar = 1,
     n1 = params_geti("npoints_A"),
@@ -444,11 +388,99 @@ void TwoPunctures (
 
   }
 
-#if (CARTESIAN_INTERP)
+
+  //free_dvector (F, 0, ntotal - 1);
+  // free_derivs (&u, ntotal);
+  //free_derivs (&v, ntotal);
+  //free_derivs (&cf_v, ntotal);
+
+  ini_data ret;  // ret_ptr = &ret;
+  ret.F = F;     // (&ret)->F = F;
+  ret.u = &u;
+  ret.v = &v;
+  ret.cf_v = &cf_v;
+  ret.ntotal = ntotal;
+  return ret;
+}
+
+void TwoPunctures_Cartesian_interpolation
+(ini_data data,     // struct containing the previously calculated solution
+ int *imin,         // min, max idxs of Cartesian Grid in the three directions
+ int *imax,         // in the three dirs
+ int *nxyz,
+ double *x,         // Cartesian coordinates
+ double *y,
+ double *z,
+ double *alp,       // lapse
+ double *psi,       // conformal factor and derivatives
+ double *psix,
+ double *psiy,
+ double *psiz,
+ double *psixx,
+ double *psixy,
+ double *psixz,
+ double *psiyy,
+ double *psiyz,
+ double *psizz,
+ double *gxx,       // metric components
+ double *gxy,
+ double *gxz,
+ double *gyy,
+ double *gyz,
+ double *gzz,
+ double *kxx,       // extrinsic curvature components
+ double *kxy,
+ double *kxz,
+ double *kyy,
+ double *kyz,
+ double *kzz){
+  // TODO:
+  // add safety check for null ini_data to make it
+
+  // unpack initial data structure
+  double *F = data.F;
+  // derivs *u = data.u;
+  derivs v = *(data.v);
+  derivs cf_v = *(data.cf_v);
+  int ntotal = data.ntotal;
+
+  /* // inspect struct */
+  /* printf("ntotal: %d\n", ntotal); */
+
+  /* int ix = 0; */
+  /* int ix_max = 10; */
+
+  /* for(ix=0; ix < ix_max; ix++){ */
+  /*   printf("(F[%d], v.d0[%d], cf_v.d0[%d])=(%lf,%lf,%lf)\n", */
+  /*          ix, ix, ix, */
+  /*          F[ix], v.d0[ix], cf_v.d0[ix]); */
+  /* } */
 
   /* ************************************* */
   /* INTERPOLATE ON CARTESIAN GRID - BEGIN */
   /* ************************************* */
+
+  // ---- prepare required parameters
+  double par_b = params_getd("par_b");
+  double mp = params_getd("par_m_plus"),
+    mm = params_getd("par_m_minus"); // Bare masses of the punctures
+
+  double center_offset[3];
+  center_offset[0] = params_getd("center_offset1");
+  center_offset[1] = params_getd("center_offset2");
+  center_offset[2] = params_getd("center_offset3");
+
+  int const nvar = 1,
+    n1 = params_geti("npoints_A"),
+    n2 = params_geti("npoints_B"),
+    n3 = params_geti("npoints_phi");
+
+
+  const int verbose = params_geti("verbose");
+
+  enum GRID_SETUP_METHOD { GSM_Taylor_expansion, GSM_evaluation };
+  enum GRID_SETUP_METHOD gsm;
+
 
   switch (params_geti("grid_setup_method")) {
   case taylor_expansion:
@@ -460,6 +492,8 @@ void TwoPunctures (
   default:
     ERROR("Something wrong setting parameter: grid_setup_method ");
   }
+
+  // ----
 
   int antisymmetric_lapse=0,
     averaged_lapse=0,
@@ -480,7 +514,8 @@ void TwoPunctures (
     break;
   }
 
-  const double initial_lapse_psi_exponent = params_getd("initial_lapse_psi_exponent");
+  const double initial_lapse_psi_exponent = params_getd
+    ("initial_lapse_psi_exponent");
 
   if (verbose) {
     if (pmn_lapse)
@@ -493,17 +528,17 @@ void TwoPunctures (
   }
 
   /*
-  if (CCTK_EQUALS(metric_type, "static conformal")) {
+    if (CCTK_EQUALS(metric_type, "static conformal")) {
     if (CCTK_EQUALS(conformal_storage, "factor")) {
-      *conformal_state = 1;
+    *conformal_state = 1;
     } else if (CCTK_EQUALS(conformal_storage, "factor+derivs")) {
-      *conformal_state = 2;
+    *conformal_state = 2;
     } else if (CCTK_EQUALS(conformal_storage, "factor+derivs+2nd derivs")) {
-      *conformal_state = 3;
+    *conformal_state = 3;
     }
-  } else {
+    } else {
     conformal_state = 0;
-  }
+    }
   */
   // conformal_state  = 0, 1,2,3 -> NONSTATIC, FACTOR0,FACTOR1,FACTOR2
   //SB: check what to use here !!!
@@ -533,9 +568,9 @@ void TwoPunctures (
 	const int ind = i + xxx * j + xxxyyy* k;
 
         double xx, yy, zz;
-        xx = x[ind] - center_offset[0];
-        yy = y[ind] - center_offset[1];
-        zz = z[ind] - center_offset[2];
+        xx = x[i] - center_offset[0];
+        yy = y[j] - center_offset[1];
+        zz = z[k] - center_offset[2];
 
         /* We implement swapping the x and z coordinates as follows.
            The bulk of the code that performs the actual calculations
@@ -560,7 +595,8 @@ void TwoPunctures (
             (0, nvar, n1, n2, n3, v, xx, yy, zz);
           break;
         case GSM_evaluation:
-          U = PunctIntPolAtArbitPositionFast(0, nvar, n1, n2, n3, cf_v, xx, yy, zz);
+          U = PunctIntPolAtArbitPositionFast(0, nvar, n1, n2, n3, cf_v,
+                                             xx, yy, zz);
           break;
         default:
           assert (0);
@@ -576,9 +612,9 @@ void TwoPunctures (
           + 0.5 * mp / r_plus
           + 0.5 * mm / r_minus + U;
 
-#define EXTEND(M,r)					       \
-	( M * (3./8 * pow(r, 4) / pow(TP_Extend_Radius, 5) -   \
-	       5./4 * pow(r, 2) / pow(TP_Extend_Radius, 3) +   \
+#define EXTEND(M,r)                                             \
+	( M * (3./8 * pow(r, 4) / pow(TP_Extend_Radius, 5) -    \
+	       5./4 * pow(r, 2) / pow(TP_Extend_Radius, 3) +    \
 	       15./8 / TP_Extend_Radius))
         if (r_plus < TP_Extend_Radius) {
           psi1 = 1
@@ -616,7 +652,7 @@ void TwoPunctures (
           rp = sqrt (xp*xp + yp*yp + zp*zp);
           rp = pow (pow (rp, 4) + pow (TP_epsilon, 4), 0.25);
           if (rp < TP_Tiny)
-              rp = TP_Tiny;
+            rp = TP_Tiny;
           ir = 1.0/rp;
 
           if (rp < TP_Extend_Radius) {
@@ -647,7 +683,7 @@ void TwoPunctures (
           rp = sqrt (xp*xp + yp*yp + zp*zp);
           rp = pow (pow (rp, 4) + pow (TP_epsilon, 4), 0.25);
           if (rp < TP_Tiny)
-              rp = TP_Tiny;
+            rp = TP_Tiny;
           ir = 1.0/rp;
 
           if (rp < TP_Extend_Radius) {
@@ -705,13 +741,15 @@ void TwoPunctures (
         gyz[ind] = 0;
         gzz[ind] = pow (psi1 / static_psi, 4);
 
-
         kxx[ind] = Aij[0][0] / pow(psi1, 2);
         kxy[ind] = Aij[0][1] / pow(psi1, 2);
         kxz[ind] = Aij[0][2] / pow(psi1, 2);
         kyy[ind] = Aij[1][1] / pow(psi1, 2);
         kyz[ind] = Aij[1][2] / pow(psi1, 2);
         kzz[ind] = Aij[2][2] / pow(psi1, 2);
+
+        // printf("(ind, gxx)=(%d, %4.8f)\n", ind, gxx[ind]);
+        // printf("\n(ind, psi)=(%d, %4.8f)\n", ind, psi[ind]);
 
         if (antisymmetric_lapse || averaged_lapse) {
           alp[ind] =
@@ -733,6 +771,8 @@ void TwoPunctures (
             alp[ind] = 0.5 * (1.0 + alp[ind]);
           }
         }
+
+
         if (multiply_old_lapse)
           alp[ind] *= old_alp;
 
@@ -759,14 +799,92 @@ void TwoPunctures (
   /* INTERPOLATE ON CARTESIAN GRID - END   */
   /* ************************************* */
 
-#endif
+};
 
-  free_dvector (F, 0, ntotal - 1);
-  free_derivs (&u, ntotal);
-  free_derivs (&v, ntotal);
-  free_derivs (&cf_v, ntotal);
+///////////////////////////////////////////////////////////////////
+// Control interaction with internal parameters in the following //
+///////////////////////////////////////////////////////////////////
 
-  // free mem for parameters
-  params_free();
+void TwoPunctures_params_set_default(){
+  /*
+    Set default parameters.
+  */
+  _alloc_params_mem_if_req();
+
+  /* Add parameters here */
+  params_add("par_b",REAL,1.0); // x coordinate of the m+ puncture; 1.0
+  params_add("par_m_plus",REAL,1.0); // mass of the m+ puncture; 1.0
+  params_add("par_m_minus",REAL,0.0); // mass of the m- puncture; 1.0
+  params_add("target_M_plus",REAL,0.0); // target ADM mass for m+; 0.5
+  params_add("target_M_minus",REAL,0.0); // target ADM mass for m-; 0.5
+  params_add("par_P_plus1",REAL,0.); // momentum of the m+ puncture
+  params_add("par_P_plus2",REAL,0.);
+  params_add("par_P_plus3",REAL,0.);
+  params_add("par_P_minus1",REAL,0.); // momentum of the m- puncture
+  params_add("par_P_minus2",REAL,0.);
+  params_add("par_P_minus3",REAL,0.);
+  params_add("par_S_plus1",REAL,0.); // spin of the m+ puncture
+  params_add("par_S_plus2",REAL,0.);
+  params_add("par_S_plus3",REAL,0.);
+  params_add("par_S_minus1",REAL,0.); // spin of the m- puncture
+  params_add("par_S_minus2",REAL,0.);
+  params_add("par_S_minus3",REAL,0.);
+  params_add("center_offset1",REAL,-1.0); // offset b=0 to position (x,y,z) ; 0
+  params_add("center_offset2",REAL,0.0);  // ; 0
+  params_add("center_offset3",REAL,0.0); // ; 0
+  params_add("give_bare_mass",INTEGER,1); // User provides bare masses rather than target ADM masses ; 1
+  params_add("npoints_A",INTEGER,30); // Number of coefficients in the compactified radial direction
+  params_add("npoints_B",INTEGER,30); // Number of coefficients in the angular direction
+  params_add("npoints_phi",INTEGER,16); // Number of coefficients in the phi direction
+  params_add("Newton_tol",REAL,1e-10); // Tolerance for Newton solver
+  params_add("Newton_maxit",INTEGER,5); // Maximum number of Newton iterations
+  params_add("TP_epsilon",REAL,0.);  // A small number to smooth out singularities at the puncture locations
+  params_add("TP_Tiny",REAL,0.);  // Tiny number to avoid nans near or at the pucture locations
+  params_add("TP_Extend_Radius",REAL,0); // Radius of an extended spacetime instead of the puncture ; 0
+  params_add("adm_tol",REAL,1e-10); // Tolerance of ADM masses when give_bare_mass=no
+  params_add("do_residuum_debug_output",INTEGER,0); // Output debug information about the residuum
+  params_add("do_initial_debug_output",INTEGER,0); // Output debug information about initial guess
+  params_add("use_external_initial_guess",INTEGER,0); // Set initial guess by external function?
+  params_add("solve_momentum_constraint",INTEGER,0); // Solve for momentum constraint?
+
+  // Interpolation
+  params_add("grid_setup_method",INTEGER,taylor_expansion); // How to fill the 3D grid from the spectral grid ?
+  params_add("initial_lapse",INTEGER,psin); // How to set the lapse ?
+  params_add("initial_lapse_psi_exponent",REAL,-2.0); // Exponent n for psi^-n initial lapse profile (<0)
+  params_add("conformal_state",INTEGER,1); // Ways to set the conformal factor
+  params_add("swap_xz",INTEGER,0); // Swap x and z coordinates when interpolating, // so that the black holes are separated in the z direction; 0
+  params_add("multiply_old_lapse",INTEGER,0); // Multiply the old lapse with the new one
+
+  params_add("verbose",INTEGER,0);
+}
+
+void TwoPunctures_params_set(bool verbose){
+  /*
+    Set parameters according to input.
+  */
+
+  params_set("verbose", verbose);
 
 }
+
+void TwoPunctures_params_set_inputfile(char* inputfile){
+  /*
+    Set parameters from input file
+  */
+
+  // allocate and seed with defaults such that we have a guaranteee of params
+  _alloc_params_mem_if_req();
+  TwoPunctures_params_set_default();
+
+  if(inputfile!=NULL){
+    params_read(inputfile);
+  }
+}
+
+void TwoPunctures_finalise(){
+  /*
+    Clean up all internally allocated objects.
+  */
+  _dealloc_params_mem_if_req();
+}
+
