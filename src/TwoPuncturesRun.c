@@ -17,45 +17,12 @@ int main(int argc, char* argv[]) {
 
   printf("Input file: %s \n", inputfile);
 
-  // example how to call it, does not work here
-  /* TwoPunctures (imin,imax, // min/max indexes of Cartesian grid in the 3 direc. */
-  /*               nxyz, */
-  /*               x,   y,   z, // Catersian coords */
-  /*               alp, // lapse */
-  /*               psi, // conf factor, and drvts: */
-  /*               psix,   psiy,   psiz, */
-  /*               psixx,   psixy,   psixz, */
-  /*               psiyy,   psiyz,   psizz, */
-  /*               // metric */
-  /*               gxx,   gxy,   gxz, */
-  /*               gyy,   gyz,   gzz, */
-  /*               // curv */
-  /*               kxx,   kxy,   kxz, */
-  /*               kyy,   kyz,   kzz); */
-
-  // interpolation is turned off, see TwoPunctures.h
-  /* TwoPunctures (NULL, NULL, */
-  /*               NULL, */
-  /*               NULL, NULL, NULL, */
-  /*               // lapse */
-  /*               NULL, */
-  /*               // conf factor */
-  /*               NULL, */
-  /*               NULL, NULL, NULL, */
-  /*               NULL, NULL, NULL, */
-  /*               NULL, NULL, NULL, */
-  /*               // metric */
-  /*               NULL, NULL, NULL, */
-  /*               NULL, NULL, NULL, */
-  /*               // curv */
-  /*               NULL, NULL, NULL, */
-  /*               NULL, NULL, NULL */
-  /*               ); */
-
   /*
     Test parameter injection.
   */
-  TwoPunctures_params_set(1.0);
+  TwoPunctures_params_set_Boolean("verbose", true);
+  TwoPunctures_params_set_Real("par_b", 1.0);
+  TwoPunctures_params_set_Real("par_m_plus", 2.0);
 
   /*
     Sans parameter injection the following is equivalent to prior all NULL call
@@ -68,7 +35,7 @@ int main(int argc, char* argv[]) {
     printf("data.F[%d]: %lf\n", ix, data.F[ix]);
   }
 
-  // interpolate a couple of nodes for inspection
+  // example of interpolating gxx and psi to a few nodes
   int imin[3] = {0, 0, 0};
   int imax[3] = {2, 2, 2};
   int n[3] = {2, 2, 2};
@@ -83,6 +50,7 @@ int main(int argc, char* argv[]) {
   double y[2] = {-15.0, -5.0};
   double z[2] = {-15.0, -5.0};
 
+
   TwoPunctures_Cartesian_interpolation
     (data,     // struct containing the previously calculated solution
      imin,         // min, max idxs of Cartesian Grid in the three directions
@@ -93,27 +61,27 @@ int main(int argc, char* argv[]) {
      z,
      tmp,       // lapse
      psi,       // conformal factor and derivatives
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
+     NULL,      // psix
+     NULL,      // psiy
+     NULL,      // psiz
+     NULL,      // psixx
+     NULL,      // psixy
+     NULL,      // psixz
+     NULL,      // psiyy
+     NULL,      // psiyz
+     NULL,      // psizz
      gxx,       // metric components
-     tmp,
-     tmp,
-     tmp,
-     tmp,
-     tmp,
-     tmp,       // extrinsic curvature components
-     tmp,
-     tmp,
-     tmp,
-     tmp,
-     tmp);
+     tmp,       // gxy
+     tmp,       // gxz
+     tmp,       // gyy
+     tmp,       // gyz
+     tmp,       // gzz
+     tmp,       // kxx extrinsic curvature components
+     tmp,       // kxy
+     tmp,       // kxz
+     tmp,       // kyy
+     tmp,       // kyz
+     tmp);      // kzz
 
   int flat_ix = 0;
   for(flat_ix=0; flat_ix<sz; flat_ix++){
@@ -123,7 +91,7 @@ int main(int argc, char* argv[]) {
   }
 
   // make sure to take care of any internal memory that must be freed!
-  TwoPunctures_finalise();
+  TwoPunctures_finalise(data);
 
   return 0;
 }

@@ -815,8 +815,8 @@ void TwoPunctures_params_set_default(){
   params_add("par_b",REAL,1.0); // x coordinate of the m+ puncture; 1.0
   params_add("par_m_plus",REAL,1.0); // mass of the m+ puncture; 1.0
   params_add("par_m_minus",REAL,0.0); // mass of the m- puncture; 1.0
-  params_add("target_M_plus",REAL,0.0); // target ADM mass for m+; 0.5
-  params_add("target_M_minus",REAL,0.0); // target ADM mass for m-; 0.5
+  params_add("target_M_plus",REAL,0.5); // target ADM mass for m+; 0.5
+  params_add("target_M_minus",REAL,0.5); // target ADM mass for m-; 0.5
   params_add("par_P_plus1",REAL,0.); // momentum of the m+ puncture
   params_add("par_P_plus2",REAL,0.);
   params_add("par_P_plus3",REAL,0.);
@@ -829,7 +829,7 @@ void TwoPunctures_params_set_default(){
   params_add("par_S_minus1",REAL,0.); // spin of the m- puncture
   params_add("par_S_minus2",REAL,0.);
   params_add("par_S_minus3",REAL,0.);
-  params_add("center_offset1",REAL,-1.0); // offset b=0 to position (x,y,z) ; 0
+  params_add("center_offset1",REAL,0.0); // offset b=0 to position (x,y,z) ; 0
   params_add("center_offset2",REAL,0.0);  // ; 0
   params_add("center_offset3",REAL,0.0); // ; 0
   params_add("give_bare_mass",INTEGER,1); // User provides bare masses rather than target ADM masses ; 1
@@ -858,14 +858,27 @@ void TwoPunctures_params_set_default(){
   params_add("verbose",INTEGER,0);
 }
 
-void TwoPunctures_params_set(bool verbose){
+void TwoPunctures_params_set_Real(char *key, double value){
   /*
     Set parameters according to input.
   */
-
-  params_set("verbose", verbose);
-
+  params_setadd(key, REAL, value, 0);       // replace, don't append new
 }
+
+void TwoPunctures_params_set_int(char *key, int value){
+  /*
+    Set parameters according to input.
+  */
+  params_setadd(key, INTEGER, value, 0);   // replace, don't append new
+}
+
+void TwoPunctures_params_set_Boolean(char *key, bool value){
+  /*
+    Set parameters according to input.
+  */
+  params_setadd(key, INTEGER, value, 0);   // replace, don't append new
+}
+
 
 void TwoPunctures_params_set_inputfile(char* inputfile){
   /*
@@ -881,10 +894,17 @@ void TwoPunctures_params_set_inputfile(char* inputfile){
   }
 }
 
-void TwoPunctures_finalise(){
+void TwoPunctures_finalise(ini_data data){
   /*
     Clean up all internally allocated objects.
   */
   _dealloc_params_mem_if_req();
+
+  int ntotal = data.ntotal;
+  //free_dvector (data.F, 0, ntotal - 1);
+  //free_derivs ((data.u), ntotal);
+  //free_derivs ((data.v), ntotal);
+  //free_derivs ((data.cf_v), ntotal);
+
 }
 

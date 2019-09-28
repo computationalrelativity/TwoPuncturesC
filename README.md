@@ -25,8 +25,9 @@ Main modifs from `Cactus`/`EinsteinToolkit`
  
 TODO
 
+ * Correct internal memory leaks (Valgrind)
  * Verify stand alone version against `Cactus`/`EinsteinToolkit`
- * Create lib 
  * Verify Cartesian grid interpolator against `Cactus`/`EinsteinToolkit` and/or the stand alone code
 
-SB 01/2019
+SB 01/2019,
+BD 09/2019

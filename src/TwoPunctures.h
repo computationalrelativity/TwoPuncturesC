@@ -143,31 +143,33 @@ void params_write(char * fname);
 double params_getd(char * key);
 int params_geti(char * key);
 void params_set(char * key, double val);
+void params_setadd(char * key, int type, double val, int addpar);
 
 void params_add(char * key, int type, double val);
 
 /* TwoPunctures.c */
 static void set_initial_guess(derivs v);
 
-typedef struct {
-  double *F;
-  derivs *u;
-  derivs *v;
-  derivs *cf_v;
-  int ntotal;
-} ini_data;
-
-
 // Expose for C++ intefacing
 #ifdef __cplusplus
 extern "C" {
 #endif
+  typedef struct {
+    double *F;
+    derivs *u;
+    derivs *v;
+    derivs *cf_v;
+    int ntotal;
+  } ini_data;
+
+
   // set default parameters
   void TwoPunctures_params_set_default();
   // set based on input file
   void TwoPunctures_params_set_inputfile(char *inputfile);
-
-  void TwoPunctures_params_set(bool verbose);
+  void TwoPunctures_params_set_Real(char *key, double value);
+  void TwoPunctures_params_set_int(char *key, int value);
+  void TwoPunctures_params_set_Boolean(char *key, bool value);
 
   ini_data TwoPunctures_make_initial_data();
 
@@ -221,7 +223,7 @@ extern "C" {
     );
   */
   // for cleanup purposes
-  void TwoPunctures_finalise();
+  void TwoPunctures_finalise(ini_data data);
 
 #ifdef __cplusplus
 }
