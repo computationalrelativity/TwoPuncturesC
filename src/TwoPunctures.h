@@ -136,6 +136,10 @@ double norm1 (double *v, int n);
 double norm2 (double *v, int n);
 double scalarproduct (double *v, double *w, int n);
 
+void write_derivs(derivs *u, const int n1,const int n2, const int n3,
+		  int include_derivatives_order, 
+		  const char *fname);
+
 void params_alloc();
 void params_free();
 void params_read(char *fname);

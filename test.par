@@ -2,6 +2,6 @@
 # The file parser is very stupid:
 # - it will ignore lines starting with '#' , and 
 # - it will look for strings '<key>=<value>'
-# be sure not to format properly the parfile and do not leave spaces ...
+# be sure to format properly the parfile and do not leave spaces ...
 verbose=0
 # be also sure not to leave blank lines after this.

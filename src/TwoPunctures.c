@@ -388,6 +388,15 @@ ini_data TwoPunctures_make_initial_data(){
 
   }
 
+#if (0)
+  /* Output the solution */
+  //FIXME: which field is correct? u or v ?
+  //FIXME: why u,v,... are all zero?
+  write_derivs( &u, n1,n2,n3, 
+		0, // =0,1,2 derivatives to output
+		"u.data");
+  //FIXME: do we need u or psi ?
+#endif
 
   //free_dvector (F, 0, ntotal - 1);
   // free_derivs (&u, ntotal);

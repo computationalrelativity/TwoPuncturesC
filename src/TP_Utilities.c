@@ -656,3 +656,37 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+/* -------------------------------------------------------------------------*/
+
+/* output routine for derivs */
+void write_derivs(derivs *u, const int n1, const int n2, const int n3,
+		  int include_derivatives_order, 
+		  const char *fname)
+{
+  FILE *fp;
+  fp = fopen(fname, "w");
+  assert(fp);
+  const int size = n1*n2*n3;
+  fprintf(fp, "# %d %d %d\n",n1,n2,n3);
+  if (include_derivatives_order==0)
+    for (int i=0; i<size; i++)
+      fprintf(fp, "%.16e\n",u->d0[i]);
+  else if (include_derivatives_order==1)
+    for (int i=0; i<size; i++)
+      fprintf(fp, "%.16e %.16e %.16e %.16e\n",
+	      u->d0[i],
+	      u->d1[i],u->d2[i],u->d3[i]);
+  else if (include_derivatives_order==2)
+    for (int i=0; i<size; i++)
+      fprintf(fp, "%.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
+	      u->d0[i],
+	      u->d1[i],u->d2[i],u->d3[i], 
+	      u->d11[i],u->d12[i],u->d13[i], u->d22[i],u->d23[i],u->d33[i]);
+  else  
+    ERROR ("include_derivatives_order = 0,1,2\n");
+  fclose(fp);
+}
+
+/* output routine for ini_data */
+//TODO
