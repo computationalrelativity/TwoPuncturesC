@@ -1001,3 +1001,188 @@ void SpecCoef(int n1, int n2, int n3, int ivar, double *v, double *cf)
   free_d3tensor(values4,0,n1,0,n2,0,n3);
   
 }
+
+/* Initial guess */
+void set_initial_guess(derivs *v)
+{
+  int nvar = 1,
+    n1 = params_geti("npoints_A"),
+    n2 = params_geti("npoints_B"),
+    n3 = params_geti("npoints_phi");
+
+  double par_b = params_getd("par_b");
+
+  double *s_x, *s_y, *s_z;
+  double al, A, Am1, be, B, phi, R, r, X;
+  int ivar, i, j, k, i3D, indx;
+  derivs *U;
+
+  FILE *debug_file;
+  
+  if (params_geti("solve_momentum_constraint"))
+    nvar = 4;
+  
+  s_x = calloc(n1*n2*n3, sizeof(double));
+  s_y = calloc(n1*n2*n3, sizeof(double));
+  s_z = calloc(n1*n2*n3, sizeof(double));
+
+  allocate_derivs (&U, nvar);
+  
+  for (ivar = 0; ivar < nvar; ivar++)
+    for (i = 0; i < n1; i++)
+      for (j = 0; j < n2; j++)
+        for (k = 0; k < n3; k++) {
+	  
+          i3D = Index(ivar,i,j,k,1,n1,n2,n3);
+	  
+          al = Pih * (2 * i + 1) / n1;
+          A = -cos (al);
+          be = Pih * (2 * j + 1) / n2;
+          B = -cos (be);
+          phi = 2. * Pi * k / n3;
+	  
+          /* Calculation of (X,R)*/
+          AB_To_XR (nvar, A, B, &X, &R, U);
+	  
+	  /* Calculation of (x,r)*/
+          C_To_c (nvar, X, R, &(s_x[i3D]), &r, par_b, U);
+	  
+	  /* Calculation of (y,z)*/
+          rx3_To_xyz (nvar, s_x[i3D], r, phi, &(s_y[i3D]), &(s_z[i3D]), U);
+	  
+	}
+  
+  //SB See: TwoPunctures/interface.ccl
+  //SB /* Set_Initial_Guess_for_u(n1*n2*n3, v->d0, s_x, s_y, s_z); */ 
+  //SB: In the BAM code this guess looks like  v = 0 , dv = 0
+  
+  for (ivar = 0; ivar < nvar; ivar++)
+    for (i = 0; i < n1; i++)
+      for (j = 0; j < n2; j++)
+        for (k = 0; k < n3; k++) {
+	  indx = Index(ivar,i,j,k,1,n1,n2,n3);
+          v->d0[indx]/=(-cos(Pih * (2 * i + 1) / n1)-1.0);
+	}
+  
+  Derivatives_AB3 (nvar, n1, n2, n3, v);
+  
+  if (params_geti("do_initial_debug_output")) {
+    
+    debug_file=fopen("initial.dat", "w");
+    assert(debug_file);
+    for (ivar = 0; ivar < nvar; ivar++)
+      for (i = 0; i < n1; i++)
+	for (j = 0; j < n2; j++) {
+	  
+	  al = Pih * (2 * i + 1) / n1;
+	  A = -cos (al);
+	  Am1 = A -1.0;
+	  be = Pih * (2 * j + 1) / n2;
+          B = -cos (be);
+          phi = 0.0;
+          indx = Index(ivar,i,j,0,1,n1,n2,n3);
+          U->d0[0] = Am1 * v->d0[indx];        /* U*/
+          U->d1[0] = v->d0[indx] + Am1 * v->d1[indx];        /* U_A*/
+          U->d2[0] = Am1 * v->d2[indx];        /* U_B*/
+          U->d3[0] = Am1 * v->d3[indx];        /* U_3*/
+          U->d11[0] = 2 * v->d1[indx] + Am1 * v->d11[indx];        /* U_AA*/
+          U->d12[0] = v->d2[indx] + Am1 * v->d12[indx];        /* U_AB*/
+          U->d13[0] = v->d3[indx] + Am1 * v->d13[indx];        /* U_AB*/
+          U->d22[0] = Am1 * v->d22[indx];        /* U_BB*/
+          U->d23[0] = Am1 * v->d23[indx];        /* U_B3*/
+          U->d33[0] = Am1 * v->d33[indx];        /* U_33*/
+
+	  /* Calculation of (X,R)*/
+	  AB_To_XR (nvar, A, B, &X, &R, U);
+
+	  /* Calculation of (x,r)*/
+	  C_To_c (nvar, X, R, &(s_x[indx]), &r, par_b, U);
+
+	  /* Calculation of (y,z)*/
+	  rx3_To_xyz (nvar, s_x[i3D], r, phi, &(s_y[indx]), &(s_z[indx]), U);
+	  fprintf(debug_file,
+		  "%.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g "
+		  "%.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g\n",
+		  (double)s_x[indx], (double)s_y[indx],
+		  (double)A,(double)B,
+		  (double)U->d0[0],
+		  (double)(-cos(Pih * (2 * i + 1) / n1)-1.0),
+		  (double)U->d1[0],
+		  (double)U->d2[0],
+		  (double)U->d3[0],
+		  (double)U->d11[0],
+		  (double)U->d22[0],
+		  (double)U->d33[0],
+		  (double)v->d0[indx],
+		  (double)v->d1[indx],
+		  (double)v->d2[indx],
+		  (double)v->d3[indx],
+		  (double)v->d11[indx],
+		  (double)v->d22[indx],
+		  (double)v->d33[indx]
+		  );
+        }
+    
+    fprintf(debug_file, "\n\n");
+    for (i=n2-10; i<n2; i++) {
+      double d;
+      indx = Index(0,0,i,0,1,n1,n2,n3);
+      d = PunctIntPolAtArbitPosition(0, nvar, n1, n2, n3, v,
+				     s_x[indx], 0.0, 0.0);
+      fprintf(debug_file, "%.16g %.16g\n",
+	      (double)s_x[indx], (double)d);
+    }
+    
+    fprintf(debug_file, "\n\n");
+
+    for (i=n2-10; i<n2-1; i++) {
+      double d;
+      int ip= Index(0,0,i+1,0,1,n1,n2,n3);
+      indx = Index(0,0,i,0,1,n1,n2,n3);
+      for (j=-10; j<10; j++) {
+        d = PunctIntPolAtArbitPosition(0, nvar, n1, n2, n3, v,
+				       s_x[indx]+(s_x[ip]-s_x[indx])*j/10,
+				       0.0, 0.0);
+        fprintf(debug_file, "%.16g %.16g\n",
+                (double)(s_x[indx]+(s_x[ip]-s_x[indx])*j/10), (double)d);
+      }
+    }
+    
+    fprintf(debug_file, "\n\n");
+    for (i = 0; i < n1; i++)
+      for (j = 0; j < n2; j++) {
+        X = 2*(2.0*i/n1-1.0);
+        R = 2*(1.0*j/n2);
+        if (X*X+R*R > 1.0) {
+	  C_To_c (nvar, X, R, &(s_x[indx]), &r, par_b, U);
+	  rx3_To_xyz (nvar, s_x[i3D], r, phi, &(s_y[indx]), &(s_z[indx]), U);
+
+	  //SB: this is wrong:
+	  *U->d0  = s_x[indx]*s_x[indx];
+	  *U->d1  = 2*s_x[indx];
+	  *U->d2  = 0.0;
+	  *U->d3 = 0.0;
+	  *U->d11 = 2.0;
+	  *U->d22 = 0.0;
+	  *U->d33 = *U->d12 = *U->d23 = *U->d13 = 0.0;
+
+	  C_To_c (nvar, X, R, &(s_x[indx]), &r, par_b, U);
+	  fprintf(debug_file,
+		    "%.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g\n",
+                  (double)s_x[indx], (double)r, (double)X, (double)R, (double)U->d0[0],
+		  (double)U->d1[0],
+		  (double)U->d2[0],
+		    (double)U->d3[0],
+		  (double)U->d11[0],
+		  (double)U->d22[0],
+		  (double)U->d33[0]);
+        }
+      }
+    fclose(debug_file);
+  }
+  
+  free(s_z);
+  free(s_y);
+  free(s_x);
+  free_derivs (U);
+}

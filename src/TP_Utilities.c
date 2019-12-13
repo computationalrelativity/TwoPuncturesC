@@ -676,3 +676,7 @@ void write_confact_atxyz(double x, double y, double z, double u,
   fprintf(fp, "%.16e %.16e %.16e %.16e \n", x, y, z, psi);
   fclose(fp);
 }
+
+
+
+

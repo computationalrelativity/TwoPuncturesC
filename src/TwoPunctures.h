@@ -20,6 +20,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <time.h>
+#include <stdbool.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_complex.h>
 #include <gsl/gsl_complex_math.h>
@@ -148,30 +149,11 @@ double PunctEvalAtArbitPositionFast (double *v, int ivar, double A, double B, do
 double PunctIntPolAtArbitPositionFast (int ivar, int nvar, int n1,
 				       int n2, int n3, derivs * v,
 				       double x, double y, double z);
+void set_initial_guess(derivs *v);
 
 /* TP_Newton.c */
 void Newton (int nvar, int n1, int n2, int n3, derivs *v,
 	     double tol, int itmax);
-
-/* TwoPunctures.c */
-static void set_initial_guess(derivs *v);
-void TwoPunctures (
-		   char * inputfile, // file to set input parameters
-		   int * imin, int * imax, // min/max indexes of Cartesian grid in the 3 directions
-		   int * nxyz, 
-		   double * x, double * y, double * z, // Cartesian coords
-		   double * alp, // lapse
-		   double * psi, // conf factor, and drvts:
-		   double * psix, double * psiy, double * psiz,
-		   double * psixx, double * psixy, double * psixz,
-		   double * psiyy, double * psiyz, double * psizz,
-		   // metric
-		   double * gxx, double * gxy, double * gxz,
-		   double * gyy, double * gyz, double * gzz,
-		   // curv
-		   double * kxx, double * kxy, double * kxz,
-		   double * kyy, double * kyz, double * kzz
-		   );
 
 /* TP_Utilies.c */
 void nrerror (char error_text[]);
@@ -213,6 +195,7 @@ void params_read(char *fname);
 void params_write(char * fname);
 double params_getd(char * key);
 int params_geti(char * key);
+void params_setadd(char * key, int type, double val, int addpar);
 void params_set(char * key, double val);
 void params_add(char * key, int type, double val);
 
@@ -221,5 +204,70 @@ void write_derivs(derivs *u, const int n1, const int n2, const int n3,
 		  const char *fname);
 void write_confact_atxyz(double x, double y, double z, double u,  
 			 const char *fname);
+
+/* TwoPunctures.c */
+
+// Expose for C++ intefacing
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+  typedef struct {
+    double *F;
+    derivs *u;
+    derivs *v;
+    derivs *cf_v;
+    int ntotal;
+  } ini_data;
+
+  // set default parameters
+  void TwoPunctures_params_set_default();
+
+  // set based on input file
+  void TwoPunctures_params_set_inputfile(char *inputfile);
+  void TwoPunctures_params_set_Real(char *key, double value);
+  void TwoPunctures_params_set_int(char *key, int value);
+  void TwoPunctures_params_set_Boolean(char *key, bool value);
+
+  ini_data * TwoPunctures_make_initial_data();
+
+  void TwoPunctures_Cartesian_interpolation
+  (ini_data *data,     // struct containing the previously calculated solution
+   int *imin,         // min, max idxs of Cartesian Grid in the three directions
+   int *imax,         // in the three dirs
+   int *nxyz,
+   double *x,         // Cartesian coordinates
+   double *y,
+   double *z,
+   double *alp,       // lapse
+   double *psi,       // conformal factor and derivatives
+   double *psix,
+   double *psiy,
+   double *psiz,
+   double *psixx,
+   double *psixy,
+   double *psixz,
+   double *psiyy,
+   double *psiyz,
+   double *psizz,
+   double *gxx,       // metric components
+   double *gxy,
+   double *gxz,
+   double *gyy,
+   double *gyz,
+   double *gzz,
+   double *kxx,       // extrinsic curvature components
+   double *kxy,
+   double *kxz,
+   double *kyy,
+   double *kyz,
+   double *kzz);
+
+  // for cleanup purposes
+  void TwoPunctures_finalise(ini_data *data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TP_HEADER_H */
