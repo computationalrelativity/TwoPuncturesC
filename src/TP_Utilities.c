@@ -1,9 +1,13 @@
 /* TP_utilities.c */
-/* Includes routines for managing params */
+
+/* Various shit from numerical recipes 
+   Routines for managing params 
+   Routines for output */
 
 #include "TwoPunctures.h"
 
-/*---------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------*/
+
 int *
 ivector (long nl, long nh)
 /* allocate an int vector with subscript range v[nl..nh] */
@@ -16,7 +20,6 @@ ivector (long nl, long nh)
   return retval - nl;
 }
 
-/*---------------------------------------------------------------------------*/
 double *
 dvector (long nl, long nh)
 /* allocate a double vector with subscript range v[nl..nh] */
@@ -29,7 +32,6 @@ dvector (long nl, long nh)
   return retval - nl;
 }
 
-/*---------------------------------------------------------------------------*/
 int **
 imatrix (long nrl, long nrh, long ncl, long nch)
 /* allocate a int matrix with subscript range m[nrl..nrh][ncl..nch] */
@@ -39,7 +41,7 @@ imatrix (long nrl, long nrh, long ncl, long nch)
   retval = malloc(sizeof(int *)*(nrh-nrl+1));
   if(retval == NULL)
     ERROR ("allocation failure (1) in imatrix()");
-
+  
   /* get all memory for the matrix in on chunk */
   retval[0] = malloc(sizeof(int)*(nrh-nrl+1)*(nch-ncl+1));
   if(retval[0] == NULL)
@@ -58,7 +60,6 @@ imatrix (long nrl, long nrh, long ncl, long nch)
   return retval;
 }
 
-/*---------------------------------------------------------------------------*/
 double **
 dmatrix (long nrl, long nrh, long ncl, long nch)
 /* allocate a double matrix with subscript range m[nrl..nrh][ncl..nch] */
@@ -87,7 +88,6 @@ dmatrix (long nrl, long nrh, long ncl, long nch)
   return retval;
 }
 
-/*---------------------------------------------------------------------------*/
 double ***
 d3tensor (long nrl, long nrh, long ncl, long nch, long ndl, long ndh)
 /* allocate a double 3tensor with range t[nrl..nrh][ncl..nch][ndl..ndh] */
@@ -134,7 +134,6 @@ d3tensor (long nrl, long nrh, long ncl, long nch, long ndl, long ndh)
   return retval;
 }
 
-/*--------------------------------------------------------------------------*/
 void
 free_ivector (int *v, long nl, long nh)
 /* free an int vector allocated with ivector() */
@@ -142,7 +141,6 @@ free_ivector (int *v, long nl, long nh)
   free(v+nl);
 }
 
-/*--------------------------------------------------------------------------*/
 void
 free_dvector (double *v, long nl, long nh)
 /* free an double vector allocated with dvector() */
@@ -150,7 +148,6 @@ free_dvector (double *v, long nl, long nh)
   free(v+nl);
 }
 
-/*--------------------------------------------------------------------------*/
 void
 free_imatrix (int **m, long nrl, long nrh, long ncl, long nch)
 /* free an int matrix allocated by imatrix() */
@@ -159,7 +156,6 @@ free_imatrix (int **m, long nrl, long nrh, long ncl, long nch)
   free(m+nrl);
 }
 
-/*--------------------------------------------------------------------------*/
 void
 free_dmatrix (double **m, long nrl, long nrh, long ncl, long nch)
 /* free a double matrix allocated by dmatrix() */
@@ -168,7 +164,6 @@ free_dmatrix (double **m, long nrl, long nrh, long ncl, long nch)
   free(m+nrl);
 }
 
-/*--------------------------------------------------------------------------*/
 void
 free_d3tensor (double ***t, long nrl, long nrh, long ncl, long nch,
 	       long ndl, long ndh)
@@ -179,7 +174,6 @@ free_d3tensor (double ***t, long nrl, long nrh, long ncl, long nch,
   free(t+nrl);
 }
 
-/*--------------------------------------------------------------------------*/
 int
 minimum2 (int i, int j)
 {
@@ -189,7 +183,6 @@ minimum2 (int i, int j)
   return result;
 }
 
-/*-------------------------------------------------------------------------*/
 int
 minimum3 (int i, int j, int k)
 {
@@ -201,7 +194,6 @@ minimum3 (int i, int j, int k)
   return result;
 }
 
-/*--------------------------------------------------------------------------*/
 int
 maximum2 (int i, int j)
 {
@@ -211,7 +203,6 @@ maximum2 (int i, int j)
   return result;
 }
 
-/*--------------------------------------------------------------------------*/
 int
 maximum3 (int i, int j, int k)
 {
@@ -223,47 +214,45 @@ maximum3 (int i, int j, int k)
   return result;
 }
 
-/*--------------------------------------------------------------------------*/
 int
 pow_int (int mantisse, int exponent)
 {
   int i, result = 1;
-
+  
   for (i = 1; i <= exponent; i++)
     result *= mantisse;
-
+  
   return result;
 }
 
-/*--------------------------------------------------------------------------*/
 void
 chebft_Zeros (double u[], int n, int inv)
-    /* eq. 5.8.7 and 5.8.8 at x = (5.8.4) of 2nd edition C++ NR */
+/* eq. 5.8.7 and 5.8.8 at x = (5.8.4) of 2nd edition C++ NR */
 {
   int k, j, isignum;
   double fac, sum, Pion, *c;
-
+  
   c = dvector (0, n);
   Pion = Pi / n;
   if (inv == 0)
-  {
-    fac = 2.0 / n;
-    isignum = 1;
-    for (j = 0; j < n; j++)
     {
-      sum = 0.0;
-      for (k = 0; k < n; k++)
-	sum += u[k] * cos (Pion * j * (k + 0.5));
-      c[j] = fac * sum * isignum;
-      isignum = -isignum;
-    }
-  }
-  else
-  {
-    for (j = 0; j < n; j++)
-    {
-      sum = -0.5 * u[0];
+      fac = 2.0 / n;
       isignum = 1;
+      for (j = 0; j < n; j++)
+	{
+	  sum = 0.0;
+	  for (k = 0; k < n; k++)
+	    sum += u[k] * cos (Pion * j * (k + 0.5));
+	  c[j] = fac * sum * isignum;
+	  isignum = -isignum;
+	}
+    }
+  else
+    {
+      for (j = 0; j < n; j++)
+	{
+	  sum = -0.5 * u[0];
+	  isignum = 1;
       for (k = 0; k < n; k++)
       {
 	sum += u[k] * cos (Pion * (j + 0.5) * k) * isignum;
@@ -282,11 +271,9 @@ chebft_Zeros (double u[], int n, int inv)
   free_dvector (c, 0, n);
 }
 
-/* --------------------------------------------------------------------------*/
-
 void
 chebft_Extremes (double u[], int n, int inv)
-    /* eq. 5.8.7 and 5.8.8 at x = (5.8.5) of 2nd edition C++ NR */
+/* eq. 5.8.7 and 5.8.8 at x = (5.8.5) of 2nd edition C++ NR */
 {
   int k, j, isignum, N = n - 1;
   double fac, sum, PioN, *c;
@@ -326,8 +313,6 @@ chebft_Extremes (double u[], int n, int inv)
   free_dvector (c, 0, N);
 }
 
-/* --------------------------------------------------------------------------*/
-
 void
 chder (double *c, double *cder, int n)
 {
@@ -339,10 +324,9 @@ chder (double *c, double *cder, int n)
     cder[j] = cder[j + 2] + 2 * (j + 1) * c[j + 1];
 }
 
-/* --------------------------------------------------------------------------*/
 double
 chebev (double a, double b, double c[], int m, double x)
-    /* eq. 5.8.11 of C++ NR (2nd ed) */
+/* eq. 5.8.11 of C++ NR (2nd ed) */
 {
   int j;
   double djp2, djp1, dj; /* d_{j+2}, d_{j+1} and d_j */
@@ -363,14 +347,13 @@ chebev (double a, double b, double c[], int m, double x)
   return y*dj - djp1 + 0.5*c[0];
 }
 
-/* --------------------------------------------------------------------------*/
 void
 fourft (double *u, int N, int inv)
-    /* a (slow) Fourier transform, seems to be just eq. 12.1.6 and 12.1.9 of C++ NR (2nd ed) */
+/* a (slow) Fourier transform, seems to be just eq. 12.1.6 and 12.1.9 of C++ NR (2nd ed) */
 {
   int l, k, iy, M;
   double x, x1, fac, Pi_fac, *a, *b;
-
+  
   M = N / 2;
   a = dvector (0, M);
   b = dvector (1, M);		/* Actually: b=vector(1,M-1) but this is problematic if M=1*/
@@ -426,7 +409,6 @@ fourft (double *u, int N, int inv)
   free_dvector (b, 1, M);
 }
 
-/* -----------------------------------------*/
 void
 fourder (double u[], double du[], int N)
 {
@@ -443,7 +425,6 @@ fourder (double u[], double du[], int N)
   }
 }
 
-/* -----------------------------------------*/
 void
 fourder2 (double u[], double d2u[], int N)
 {
@@ -461,7 +442,6 @@ fourder2 (double u[], double d2u[], int N)
   }
 }
 
-/* ----------------------------------------- */
 double
 fourev (double *u, int N, double x)
 {
@@ -477,7 +457,6 @@ fourev (double *u, int N, double x)
   return result;
 }
 
-/* ------------------------------------------------------------------------*/
 double
 norm1 (double *v, int n)
 {
@@ -491,20 +470,18 @@ norm1 (double *v, int n)
   return result;
 }
 
-/* -------------------------------------------------------------------------*/
 double
 norm2 (double *v, int n)
 {
   int i;
   double result = 0;
-
+  
   for (i = 0; i < n; i++)
     result += v[i] * v[i];
-
+  
   return sqrt (result);
 }
 
-/* -------------------------------------------------------------------------*/
 double
 scalarproduct (double *v, double *w, int n)
 {
@@ -651,3 +628,51 @@ void params_add(char * key, int type, double val) {
   params_setadd(key, type, val, 1);
 }
 
+/* -------------------------------------------------------------------------*/
+
+void write_derivs(derivs *u, const int n1, const int n2, const int n3,
+		  int include_derivatives_order, 
+		  const char *fname)
+/* output routine for derivs */
+{
+  FILE *fp;
+  fp = fopen(fname, "w");
+  assert(fp);
+  const int size = n1*n2*n3;
+  fprintf(fp, "# %d %d %d\n",n1,n2,n3);
+  if (include_derivatives_order==0)
+    for (int i=0; i<size; i++)
+      fprintf(fp, "%.16e\n",u->d0[i]);
+  else if (include_derivatives_order==1)
+    for (int i=0; i<size; i++)
+      fprintf(fp, "%.16e %.16e %.16e %.16e\n",
+	      u->d0[i],
+	      u->d1[i],u->d2[i],u->d3[i]);
+  else if (include_derivatives_order==2)
+    for (int i=0; i<size; i++)
+      fprintf(fp, "%.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e %.16e\n",
+	      u->d0[i],
+	      u->d1[i],u->d2[i],u->d3[i], 
+	      u->d11[i],u->d12[i],u->d13[i], u->d22[i],u->d23[i],u->d33[i]);
+  else  
+    ERROR ("include_derivatives_order = 0,1,2\n");
+  fclose(fp);
+}
+
+void write_confact_atxyz(double x, double y, double z, double u, 
+			 const char *fname)
+{
+  double par_b = params_getd("par_b");
+  double par_m_plus = params_getd("par_m_plus");
+  double par_m_minus = params_getd("par_m_minus");
+  
+  double r_plus = sqrt ((x - par_b) * (x - par_b) + y * y + z * z);
+  double r_minus = sqrt ((x + par_b) * (x + par_b) + y * y + z * z);
+  double psi = 1.+ 0.5 * par_m_plus  / r_plus + 0.5 * par_m_minus / r_minus + u;
+
+  FILE *fp;
+  fp = fopen(fname, "w");
+  assert(fp);
+  fprintf(fp, "%.16e %.16e %.16e %.16e \n", x, y, z, psi);
+  fclose(fp);
+}

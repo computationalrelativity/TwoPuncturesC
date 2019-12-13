@@ -4,7 +4,7 @@
 
 static int
 bicgstab (int const nvar, int const n1, int const n2, int const n3,
-          derivs v, derivs dv,
+          derivs* v, derivs* dv,
           int const output, int const itmax, double const tol,
           double * restrict const normres);
 static double
@@ -41,6 +41,7 @@ LineRelax_be (double * restrict const dv,
               int * ncols, 
               int ** cols,
               double ** JFD);
+
 /* --------------------------------------------------------------------------*/
 static double
 norm_inf (double const * restrict const F,
@@ -60,6 +61,7 @@ norm_inf (double const * restrict const F,
   }
   return dmax;
 }
+
 /* --------------------------------------------------------------------------*/
 static void
 resid (double * restrict const res,
@@ -250,13 +252,13 @@ relax (double * restrict const dv,
 
 /* --------------------------------------------------------------------------*/
 void
-TestRelax (int nvar, int n1, int n2, int n3, derivs v,
+TestRelax (int nvar, int n1, int n2, int n3, derivs *v,
 	   double *dv)
 {
-  int ntotal = n1 * n2 * n3 * nvar, **cols, *ncols, maxcol =
-    StencilSize * nvar, j;
+  int ntotal = n1 * n2 * n3 * nvar, **cols, *ncols,
+    maxcol = StencilSize * nvar, j;
   double *F, *res, **JFD;
-  derivs u;
+  derivs *u;
 
   F = dvector (0, ntotal - 1);
   res = dvector (0, ntotal - 1);
@@ -292,7 +294,7 @@ TestRelax (int nvar, int n1, int n2, int n3, derivs v,
 
   free_dvector (F, 0, ntotal - 1);
   free_dvector (res, 0, ntotal - 1);
-  free_derivs (&u, ntotal);
+  free_derivs (u);
 
   free_dmatrix (JFD, 0, ntotal - 1, 0, maxcol - 1);
   free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
@@ -302,7 +304,7 @@ TestRelax (int nvar, int n1, int n2, int n3, derivs v,
 /* --------------------------------------------------------------------------*/
 static int
 bicgstab (int const nvar, int const n1, int const n2, int const n3,
-          derivs v, derivs dv,
+          derivs* v, derivs* dv,
           int const output, int const itmax, double const tol,
           double * restrict const normres)
 {
@@ -314,7 +316,7 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
   double **JFD;
   int **cols, *ncols, maxcol = StencilSize * nvar;
   double *F;
-  derivs u, ph, sh;
+  derivs *u, *ph, *sh;
 
   F = dvector (0, ntotal - 1);
   allocate_derivs (&u, ntotal);
@@ -384,9 +386,9 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
     /* compute direction adjusting vector ph and scalar alpha */
 #pragma omp parallel for
     for (int j = 0; j < ntotal; j++)
-      ph.d0[j] = 0;
+      ph->d0[j] = 0;
     for (int j = 0; j < NRELAX; j++)	/* solves JFD*ph = p by relaxation*/
-      relax (ph.d0, nvar, n1, n2, n3, p, ncols, cols, JFD);
+      relax (ph->d0, nvar, n1, n2, n3, p, ncols, cols, JFD);
 
     J_times_dv (nvar, n1, n2, n3, ph, vv, u);	/* vv=J*ph*/
     alpha = rho / scalarproduct (rt, vv, ntotal);
@@ -400,7 +402,7 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
     {
 #pragma omp parallel for
       for (int j = 0; j < ntotal; j++)
-	dv.d0[j] += alpha * ph.d0[j];
+	dv->d0[j] += alpha * ph->d0[j];
       if (output == 1) {
 	printf ("bicgstab: %5d  %10.3e  %10.3e  %10.3e  %10.3e\n",
 		ii + 1, (double) *normres, (double)alpha, (double)beta, (double)omega);
@@ -412,9 +414,9 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
     /* compute stabilizer vector sh and scalar omega */
 #pragma omp parallel for
     for (int j = 0; j < ntotal; j++)
-      sh.d0[j] = 0;
+      sh->d0[j] = 0;
     for (int j = 0; j < NRELAX; j++)	/* solves JFD*sh = s by relaxation*/
-      relax (sh.d0, nvar, n1, n2, n3, s, ncols, cols, JFD);
+      relax (sh->d0, nvar, n1, n2, n3, s, ncols, cols, JFD);
 
     J_times_dv (nvar, n1, n2, n3, sh, t, u);	/* t=J*sh*/
     omega = scalarproduct (t, s, ntotal) / scalarproduct (t, t, ntotal);
@@ -423,7 +425,7 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
 #pragma omp parallel for
     for (int j = 0; j < ntotal; j++)
     {
-      dv.d0[j] += alpha * ph.d0[j] + omega * sh.d0[j];
+      dv->d0[j] += alpha * ph->d0[j] + omega * sh->d0[j];
       r[j] = s[j] - omega * t[j];
     }
     /* are we done? */
@@ -445,16 +447,16 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
   free_dvector (r, 0, ntotal - 1);
   free_dvector (p, 0, ntotal - 1);
 /*      free_dvector(ph,  0, ntotal-1);*/
-  free_derivs (&ph, ntotal);
+  free_derivs (ph);
   free_dvector (rt, 0, ntotal - 1);
   free_dvector (s, 0, ntotal - 1);
 /*      free_dvector(sh,  0, ntotal-1);*/
-  free_derivs (&sh, ntotal);
+  free_derivs (sh);
   free_dvector (t, 0, ntotal - 1);
   free_dvector (vv, 0, ntotal - 1);
 
   free_dvector (F, 0, ntotal - 1);
-  free_derivs (&u, ntotal);
+  free_derivs (u);
 
   free_dmatrix (JFD, 0, ntotal - 1, 0, maxcol - 1);
   free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
@@ -477,62 +479,62 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
 /* -------------------------------------------------------------------*/
 void
 Newton (int const nvar, int const n1, int const n2, int const n3,
-	derivs v,
+	derivs *v,
         double const tol, int const itmax)
 {
   int verbose = params_geti("verbose");
   
   int ntotal = n1 * n2 * n3 * nvar, ii, it;
   double *F, dmax, normres;
-  derivs u, dv;
-
+  derivs *u, *dv;
+  
   F = dvector (0, ntotal - 1);
   allocate_derivs (&dv, ntotal);
   allocate_derivs (&u, ntotal);
-
-/*         TestRelax(nvar, n1, n2, n3, v, dv.d0); */
+  
+  /*         TestRelax(nvar, n1, n2, n3, v, dv->d0); */
   it = 0;
   dmax = 1;
   while (dmax > tol && it < itmax)
-  {
-    if (it == 0)
+    {
+      if (it == 0)
+	{
+	  F_of_v (nvar, n1, n2, n3, v, F, u);
+	  dmax = norm_inf (F, ntotal);
+	}
+#pragma omp parallel for
+      for (int j = 0; j < ntotal; j++)
+	dv->d0[j] = 0;
+      
+      if(verbose){
+	printf ("Newton: it=%d \t |F|=%e\n", it, (double)dmax);
+	printf ("bare mass: mp=%g \t mm=%g\n",
+		params_getd("par_m_plus"), params_getd("par_m_minus"));
+      }
+      
+      fflush(stdout);
+      ii =
+	bicgstab (nvar, n1, n2, n3, v, dv, verbose, 100, dmax * 1.e-3, &normres);
+#pragma omp parallel for
+      for (int j = 0; j < ntotal; j++)
+	v->d0[j] -= dv->d0[j];
+      F_of_v (nvar, n1, n2, n3, v, F, u);
+      dmax = norm_inf (F, ntotal);
+      it += 1;
+    }
+  if (itmax==0)
     {
       F_of_v (nvar, n1, n2, n3, v, F, u);
       dmax = norm_inf (F, ntotal);
     }
-#pragma omp parallel for
-    for (int j = 0; j < ntotal; j++)
-      dv.d0[j] = 0;
-
-    if(verbose){
-      printf ("Newton: it=%d \t |F|=%e\n", it, (double)dmax);
-      printf ("bare mass: mp=%g \t mm=%g\n",
-	      params_getd("par_m_plus"), params_getd("par_m_minus"));
-    }
-
-    fflush(stdout);
-    ii =
-      bicgstab (nvar, n1, n2, n3, v, dv, verbose, 100, dmax * 1.e-3, &normres);
-#pragma omp parallel for
-    for (int j = 0; j < ntotal; j++)
-      v.d0[j] -= dv.d0[j];
-    F_of_v (nvar, n1, n2, n3, v, F, u);
-    dmax = norm_inf (F, ntotal);
-    it += 1;
-  }
-  if (itmax==0)
-  {
-      F_of_v (nvar, n1, n2, n3, v, F, u);
-      dmax = norm_inf (F, ntotal);
-  }
-
-  if(verbose==1)
+  
+  if(verbose)
     printf ("Newton: it=%d \t |F|=%e \n", it, (double)dmax);
-
+  
   fflush(stdout);
-
+  
   free_dvector (F, 0, ntotal - 1);
-  free_derivs (&dv, ntotal);
-  free_derivs (&u, ntotal);
+  free_derivs (dv);
+  free_derivs (u);
 }
 

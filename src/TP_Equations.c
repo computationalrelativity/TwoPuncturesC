@@ -2,19 +2,7 @@
 
 #include "TwoPunctures.h"
 
-/* U.d0[ivar]   = U[ivar];  (ivar = 0..nvar-1) */
-/* U.d1[ivar]   = U[ivar]_x;  */
-/* U.d2[ivar]   = U[ivar]_y;  */
-/* U.d3[ivar]   = U[ivar]_z;  */
-/* U.d11[ivar]  = U[ivar]_xx; */
-/* U.d12[ivar]  = U[ivar]_xy; */
-/* U.d13[ivar]  = U[ivar]_xz;*/
-/* U.d22[ivar]  = U[ivar]_yy;*/
-/* U.d23[ivar]  = U[ivar]_yz;*/
-/* U.d33[ivar]  = U[ivar]_zz;*/
-
-double
-BY_KKofxyz (double x, double y, double z)
+double BY_KKofxyz (double x, double y, double z)
 {
 
   double par_b = params_getd("par_b");
@@ -46,22 +34,22 @@ BY_KKofxyz (double x, double y, double z)
   r_minus = sqrt (r2_minus);
   r3_plus = r_plus * r2_plus;
   r3_minus = r_minus * r2_minus;
-
+  
   n_plus[0] = (x - par_b) / r_plus;
   n_minus[0] = (x + par_b) / r_minus;
   n_plus[1] = y / r_plus;
   n_minus[1] = y / r_minus;
   n_plus[2] = z / r_plus;
   n_minus[2] = z / r_minus;
-
+  
   /* dot product: np_Pp = (n_+).(P_+); nm_Pm = (n_-).(P_-) */
   np_Pp = 0;
   nm_Pm = 0;
-  for (i = 0; i < 3; i++)
-  {
+  for (i = 0; i < 3; i++) {
     np_Pp += n_plus[i] * par_P_plus[i];
     nm_Pm += n_minus[i] * par_P_minus[i];
   }
+
   /* cross product: np_Sp[i] = [(n_+) x (S_+)]_i; nm_Sm[i] = [(n_-) x (S_-)]_i*/
   np_Sp[0] = n_plus[1] * par_S_plus[2] - n_plus[2] * par_S_plus[1];
   np_Sp[1] = n_plus[2] * par_S_plus[0] - n_plus[0] * par_S_plus[2];
@@ -69,11 +57,12 @@ BY_KKofxyz (double x, double y, double z)
   nm_Sm[0] = n_minus[1] * par_S_minus[2] - n_minus[2] * par_S_minus[1];
   nm_Sm[1] = n_minus[2] * par_S_minus[0] - n_minus[0] * par_S_minus[2];
   nm_Sm[2] = n_minus[0] * par_S_minus[1] - n_minus[1] * par_S_minus[0];
+
   AijAij = 0;
-  for (i = 0; i < 3; i++)
-  {
-    for (j = 0; j < 3; j++)
-    {				/* Bowen-York-Curvature :*/
+  
+  for (i = 0; i < 3; i++) {
+    for (j = 0; j < 3; j++) {
+      /* Bowen-York-Curvature :*/
       Aij =
 	+ 1.5 * (par_P_plus[i] * n_plus[j] + par_P_plus[j] * n_plus[i]
                  + np_Pp * n_plus[i] * n_plus[j]) / r2_plus
@@ -86,14 +75,13 @@ BY_KKofxyz (double x, double y, double z)
       AijAij += Aij * Aij;
     }
   }
-
+  
   return AijAij;
 }
 
-void
-BY_Aijofxyz (double x, double y, double z, double Aij[3][3])
+void BY_Aijofxyz (double x, double y, double z, double Aij[3][3])
 {
-
+  
   double par_b = params_getd("par_b");
   double TP_epsilon = params_getd("TP_epsilon");
   double TP_Tiny = params_getd("TP_Tiny");
@@ -142,11 +130,11 @@ BY_Aijofxyz (double x, double y, double z, double Aij[3][3])
   /* dot product: np_Pp = (n_+).(P_+); nm_Pm = (n_-).(P_-) */
   np_Pp = 0;
   nm_Pm = 0;
-  for (i = 0; i < 3; i++)
-  {
+  for (i = 0; i < 3; i++) {
     np_Pp += n_plus[i] * par_P_plus[i];
     nm_Pm += n_minus[i] * par_P_minus[i];
   }
+  
   /* cross product: np_Sp[i] = [(n_+) x (S_+)]_i; nm_Sm[i] = [(n_-) x (S_-)]_i*/
   np_Sp[0] = n_plus[1] * par_S_plus[2] - n_plus[2] * par_S_plus[1];
   np_Sp[1] = n_plus[2] * par_S_plus[0] - n_plus[0] * par_S_plus[2];
@@ -154,10 +142,10 @@ BY_Aijofxyz (double x, double y, double z, double Aij[3][3])
   nm_Sm[0] = n_minus[1] * par_S_minus[2] - n_minus[2] * par_S_minus[1];
   nm_Sm[1] = n_minus[2] * par_S_minus[0] - n_minus[0] * par_S_minus[2];
   nm_Sm[2] = n_minus[0] * par_S_minus[1] - n_minus[1] * par_S_minus[0];
-  for (i = 0; i < 3; i++)
-  {
-    for (j = 0; j < 3; j++)
-    {				/* Bowen-York-Curvature :*/
+  
+  for (i = 0; i < 3; i++) {
+    for (j = 0; j < 3; j++) {
+      /* Bowen-York-Curvature :*/
       Aij[i][j] =
         + 1.5 * (par_P_plus[i] * n_plus[j] + par_P_plus[j] * n_plus[i]
 		 + np_Pp * n_plus[i] * n_plus[j]) / r2_plus
@@ -171,14 +159,10 @@ BY_Aijofxyz (double x, double y, double z, double Aij[3][3])
   }
 }
 
-/*-----------------------------------------------------------*/
-/********           Nonlinear Equations                ***********/
-/*-----------------------------------------------------------*/
-void
-NonLinEquations (double rho_adm,
-		 double A, double B, double X, double R,
-		 double x, double r, double phi,
-		 double y, double z, derivs U, double *values)
+void NonLinEquations (double rho_adm,
+		      double A, double B, double X, double R,
+		      double x, double r, double phi,
+		      double y, double z, derivs *U, double *values)
 {
   double par_b = params_getd("par_b");
   double par_m_plus = params_getd("par_m_plus");
@@ -190,25 +174,18 @@ NonLinEquations (double rho_adm,
   r_plus = sqrt ((x - par_b) * (x - par_b) + y * y + z * z);
   r_minus = sqrt ((x + par_b) * (x + par_b) + y * y + z * z);
 
-  psi =
-    1. + 0.5 * par_m_plus / r_plus + 0.5 * par_m_minus / r_minus + U.d0[0];
+  psi = 1. + 0.5 * par_m_plus / r_plus + 0.5 * par_m_minus / r_minus + U->d0[0];
   psi2 = psi * psi;
   psi4 = psi2 * psi2;
   psi7 = psi * psi2 * psi4;
-
-  values[0] =
-    U.d11[0] + U.d22[0] + U.d33[0] + 0.125 * BY_KKofxyz (x, y, z) / psi7 +
-    2.0 * Pi / psi2/psi * rho_adm;
-
+  
+  values[0] = U->d11[0] + U->d22[0] + U->d33[0] + 0.125 * BY_KKofxyz (x, y, z) / psi7 
+    + 2.0 * Pi / psi2/psi * rho_adm;
 }
 
-/*-----------------------------------------------------------*/
-/********               Linear Equations                ***********/
-/*-----------------------------------------------------------*/
-void
-LinEquations (double A, double B, double X, double R,
-	      double x, double r, double phi,
-	      double y, double z, derivs dU, derivs U, double *values)
+void LinEquations (double A, double B, double X, double R,
+		   double x, double r, double phi,
+		   double y, double z, derivs *dU, derivs *U, double *values)
 {
   double par_b = params_getd("par_b");
   double par_m_plus = params_getd("par_m_plus");
@@ -219,13 +196,11 @@ LinEquations (double A, double B, double X, double R,
   r_plus = sqrt ((x - par_b) * (x - par_b) + y * y + z * z);
   r_minus = sqrt ((x + par_b) * (x + par_b) + y * y + z * z);
   
-  psi =
-    1. + 0.5 * par_m_plus / r_plus + 0.5 * par_m_minus / r_minus + U.d0[0];
+  psi = 1. + 0.5 * par_m_plus / r_plus + 0.5 * par_m_minus / r_minus + U->d0[0];
   psi2 = psi * psi;
   psi4 = psi2 * psi2;
   psi8 = psi4 * psi4;
-
-  values[0] = dU.d11[0] + dU.d22[0] + dU.d33[0]
-    - 0.875 * BY_KKofxyz (x, y, z) / psi8 * dU.d0[0];
+  
+  values[0] = dU->d11[0] + dU->d22[0] + dU->d33[0] - 0.875 * BY_KKofxyz (x, y, z) / psi8 * dU->d0[0];
 }
 

@@ -11,18 +11,22 @@ void swap (double * restrict const a, double * restrict const b)
 #undef SWAP
 #define SWAP(a,b) (swap(&(a),&(b)))
 
-/* */
+/* Initial guess */
 static
-void set_initial_guess(derivs v)
+void set_initial_guess(derivs *v)
 {
   int nvar = 1,
     n1 = params_geti("npoints_A"),
     n2 = params_geti("npoints_B"),
     n3 = params_geti("npoints_phi");
+
+  double par_b = params_getd("par_b");
+
   double *s_x, *s_y, *s_z;
   double al, A, Am1, be, B, phi, R, r, X;
   int ivar, i, j, k, i3D, indx;
-  derivs U;
+  derivs *U;
+
   FILE *debug_file;
   
   if (params_geti("solve_momentum_constraint"))
@@ -33,7 +37,7 @@ void set_initial_guess(derivs v)
   s_z = calloc(n1*n2*n3, sizeof(double));
 
   allocate_derivs (&U, nvar);
-
+  
   for (ivar = 0; ivar < nvar; ivar++)
     for (i = 0; i < n1; i++)
       for (j = 0; j < n2; j++)
@@ -49,29 +53,29 @@ void set_initial_guess(derivs v)
 	  
           /* Calculation of (X,R)*/
           AB_To_XR (nvar, A, B, &X, &R, U);
-
+	  
 	  /* Calculation of (x,r)*/
-          C_To_c (nvar, X, R, &(s_x[i3D]), &r, U);
-
+          C_To_c (nvar, X, R, &(s_x[i3D]), &r, par_b, U);
+	  
 	  /* Calculation of (y,z)*/
           rx3_To_xyz (nvar, s_x[i3D], r, phi, &(s_y[i3D]), &(s_z[i3D]), U);
-
+	  
 	}
-
-  // See: TwoPunctures/interface.ccl
-  //Set_Initial_Guess_for_u(n1*n2*n3, v.d0, s_x, s_y, s_z); 
-  // In the BAM code this guess looks like  v = 0 , dv = 0
+  
+  //SB See: TwoPunctures/interface.ccl
+  //SB /* Set_Initial_Guess_for_u(n1*n2*n3, v->d0, s_x, s_y, s_z); */ 
+  //SB: In the BAM code this guess looks like  v = 0 , dv = 0
   
   for (ivar = 0; ivar < nvar; ivar++)
     for (i = 0; i < n1; i++)
       for (j = 0; j < n2; j++)
         for (k = 0; k < n3; k++) {
 	  indx = Index(ivar,i,j,k,1,n1,n2,n3);
-          v.d0[indx]/=(-cos(Pih * (2 * i + 1) / n1)-1.0);
+          v->d0[indx]/=(-cos(Pih * (2 * i + 1) / n1)-1.0);
 	}
   
   Derivatives_AB3 (nvar, n1, n2, n3, v);
-
+  
   if (params_geti("do_initial_debug_output")) {
     
     debug_file=fopen("initial.dat", "w");
@@ -87,22 +91,22 @@ void set_initial_guess(derivs v)
           B = -cos (be);
           phi = 0.0;
           indx = Index(ivar,i,j,0,1,n1,n2,n3);
-          U.d0[0] = Am1 * v.d0[indx];        /* U*/
-          U.d1[0] = v.d0[indx] + Am1 * v.d1[indx];        /* U_A*/
-          U.d2[0] = Am1 * v.d2[indx];        /* U_B*/
-          U.d3[0] = Am1 * v.d3[indx];        /* U_3*/
-          U.d11[0] = 2 * v.d1[indx] + Am1 * v.d11[indx];        /* U_AA*/
-          U.d12[0] = v.d2[indx] + Am1 * v.d12[indx];        /* U_AB*/
-          U.d13[0] = v.d3[indx] + Am1 * v.d13[indx];        /* U_AB*/
-          U.d22[0] = Am1 * v.d22[indx];        /* U_BB*/
-          U.d23[0] = Am1 * v.d23[indx];        /* U_B3*/
-          U.d33[0] = Am1 * v.d33[indx];        /* U_33*/
+          U->d0[0] = Am1 * v->d0[indx];        /* U*/
+          U->d1[0] = v->d0[indx] + Am1 * v->d1[indx];        /* U_A*/
+          U->d2[0] = Am1 * v->d2[indx];        /* U_B*/
+          U->d3[0] = Am1 * v->d3[indx];        /* U_3*/
+          U->d11[0] = 2 * v->d1[indx] + Am1 * v->d11[indx];        /* U_AA*/
+          U->d12[0] = v->d2[indx] + Am1 * v->d12[indx];        /* U_AB*/
+          U->d13[0] = v->d3[indx] + Am1 * v->d13[indx];        /* U_AB*/
+          U->d22[0] = Am1 * v->d22[indx];        /* U_BB*/
+          U->d23[0] = Am1 * v->d23[indx];        /* U_B3*/
+          U->d33[0] = Am1 * v->d33[indx];        /* U_33*/
 
 	  /* Calculation of (X,R)*/
 	  AB_To_XR (nvar, A, B, &X, &R, U);
 
 	  /* Calculation of (x,r)*/
-	  C_To_c (nvar, X, R, &(s_x[indx]), &r, U);
+	  C_To_c (nvar, X, R, &(s_x[indx]), &r, par_b, U);
 
 	  /* Calculation of (y,z)*/
 	  rx3_To_xyz (nvar, s_x[i3D], r, phi, &(s_y[indx]), &(s_z[indx]), U);
@@ -111,21 +115,21 @@ void set_initial_guess(derivs v)
 		  "%.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g\n",
 		  (double)s_x[indx], (double)s_y[indx],
 		  (double)A,(double)B,
-		  (double)U.d0[0],
+		  (double)U->d0[0],
 		  (double)(-cos(Pih * (2 * i + 1) / n1)-1.0),
-		  (double)U.d1[0],
-		  (double)U.d2[0],
-		  (double)U.d3[0],
-		  (double)U.d11[0],
-		  (double)U.d22[0],
-		  (double)U.d33[0],
-		  (double)v.d0[indx],
-		  (double)v.d1[indx],
-		  (double)v.d2[indx],
-		  (double)v.d3[indx],
-		  (double)v.d11[indx],
-		  (double)v.d22[indx],
-		  (double)v.d33[indx]
+		  (double)U->d1[0],
+		  (double)U->d2[0],
+		  (double)U->d3[0],
+		  (double)U->d11[0],
+		  (double)U->d22[0],
+		  (double)U->d33[0],
+		  (double)v->d0[indx],
+		  (double)v->d1[indx],
+		  (double)v->d2[indx],
+		  (double)v->d3[indx],
+		  (double)v->d11[indx],
+		  (double)v->d22[indx],
+		  (double)v->d33[indx]
 		  );
         }
     
@@ -160,36 +164,37 @@ void set_initial_guess(derivs v)
         X = 2*(2.0*i/n1-1.0);
         R = 2*(1.0*j/n2);
         if (X*X+R*R > 1.0) {
-	    C_To_c (nvar, X, R, &(s_x[indx]), &r, U);
-	    rx3_To_xyz (nvar, s_x[i3D], r, phi, &(s_y[indx]), &(s_z[indx]), U);
-	    *U.d0  = s_x[indx]*s_x[indx];
-	    *U.d1  = 2*s_x[indx];
-	    *U.d2  = 0.0;
-	    *U.d3 = 0.0;
-	    *U.d11 = 2.0;
-	    *U.d22 = 0.0;
-	    *U.d33 = *U.d12 = *U.d23 = *U.d13 = 0.0;
-	    C_To_c (nvar, X, R, &(s_x[indx]), &r, U);
-	    fprintf(debug_file,
+	  C_To_c (nvar, X, R, &(s_x[indx]), &r, par_b, U);
+	  rx3_To_xyz (nvar, s_x[i3D], r, phi, &(s_y[indx]), &(s_z[indx]), U);
+
+	  // SB: this is wrong:
+	  *U->d0  = s_x[indx]*s_x[indx];
+	  *U->d1  = 2*s_x[indx];
+	  *U->d2  = 0.0;
+	  *U->d3 = 0.0;
+	  *U->d11 = 2.0;
+	  *U->d22 = 0.0;
+	  *U->d33 = *U->d12 = *U->d23 = *U->d13 = 0.0;
+
+	  C_To_c (nvar, X, R, &(s_x[indx]), &r, par_b, U);
+	  fprintf(debug_file,
 		    "%.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g\n",
-                  (double)s_x[indx], (double)r, (double)X, (double)R, (double)U.d0[0],
-		    (double)U.d1[0],
-		    (double)U.d2[0],
-		    (double)U.d3[0],
-		    (double)U.d11[0],
-		    (double)U.d22[0],
-		    (double)U.d33[0]);
+                  (double)s_x[indx], (double)r, (double)X, (double)R, (double)U->d0[0],
+		  (double)U->d1[0],
+		  (double)U->d2[0],
+		    (double)U->d3[0],
+		  (double)U->d11[0],
+		  (double)U->d22[0],
+		  (double)U->d33[0]);
         }
       }
-    
     fclose(debug_file);
-
   }
   
   free(s_z);
   free(s_y);
   free(s_x);
-  free_derivs (&U, nvar);
+  free_derivs (U);
 }
 
 /* Solve & Interp */
@@ -316,7 +321,7 @@ void TwoPunctures (
   int percent10 = 0;
 #endif
   static double *F = NULL;
-  static derivs u, v, cf_v;
+  static derivs *u, *v, *cf_v;
 
   if (! F) {
     double up, um;
@@ -335,26 +340,26 @@ void TwoPunctures (
     
     /* initialise to 0 */
     for (int j = 0; j < ntotal; j++) {
-      cf_v.d0[j] = 0.0;
-      cf_v.d1[j] = 0.0;
-      cf_v.d2[j] = 0.0;
-      cf_v.d3[j] = 0.0;
-      cf_v.d11[j] = 0.0;
-      cf_v.d12[j] = 0.0;
-      cf_v.d13[j] = 0.0;
-      cf_v.d22[j] = 0.0;
-      cf_v.d23[j] = 0.0;
-      cf_v.d33[j] = 0.0;
-      v.d0[j] = 0.0;
-      v.d1[j] = 0.0;
-      v.d2[j] = 0.0;
-      v.d3[j] = 0.0;
-      v.d11[j] = 0.0;
-      v.d12[j] = 0.0;
-      v.d13[j] = 0.0;
-      v.d22[j] = 0.0;
-      v.d23[j] = 0.0;
-      v.d33[j] = 0.0;
+      cf_v->d0[j] = 0.0;
+      cf_v->d1[j] = 0.0;
+      cf_v->d2[j] = 0.0;
+      cf_v->d3[j] = 0.0;
+      cf_v->d11[j] = 0.0;
+      cf_v->d12[j] = 0.0;
+      cf_v->d13[j] = 0.0;
+      cf_v->d22[j] = 0.0;
+      cf_v->d23[j] = 0.0;
+      cf_v->d33[j] = 0.0;
+      v->d0[j] = 0.0;
+      v->d1[j] = 0.0;
+      v->d2[j] = 0.0;
+      v->d3[j] = 0.0;
+      v->d11[j] = 0.0;
+      v->d12[j] = 0.0;
+      v->d13[j] = 0.0;
+      v->d22[j] = 0.0;
+      v->d23[j] = 0.0;
+      v->d33[j] = 0.0;
     }
 
     /* call for external initial guess */
@@ -417,7 +422,7 @@ void TwoPunctures (
     
     F_of_v (nvar, n1, n2, n3, v, F, u);
     
-    SpecCoef(n1, n2, n3, 0, v.d0, cf_v.d0);
+    SpecCoef(n1, n2, n3, 0, v->d0, cf_v->d0);
     
     if (verbose) printf ("The two puncture masses are mp=%.17g and mm=%.17g\n", mp, mm);
 
@@ -433,7 +438,7 @@ void TwoPunctures (
 
     /* print out ADM mass, eq.: \Delta M_ADM=2*r*u=4*b*V for A=1,B=0,phi=0 */
     admMass = (mp + mm
-               - 4*par_b*PunctEvalAtArbitPosition(v.d0, 0, 1, 0, 0, nvar, n1, n2, n3));
+               - 4*par_b*PunctEvalAtArbitPosition(v->d0, 0, 1, 0, 0, nvar, n1, n2, n3));
     if (verbose) printf ("The total ADM mass is %g\n", admMass);
 
     E = admMass;
@@ -761,9 +766,9 @@ void TwoPunctures (
 #endif
   
   free_dvector (F, 0, ntotal - 1);
-  free_derivs (&u, ntotal);
-  free_derivs (&v, ntotal);
-  free_derivs (&cf_v, ntotal);
+  free_derivs (u);
+  free_derivs (v);
+  free_derivs (cf_v);
 
   // free mem for parameters
   params_free();
