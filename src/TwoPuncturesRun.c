@@ -9,20 +9,21 @@ int main(int argc, char* argv[]) {
   char * inputfile = NULL;
   if(argc == 2){
     inputfile = argv[1];
+    printf("Input file: %s \n", inputfile);
     TwoPunctures_params_set_inputfile(inputfile);
   } else {
     // revert to defaults if no input file passed
     TwoPunctures_params_set_default();  // must be set initially
   }
 
-  printf("Input file: %s \n", inputfile);
-
+#if (0)
   /*
     Test parameter injection.
   */
   TwoPunctures_params_set_Boolean("verbose", true);
   TwoPunctures_params_set_Real("par_b", 1.0);
-  TwoPunctures_params_set_Real("par_m_plus", 2.0);
+  TwoPunctures_params_set_Real("par_m_plus", 1.0);
+#endif
 
   /*
     Sans parameter injection the following is equivalent to prior all NULL call

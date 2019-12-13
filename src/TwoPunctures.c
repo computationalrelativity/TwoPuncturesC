@@ -66,10 +66,10 @@ void TwoPunctures_params_set_default(){
 
   /* Add parameters here */
   params_add("par_b",REAL,1.0); // x coordinate of the m+ puncture; 1.0
-  params_add("par_m_plus",REAL,1.0); // mass of the m+ puncture; 1.0
+  params_add("par_m_plus",REAL,0.9); // mass of the m+ puncture; 1.0
   params_add("par_m_minus",REAL,0.0); // mass of the m- puncture; 1.0
-  params_add("target_M_plus",REAL,0.5); // target ADM mass for m+; 0.5
-  params_add("target_M_minus",REAL,0.5); // target ADM mass for m-; 0.5
+  params_add("target_M_plus",REAL,1.0); // target ADM mass for m+; 0.5
+  params_add("target_M_minus",REAL,0.0); // target ADM mass for m-; 0.5
   params_add("par_P_plus1",REAL,0.); // momentum of the m+ puncture
   params_add("par_P_plus2",REAL,0.);
   params_add("par_P_plus3",REAL,0.);
@@ -303,7 +303,6 @@ ini_data* TwoPunctures_make_initial_data() {
 
 #if (0)
   /* Output the solution */
-  //FIXME: why it prints all 0s ?
   write_derivs( u, n1,n2,n3, 
 		0, // =0,1,2 derivatives to output
 		"u.data");
