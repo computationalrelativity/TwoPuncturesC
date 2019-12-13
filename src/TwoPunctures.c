@@ -99,7 +99,8 @@ void TwoPunctures_params_set_default(){
   params_add("do_initial_debug_output",INTEGER,0); // Output debug information about initial guess
   params_add("use_external_initial_guess",INTEGER,0); // Set initial guess by external function?
   params_add("solve_momentum_constraint",INTEGER,0); // Solve for momentum constraint?
-
+  params_add("do_solution_file_output",INTEGER,0); // output .data files
+  
   // Interpolation
   params_add("grid_setup_method",INTEGER,taylor_expansion); // How to fill the 3D grid from the spectral grid ?
   params_add("initial_lapse",INTEGER,psin); // How to set the lapse ?
@@ -301,18 +302,18 @@ ini_data* TwoPunctures_make_initial_data() {
 
   }
 
-#if (0)
-  /* Output the solution */
-  write_derivs( u, n1,n2,n3, 
-		0, // =0,1,2 derivatives to output
-		"u.data");
-  write_derivs( v, n1,n2,n3, 
-		0, // =0,1,2 derivatives to output
-		"v.data");
-  write_derivs( cf_v, n1,n2,n3, 
-		0, // =0,1,2 derivatives to output
-		"cf_v.data");
-#endif
+  if (params_geti("do_solution_file_output")) {
+    /* Output the solution */
+    write_derivs( u, n1,n2,n3, 
+		  0, // =0,1,2 derivatives to output
+		  "u.data");
+    write_derivs( v, n1,n2,n3, 
+		  0, // =0,1,2 derivatives to output
+		  "v.data");
+    write_derivs( cf_v, n1,n2,n3, 
+		  0, // =0,1,2 derivatives to output
+		  "cf_v.data");
+  }
   
   //free_dvector (F, 0, ntotal - 1);
   //free_derivs (u);
