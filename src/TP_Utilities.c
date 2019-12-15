@@ -677,6 +677,69 @@ void write_confact_atxyz(double x, double y, double z, double u,
   fclose(fp);
 }
 
-
-
+void write_bam_inifile(derivs *u, const int n1, const int n2, const int n3,
+		       const char *fname)
+/* output routine for derivs in BAM format */
+{
+  FILE *fp;
+  fp = fopen(fname, "w");
+  assert(fp);
+  const int size = n1*n2*n3;
+  fprintf(fp, "# TwoPuncture.c\n");
+  fprintf(fp, "# Black hole puncture data produced for bam's punctures_ps\n");
+  fprintf(fp, "# Newton_tol = %e\n",params_getd("Newton_tol"));
+  fprintf(fp, "# nx = %d\n",n1);
+  fprintf(fp, "# ny = %d\n",n2);
+  fprintf(fp, "# nz = %d\n",n3);
+  fprintf(fp, "bhmass1 = %e\n",params_getd("par_m_plus"));
+  fprintf(fp, "bhx1 = %e\n",params_getd("par_b")); // FIXME
+  fprintf(fp, "bhy1 = %e\n",params_getd("par_b")); //
+  fprintf(fp, "bhz1 = %e\n",params_getd("par_b")); //
+  fprintf(fp, "bhpx1 = %e\n",params_getd("par_P_plus1")); // FIXME: might need rotation
+  fprintf(fp, "bhpy1 = %e\n",params_getd("par_P_plus2"));
+  fprintf(fp, "bhpz1 = %e\n",params_getd("par_P_plus3"));
+  fprintf(fp, "bhsx1 = %e\n",params_getd("par_S_plus1")); // FIXME: might need rotation
+  fprintf(fp, "bhsy1 = %e\n",params_getd("par_S_plus2"));
+  fprintf(fp, "bhsz1 = %e\n",params_getd("par_S_plus3"));
+  fprintf(fp, "bhmass2 = %e\n",params_getd("par_m_minus"));
+  fprintf(fp, "bhx2 = %e\n",params_getd("par_b")); // FIXME
+  fprintf(fp, "bhy2 = %e\n",params_getd("par_b")); //
+  fprintf(fp, "bhz2 = %e\n",params_getd("par_b")); //
+  fprintf(fp, "bhpx2 = %e\n",params_getd("par_P_minus1")); // FIXME: might need rotation
+  fprintf(fp, "bhpy2 = %e\n",params_getd("par_P_minus2"));
+  fprintf(fp, "bhpz2 = %e\n",params_getd("par_P_minus3"));
+  fprintf(fp, "bhsx2 = %e\n",params_getd("par_S_minus1")); // FIXME: might need rotation
+  fprintf(fp, "bhsy2 = %e\n",params_getd("par_S_minus2"));
+  fprintf(fp, "bhsz2 = %e\n",params_getd("par_S_minus3"));
+  fprintf(fp,"#\n"); // FIXME: Are the following data use dby BAM?
+		     //  some must be calculated.
+  fprintf(fp,"# d = %e\n",0.); // FIXME
+  fprintf(fp,"# m1 = %e\n",params_getd("par_m_plus"));
+  fprintf(fp,"# m2 = %e\n",params_getd("par_m_minus"));
+  fprintf(fp,"# P1 = %e\n",0.);
+  fprintf(fp,"# P2 = %e\n",0.);
+  fprintf(fp,"# S1 = %e\n",0.);
+  fprintf(fp,"# S2 = %e\n",0.);
+  fprintf(fp,"#\n");
+  fprintf(fp,"# M1 = %e\n",0.); // FIXME
+  fprintf(fp,"# M2 = %e\n",0.);
+  fprintf(fp,"# Madm = %e\n",0.);
+  fprintf(fp,"# deltaMadm = %e\n",0.);
+  fprintf(fp,"# Ebind = %e\n",0.); // FIXME
+  fprintf(fp,"#\n");
+  fprintf(fp,"# d/Madm = %e\n",0.);
+  fprintf(fp,"# M1/Madm = %e\n",0.);
+  fprintf(fp,"# M2/Madm = %e\n",0.);
+  fprintf(fp,"# P1/Madm = %e\n",0.);
+  fprintf(fp,"# P2/Madm = %e\n",0.);
+  fprintf(fp,"# S1/Madm = %e\n",0.);
+  fprintf(fp,"# S2/Madm = %e\n",0.);
+  fprintf(fp,"# S1/M1^2 = %e\n",0.);
+  fprintf(fp,"# S2/M2^2 = %e\n",0.);
+  fprintf(fp,"#\n");
+  fprintf(fp,"data %d %d %d\n",n1,n2,n3);
+  for (int i=0; i<size; i++)
+    fprintf(fp, "%.16e\n",u->d0[i]);
+  fclose(fp);
+}
 
