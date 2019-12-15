@@ -525,7 +525,7 @@ void params_read(char *fname) {
   FILE *fp;
   char line[STRLEN], key[STRLEN], val[STRLEN];
   char *s;
-  
+
   fp = fopen(fname, "r");
   if (fp == NULL)
     ERROR("[params_read] Failed to open input file");
@@ -534,17 +534,17 @@ void params_read(char *fname) {
     if (line[0]=='#') continue;
     s = strtok(line, "=");
     strcpy(key,s);
-    s = strtok(NULL, s);
+    /* s = strtok(NULL, s); */
+    s = strtok(0, "=");
     strcpy(val,s);
-    //printf("%s %s\n",key,val);
+    strtok(val, "\n");
+    if (verbose && 0) printf("|%s|%s|\n",key,val);
     // Do not add parameters from input file, make sure they exist already
     for (int i =0; i < params->n; i++) {
       if (STREQL(key,params->key[i])) {
-	if (params->type[i]==INTEGER) 
-	  params->val[i] = (double)atoi(val);
-	else
-	  params->val[i] = atof(val); 
+	strcpy(params->val[i],val);
 	if (verbose) printf("[params_read] read: %s = %s\n",key,val);
+	break; // goto next line
       }
     }
 
@@ -560,20 +560,46 @@ void params_write(char * fname)
   if (fp == NULL)
     ERROR("[params_write] Failed to open file\n");
   for (int i =0; i < params->n; i++) {
-    if (params->type[i]==INTEGER)
-      fprintf(fp,"%s=%d\n",params->key[i],(int)params->val[i]);
-    else
-      fprintf(fp,"%s=%.12e\n",params->key[i],params->val[i]);
+    fprintf(fp,"%s=%s\n",params->key[i],params->val[i]);
   }
   fclose(fp);
 }
 
 /* get double */
-double params_getd(char * key)
+double params_get_real(char * key)
+{
+  double d;
+  for (int i =0; i < params->n; i++)  {
+    if (STREQL(key,params->key[i])) {
+      if (params->type[i]==REAL) {
+	return atof(params->val[i]);
+      }  else
+	ERROR("[params_get] parameter is not of type REAL\n");
+    }
+  }
+  ERROR("[params_get] parameter not found");
+}
+
+/* get int */
+int params_get_int(char * key) 
 {
   for (int i =0; i < params->n; i++)  {
     if (STREQL(key,params->key[i])) {
-      if (params->type[i]==REAL) 
+      if (params->type[i]==INTEGER) 
+	return atoi(params->val[i]);
+      else
+	ERROR("[params_get] parameter is not of type INTEGER\n");
+    }
+  }
+  ERROR("[params_get] parameter not found");
+}
+
+/* get string */
+char * params_get_str(char * key)
+{
+  for (int i =0; i < params->n; i++)  {
+    if (STREQL(key,params->key[i])) {
+      if (params->type[i]==STRING) 
 	return params->val[i];
       else
 	ERROR("[params_get] parameter is not of type REAL\n");
@@ -582,61 +608,107 @@ double params_getd(char * key)
   ERROR("[params_get] parameter not found");
 }
 
-/* get int */
-int params_geti(char * key) 
-{
-  for (int i =0; i < params->n; i++)  {
-    if (STREQL(key,params->key[i])) {
-      if (params->type[i]==INTEGER) 
-	return (int) params->val[i];
-      else
-	ERROR("[params_get] parameter is not of type INTEGER\n");
-    }
-  }
-  ERROR("[params_get] parameter not found");
-}
-
 /* set parameter */
-void params_setadd(char * key, int type, double val, int addpar)
+void params_setadd(char * key, int type, char* val, int addpar)
 {
   
   if (addpar) {
     int i = params->n;
     if (i>=NPARAMS) ERROR("Increase NPARAMS.");
-    strcpy(params->key[i],key);    
+    if (type>=N_PAR_TYPES) ERROR("Unknown parameter type.");
+    strcpy(params->key[i],key);
+    strcpy(params->val[i],val);    
     params->type[i] = type;
-    params->val[i] = val;
     params->n++;
-    if (0) printf ("Add parameter: %s TYPE=%d VALUE=%g (%d)\n",key,type,val,params->n);
+    if (0) printf ("Add parameter: %s TYPE=%s VALUE=%s (%d)\n",
+		   key,str_par_type[type],val,params->n);
     return;
   }
   
   for (int i =0; i < params->n; i++)  {
     if (STREQL(key,params->key[i])) {
-      params->val[i] = val;
+      strcpy(params->val[i],val);
       return;
     }
   }
   ERROR("[params_set] parameter not found\n");
 }
 
-void params_set(char * key, double val) {
-  params_setadd(key, 42, val, 0); // addpar=0 does not set the type
+/* 'set' wrappers */
+
+void params_set_int(char * key, int val) {
+  char cval[STRLEN];
+  sprintf(cval, "%d", val);
+  params_setadd(key, INTEGER, cval, 0); // Note: addpar=0 does not set the type
+}
+ 
+void params_set_bool(char * key, bool val) {
+  char cval[STRLEN];
+  sprintf(cval, "%d", (int)val);
+  params_setadd(key, INTEGER, cval, 0); // Note: addpar=0 does not set the type
 }
 
-void params_add(char * key, int type, double val) {
-  params_setadd(key, type, val, 1);
+void params_set_real(char * key, double val) {
+  char cval[STRLEN];
+  sprintf(cval, "%.16e", val);
+  params_setadd(key, REAL, cval, 0); // Note: addpar=0 does not set the type
 }
+
+void params_set_str(char * key, char *val) {
+  params_setadd(key, STRING, val, 0);
+}
+
+/* 'add' wrappers */
+
+void params_add_int(char * key, int val) {
+  char cval[STRLEN];
+  sprintf(cval, "%d", val);
+  params_setadd(key, INTEGER, cval, 1);
+}
+
+void params_add_bool(char * key, bool val) {
+  char cval[STRLEN];
+  sprintf(cval, "%d", (int)val);
+  params_setadd(key, INTEGER, cval, 0); 
+}
+
+void params_add_real(char * key, double val) {
+  char cval[STRLEN];
+  sprintf(cval, "%.16e", val);
+  params_setadd(key, REAL, cval, 1);
+}
+
+void params_add_str(char * key, char *val) {
+  params_setadd(key, STRING, val, 1);
+}
+
 
 /* -------------------------------------------------------------------------*/
+
+void make_output_dir()
+/* note this is unsafe */
+{
+  char s[STRLEN*4];
+  sprintf(s,"mkdir -p %s",params_get_str("outputdir"));
+  if (system(s)==-1) ERROR("System call failed to mkdir");
+  strcpy(s,params_get_str("outputdir"));
+  strcat (s,"/params.par");
+  params_write(s);
+}
 
 void write_derivs(derivs *u, const int n1, const int n2, const int n3,
 		  int include_derivatives_order, 
 		  const char *fname)
 /* output routine for derivs */
 {
+
+  char f[STRLEN*4];
+  strcpy(f,params_get_str("outputdir"));
+  strcat(f,"/");
+  strcat(f,fname);
+
   FILE *fp;
-  fp = fopen(fname, "w");
+  fp = fopen(f, "w");
   assert(fp);
   const int size = n1*n2*n3;
   fprintf(fp, "# %d %d %d\n",n1,n2,n3);
@@ -662,16 +734,21 @@ void write_derivs(derivs *u, const int n1, const int n2, const int n3,
 void write_confact_atxyz(double x, double y, double z, double u, 
 			 const char *fname)
 {
-  double par_b = params_getd("par_b");
-  double par_m_plus = params_getd("par_m_plus");
-  double par_m_minus = params_getd("par_m_minus");
+  double par_b = params_get_real("par_b");
+  double par_m_plus = params_get_real("par_m_plus");
+  double par_m_minus = params_get_real("par_m_minus");
   
   double r_plus = sqrt ((x - par_b) * (x - par_b) + y * y + z * z);
   double r_minus = sqrt ((x + par_b) * (x + par_b) + y * y + z * z);
   double psi = 1.+ 0.5 * par_m_plus  / r_plus + 0.5 * par_m_minus / r_minus + u;
 
+  char f[STRLEN*4];
+  strcpy(f,params_get_str("outputdir"));
+  strcat(f,"/");
+  strcat(f,fname);
+  
   FILE *fp;
-  fp = fopen(fname, "w");
+  fp = fopen(f, "w");
   assert(fp);
   fprintf(fp, "%.16e %.16e %.16e %.16e \n", x, y, z, psi);
   fclose(fp);
@@ -681,41 +758,47 @@ void write_bam_inifile(derivs *u, const int n1, const int n2, const int n3,
 		       const char *fname)
 /* output routine for derivs in BAM format */
 {
+
+  char f[STRLEN*4];
+  strcpy(f,params_get_str("outputdir"));
+  strcat(f,"/");
+  strcat(f,fname);
+
   FILE *fp;
-  fp = fopen(fname, "w");
+  fp = fopen(f, "w");
   assert(fp);
   const int size = n1*n2*n3;
   fprintf(fp, "# TwoPuncture.c\n");
   fprintf(fp, "# Black hole puncture data produced for bam's punctures_ps\n");
-  fprintf(fp, "# Newton_tol = %e\n",params_getd("Newton_tol"));
+  fprintf(fp, "# Newton_tol = %e\n",params_get_real("Newton_tol"));
   fprintf(fp, "# nx = %d\n",n1);
   fprintf(fp, "# ny = %d\n",n2);
   fprintf(fp, "# nz = %d\n",n3);
-  fprintf(fp, "bhmass1 = %e\n",params_getd("par_m_plus"));
-  fprintf(fp, "bhx1 = %e\n",params_getd("par_b")); // FIXME
-  fprintf(fp, "bhy1 = %e\n",params_getd("par_b")); //
-  fprintf(fp, "bhz1 = %e\n",params_getd("par_b")); //
-  fprintf(fp, "bhpx1 = %e\n",params_getd("par_P_plus1")); // FIXME: might need rotation
-  fprintf(fp, "bhpy1 = %e\n",params_getd("par_P_plus2"));
-  fprintf(fp, "bhpz1 = %e\n",params_getd("par_P_plus3"));
-  fprintf(fp, "bhsx1 = %e\n",params_getd("par_S_plus1")); // FIXME: might need rotation
-  fprintf(fp, "bhsy1 = %e\n",params_getd("par_S_plus2"));
-  fprintf(fp, "bhsz1 = %e\n",params_getd("par_S_plus3"));
-  fprintf(fp, "bhmass2 = %e\n",params_getd("par_m_minus"));
-  fprintf(fp, "bhx2 = %e\n",params_getd("par_b")); // FIXME
-  fprintf(fp, "bhy2 = %e\n",params_getd("par_b")); //
-  fprintf(fp, "bhz2 = %e\n",params_getd("par_b")); //
-  fprintf(fp, "bhpx2 = %e\n",params_getd("par_P_minus1")); // FIXME: might need rotation
-  fprintf(fp, "bhpy2 = %e\n",params_getd("par_P_minus2"));
-  fprintf(fp, "bhpz2 = %e\n",params_getd("par_P_minus3"));
-  fprintf(fp, "bhsx2 = %e\n",params_getd("par_S_minus1")); // FIXME: might need rotation
-  fprintf(fp, "bhsy2 = %e\n",params_getd("par_S_minus2"));
-  fprintf(fp, "bhsz2 = %e\n",params_getd("par_S_minus3"));
+  fprintf(fp, "bhmass1 = %e\n",params_get_real("par_m_plus"));
+  fprintf(fp, "bhx1 = %e\n",params_get_real("par_b")); // FIXME
+  fprintf(fp, "bhy1 = %e\n",params_get_real("par_b")); //
+  fprintf(fp, "bhz1 = %e\n",params_get_real("par_b")); //
+  fprintf(fp, "bhpx1 = %e\n",params_get_real("par_P_plus1")); // FIXME: might need rotation
+  fprintf(fp, "bhpy1 = %e\n",params_get_real("par_P_plus2"));
+  fprintf(fp, "bhpz1 = %e\n",params_get_real("par_P_plus3"));
+  fprintf(fp, "bhsx1 = %e\n",params_get_real("par_S_plus1")); // FIXME: might need rotation
+  fprintf(fp, "bhsy1 = %e\n",params_get_real("par_S_plus2"));
+  fprintf(fp, "bhsz1 = %e\n",params_get_real("par_S_plus3"));
+  fprintf(fp, "bhmass2 = %e\n",params_get_real("par_m_minus"));
+  fprintf(fp, "bhx2 = %e\n",params_get_real("par_b")); // FIXME
+  fprintf(fp, "bhy2 = %e\n",params_get_real("par_b")); //
+  fprintf(fp, "bhz2 = %e\n",params_get_real("par_b")); //
+  fprintf(fp, "bhpx2 = %e\n",params_get_real("par_P_minus1")); // FIXME: might need rotation
+  fprintf(fp, "bhpy2 = %e\n",params_get_real("par_P_minus2"));
+  fprintf(fp, "bhpz2 = %e\n",params_get_real("par_P_minus3"));
+  fprintf(fp, "bhsx2 = %e\n",params_get_real("par_S_minus1")); // FIXME: might need rotation
+  fprintf(fp, "bhsy2 = %e\n",params_get_real("par_S_minus2"));
+  fprintf(fp, "bhsz2 = %e\n",params_get_real("par_S_minus3"));
   fprintf(fp,"#\n"); // FIXME: Are the following data use dby BAM?
 		     //  some must be calculated.
   fprintf(fp,"# d = %e\n",0.); // FIXME
-  fprintf(fp,"# m1 = %e\n",params_getd("par_m_plus"));
-  fprintf(fp,"# m2 = %e\n",params_getd("par_m_minus"));
+  fprintf(fp,"# m1 = %e\n",params_get_real("par_m_plus"));
+  fprintf(fp,"# m2 = %e\n",params_get_real("par_m_minus"));
   fprintf(fp,"# P1 = %e\n",0.);
   fprintf(fp,"# P2 = %e\n",0.);
   fprintf(fp,"# S1 = %e\n",0.);

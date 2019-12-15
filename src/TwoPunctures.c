@@ -27,21 +27,28 @@ void TwoPunctures_params_set_Real(char *key, double value){
   /*
     Set parameters according to input.
   */
-  params_setadd(key, REAL, value, 0);       // replace, don't append new
+  params_set_real(key, value);       // replace, don't append new
 }
 
-void TwoPunctures_params_set_int(char *key, int value){
+void TwoPunctures_params_set_Int(char *key, int value){
   /*
     Set parameters according to input.
   */
-  params_setadd(key, INTEGER, value, 0);   // replace, don't append new
+  params_set_int(key, value);   // replace, don't append new
 }
 
 void TwoPunctures_params_set_Boolean(char *key, bool value){
   /*
     Set parameters according to input.
   */
-  params_setadd(key, INTEGER, value, 0);   // replace, don't append new
+  params_set_bool(key, value);   // replace, don't append new
+}
+
+void TwoPunctures_params_set_String(char *key, char * value){
+  /*
+    Set parameters according to input.
+  */
+  params_set_str(key, value);   // replace, don't append new
 }
 
 void TwoPunctures_params_set_inputfile(char* inputfile){
@@ -55,6 +62,15 @@ void TwoPunctures_params_set_inputfile(char* inputfile){
 
   if(inputfile!=NULL){
     params_read(inputfile);
+
+    char od[STRLEN];//SB: this can be improved.
+    int n = strlen(inputfile);
+    if (STREQL(inputfile+(n-4),".par")) {
+      strncpy (od,inputfile,n-4);
+      od[n-4] = '\0';
+      //printf("%s\n",s);
+      params_set_str("outputdir",od); 
+    }
   }
 }
 
@@ -65,51 +81,58 @@ void TwoPunctures_params_set_default(){
   _alloc_params_mem_if_req();
 
   /* Add parameters here */
-  params_add("par_b",REAL,1.0); // x coordinate of the m+ puncture; 1.0
-  params_add("par_m_plus",REAL,0.9); // mass of the m+ puncture; 1.0
-  params_add("par_m_minus",REAL,0.0); // mass of the m- puncture; 1.0
-  params_add("target_M_plus",REAL,1.0); // target ADM mass for m+; 0.5
-  params_add("target_M_minus",REAL,0.0); // target ADM mass for m-; 0.5
-  params_add("par_P_plus1",REAL,0.); // momentum of the m+ puncture
-  params_add("par_P_plus2",REAL,0.);
-  params_add("par_P_plus3",REAL,0.);
-  params_add("par_P_minus1",REAL,0.); // momentum of the m- puncture
-  params_add("par_P_minus2",REAL,0.);
-  params_add("par_P_minus3",REAL,0.);
-  params_add("par_S_plus1",REAL,0.); // spin of the m+ puncture
-  params_add("par_S_plus2",REAL,0.);
-  params_add("par_S_plus3",REAL,0.);
-  params_add("par_S_minus1",REAL,0.); // spin of the m- puncture
-  params_add("par_S_minus2",REAL,0.);
-  params_add("par_S_minus3",REAL,0.);
-  params_add("center_offset1",REAL,0.0); // offset b=0 to position (x,y,z) ; 0
-  params_add("center_offset2",REAL,0.0);  // ; 0
-  params_add("center_offset3",REAL,0.0); // ; 0
-  params_add("give_bare_mass",INTEGER,1); // User provides bare masses rather than target ADM masses ; 1
-  params_add("npoints_A",INTEGER,30); // Number of coefficients in the compactified radial direction
-  params_add("npoints_B",INTEGER,30); // Number of coefficients in the angular direction
-  params_add("npoints_phi",INTEGER,16); // Number of coefficients in the phi direction
-  params_add("Newton_tol",REAL,1e-10); // Tolerance for Newton solver
-  params_add("Newton_maxit",INTEGER,5); // Maximum number of Newton iterations
-  params_add("TP_epsilon",REAL,0.);  // A small number to smooth out singularities at the puncture locations
-  params_add("TP_Tiny",REAL,0.);  // Tiny number to avoid nans near or at the pucture locations
-  params_add("TP_Extend_Radius",REAL,0); // Radius of an extended spacetime instead of the puncture ; 0
-  params_add("adm_tol",REAL,1e-10); // Tolerance of ADM masses when give_bare_mass=no
-  params_add("do_residuum_debug_output",INTEGER,0); // Output debug information about the residuum
-  params_add("do_initial_debug_output",INTEGER,0); // Output debug information about initial guess
-  params_add("use_external_initial_guess",INTEGER,0); // Set initial guess by external function?
-  params_add("solve_momentum_constraint",INTEGER,0); // Solve for momentum constraint?
-  params_add("do_solution_file_output",INTEGER,0); // output .data files
+  params_add_real("par_b",1.0); // x coordinate of the m+ puncture; 1.0
+  params_add_real("par_m_plus",0.9); // mass of the m+ puncture; 1.0
+  params_add_real("par_m_minus",0.0); // mass of the m- puncture; 1.0
+  params_add_real("target_M_plus",1.0); // target ADM mass for m+; 0.5
+  params_add_real("target_M_minus",0.0); // target ADM mass for m-; 0.5
+  params_add_real("par_P_plus1",0.); // momentum of the m+ puncture
+  params_add_real("par_P_plus2",0.);
+  params_add_real("par_P_plus3",0.);
+  params_add_real("par_P_minus1",0.); // momentum of the m- puncture
+  params_add_real("par_P_minus2",0.);
+  params_add_real("par_P_minus3",0.);
+  params_add_real("par_S_plus1",0.); // spin of the m+ puncture
+  params_add_real("par_S_plus2",0.);
+  params_add_real("par_S_plus3",0.);
+  params_add_real("par_S_minus1",0.); // spin of the m- puncture
+  params_add_real("par_S_minus2",0.);
+  params_add_real("par_S_minus3",0.);
+  params_add_real("center_offset1",0.0); // offset b=0 to position (x,y,z) ; 0
+  params_add_real("center_offset2",0.0);  // ; 0
+  params_add_real("center_offset3",0.0); // ; 0
+
+  params_add_int("give_bare_mass",1); // User provides bare masses rather than target ADM masses ; 1
+  params_add_int("npoints_A",30); // Number of coefficients in the compactified radial direction
+  params_add_int("npoints_B",30); // Number of coefficients in the angular direction
+  params_add_int("npoints_phi",16); // Number of coefficients in the phi direction
+
+  params_add_real("Newton_tol",1e-10); // Tolerance for Newton solver
+  params_add_int("Newton_maxit",5); // Maximum number of Newton iterations
+
+  params_add_real("TP_epsilon",0.);  // A small number to smooth out singularities at the puncture locations
+  params_add_real("TP_Tiny",0.);  // Tiny number to avoid nans near or at the pucture locations
+  params_add_real("TP_Extend_Radius",0); // Radius of an extended spacetime instead of the puncture ; 0
+  params_add_real("adm_tol",1e-10); // Tolerance of ADM masses when give_bare_mass=no
+  params_add_int("solve_momentum_constraint",0); // Solve for momentum constraint?
+  params_add_int("use_external_initial_guess",0); // Set initial guess by external function?
+
+  // output
+  params_add_str("outputdir","./"); // Output debug information about the residuum
+  params_add_int("do_residuum_debug_output",0); // Output debug information about the residuum
+  params_add_int("do_initial_debug_output",0); // Output debug information about initial guess
+  params_add_int("do_solution_file_output",0); // output .data files
+  params_add_int("do_bam_file_output",0); // output input files for bam's puncture_ps
   
   // Interpolation
-  params_add("grid_setup_method",INTEGER,taylor_expansion); // How to fill the 3D grid from the spectral grid ?
-  params_add("initial_lapse",INTEGER,psin); // How to set the lapse ?
-  params_add("initial_lapse_psi_exponent",REAL,-2.0); // Exponent n for psi^-n initial lapse profile (<0)
-  params_add("conformal_state",INTEGER,1); // Ways to set the conformal factor
-  params_add("swap_xz",INTEGER,0); // Swap x and z coordinates when interpolating, // so that the black holes are separated in the z direction; 0
-  params_add("multiply_old_lapse",INTEGER,0); // Multiply the old lapse with the new one
+  params_add_int("grid_setup_method",taylor_expansion); // How to fill the 3D grid from the spectral grid ?
+  params_add_int("initial_lapse",psin); // How to set the lapse ?
+  params_add_real("initial_lapse_psi_exponent",-2.0); // Exponent n for psi^-n initial lapse profile (<0)
+  params_add_int("conformal_state",1); // Ways to set the conformal factor
+  params_add_int("swap_xz",0); // Swap x and z coordinates when interpolating, // so that the black holes are separated in the z direction; 0
+  params_add_int("multiply_old_lapse",0); // Multiply the old lapse with the new one
 
-  params_add("verbose",INTEGER,0);
+  params_add_int("verbose",0);
 
 }
 
@@ -129,45 +152,53 @@ ini_data* TwoPunctures_make_initial_data() {
   /* Prepare initial data based on internal settings 
      This alloc the mem */
 
-  const int verbose = params_geti("verbose");
+  const int verbose = params_get_int("verbose");
 
+  char outdir[STRLEN];
+  if (params_get_int("do_residuum_debug_output")+
+      params_get_int("do_initial_debug_output")+
+      params_get_int("do_solution_file_output")+
+      params_get_int("do_bam_file_output")) {
+    make_output_dir();
+  }
+  
   double par_P_plus[3], par_P_minus[3];
-  par_P_plus[0] = params_getd("par_P_plus1");
-  par_P_plus[1] = params_getd("par_P_plus2");
-  par_P_plus[2] = params_getd("par_P_plus3");
-  par_P_minus[0] = params_getd("par_P_minus1");
-  par_P_minus[1] = params_getd("par_P_minus2");
-  par_P_minus[2] = params_getd("par_P_minus3");
+  par_P_plus[0] = params_get_real("par_P_plus1");
+  par_P_plus[1] = params_get_real("par_P_plus2");
+  par_P_plus[2] = params_get_real("par_P_plus3");
+  par_P_minus[0] = params_get_real("par_P_minus1");
+  par_P_minus[1] = params_get_real("par_P_minus2");
+  par_P_minus[2] = params_get_real("par_P_minus3");
 
   double par_S_plus[3], par_S_minus[3];
-  par_S_plus[0] = params_getd("par_S_plus1");
-  par_S_plus[1] = params_getd("par_S_plus2");
-  par_S_plus[2] = params_getd("par_S_plus3");
-  par_S_minus[0] = params_getd("par_S_minus1");
-  par_S_minus[1] = params_getd("par_S_minus2");
-  par_S_minus[2] = params_getd("par_S_minus3");
+  par_S_plus[0] = params_get_real("par_S_plus1");
+  par_S_plus[1] = params_get_real("par_S_plus2");
+  par_S_plus[2] = params_get_real("par_S_plus3");
+  par_S_minus[0] = params_get_real("par_S_minus1");
+  par_S_minus[1] = params_get_real("par_S_minus2");
+  par_S_minus[2] = params_get_real("par_S_minus3");
 
-  double par_b = params_getd("par_b");
+  double par_b = params_get_real("par_b");
 
   double center_offset[3];
-  center_offset[0] = params_getd("center_offset1");
-  center_offset[1] = params_getd("center_offset2");
-  center_offset[2] = params_getd("center_offset3");
+  center_offset[0] = params_get_real("center_offset1");
+  center_offset[1] = params_get_real("center_offset2");
+  center_offset[2] = params_get_real("center_offset3");
 
   // ---------------------------------------------------
 
   double E; // ADM energy of the Bowen-York spacetime"
   double J1, J2, J3; // Angular momentum of the Bowen-York spacetime"
-  double mp = params_getd("par_m_plus"), mm = params_getd("par_m_minus"); // Bare masses of the punctures
+  double mp = params_get_real("par_m_plus"), mm = params_get_real("par_m_minus"); // Bare masses of the punctures
   double mp_adm, mm_adm; // ADM masses of the punctures (measured at the other spatial infinities
   double admMass;
 
   // ---------------------------------------------------
 
   int const nvar = 1,
-    n1 = params_geti("npoints_A"),
-    n2 = params_geti("npoints_B"),
-    n3 = params_geti("npoints_phi");
+    n1 = params_get_int("npoints_A"),
+    n2 = params_get_int("npoints_B"),
+    n3 = params_get_int("npoints_phi");
 
   int const ntotal = n1 * n2 * n3 * nvar;
 #if (0)
@@ -216,31 +247,31 @@ ini_data* TwoPunctures_make_initial_data() {
     }
 
     /* call for external initial guess */
-    if (params_geti("use_external_initial_guess")) {
+    if (params_get_int("use_external_initial_guess")) {
       set_initial_guess(v);
     }
 
     /* If bare masses are not given, iteratively solve for them given the
        target ADM masses target_M_plus and target_M_minus and with initial
        guesses given by par_m_plus and par_m_minus. */
-    if(!(params_geti("give_bare_mass"))) {
+    if(!(params_get_int("give_bare_mass"))) {
 
       double tmp, mp_adm_err, mm_adm_err;
       //char valbuf[100];
 
-      double M_p = params_getd("target_M_plus");
-      double M_m = params_getd("target_M_minus");
+      double M_p = params_get_real("target_M_plus");
+      double M_m = params_get_real("target_M_minus");
 
       if (verbose) {
 	printf ("Attempting to find bare masses.\n");
 	printf ("Target ADM masses: M_p=%g and M_m=%g\n", M_p, M_m);
-	printf ("ADM mass tolerance: %g\n", params_getd("adm_tol"));
+	printf ("ADM mass tolerance: %g\n", params_get_real("adm_tol"));
       }
 
       /* Loop until both ADM masses are within adm_tol of their target */
       do {
         if (verbose) printf ("Bare masses: mp=%.15g, mm=%.15g\n", mp, mm);
-        Newton (nvar, n1, n2, n3, v, params_getd("Newton_tol"), 1);
+        Newton (nvar, n1, n2, n3, v, params_get_real("Newton_tol"), 1);
 
         F_of_v (nvar, n1, n2, n3, v, F, u);
 
@@ -265,13 +296,13 @@ ini_data* TwoPunctures_make_initial_data() {
         mp = (tmp + M_p - M_m)/(2.*(1 + up));
         mm = (tmp - M_p + M_m)/(2.*(1 + um));
 
-      } while ( (mp_adm_err > params_getd("adm_tol")) ||
-                (mm_adm_err > params_getd("adm_tol")) );
+      } while ( (mp_adm_err > params_get_real("adm_tol")) ||
+                (mm_adm_err > params_get_real("adm_tol")) );
 
       if (verbose) printf ("Found bare masses.\n");
     }
 
-    Newton (nvar, n1, n2, n3, v, params_getd("Newton_tol"), params_geti("Newton_maxit"));
+    Newton (nvar, n1, n2, n3, v, params_get_real("Newton_tol"), params_get_int("Newton_maxit"));
 
     F_of_v (nvar, n1, n2, n3, v, F, u);
 
@@ -290,8 +321,7 @@ ini_data* TwoPunctures_make_initial_data() {
     if (verbose) printf ("Puncture 2 ADM mass is %g\n", mm_adm);
 
     /* print out ADM mass, eq.: \Delta M_ADM=2*r*u=4*b*V for A=1,B=0,phi=0 */
-    admMass = (mp + mm
-               - 4*par_b*PunctEvalAtArbitPosition(v->d0, 0, 1, 0, 0, nvar, n1, n2, n3));
+    admMass = (mp + mm - 4*par_b*PunctEvalAtArbitPosition(v->d0, 0, 1, 0, 0, nvar, n1, n2, n3));
     if (verbose) printf ("The total ADM mass is %g\n", admMass);
 
     E = admMass;
@@ -302,8 +332,8 @@ ini_data* TwoPunctures_make_initial_data() {
 
   }
 
-  if (params_geti("do_solution_file_output")) {
-    /* Output the solution */
+  if (params_get_int("do_solution_file_output")) {
+    /* Output the solution */    
     write_derivs( u, n1,n2,n3, 
 		  0, // =0,1,2 derivatives to output
 		  "u.data");
@@ -314,11 +344,20 @@ ini_data* TwoPunctures_make_initial_data() {
 		  0, // =0,1,2 derivatives to output
 		  "cf_v.data");
   }
+
+  if (params_get_int("do_bam_file_output")) {
+    /* Output the solution for bam */
+    write_bam_inifile( u, n1,n2,n3,"u.bamdata");
+    write_bam_inifile( v, n1,n2,n3,"v.bamdata");
+    write_bam_inifile( cf_v, n1,n2,n3,"cf_v.bamdata");
+  }
   
-  //free_dvector (F, 0, ntotal - 1);
-  //free_derivs (u);
-  //free_derivs (v);
-  //free_derivs (cf_v);
+  /*
+    free_dvector (F, 0, ntotal - 1);
+    free_derivs (u);
+    free_derivs (v);
+    free_derivs (cf_v);
+  */  
   /*
   ini_data ret;  // ret_ptr = &ret;
   ret.F = F;     // (&ret)->F = F;
@@ -331,7 +370,7 @@ ini_data* TwoPunctures_make_initial_data() {
   ini_data *data;
   data = (ini_data *) calloc(1, sizeof(ini_data)); 
   if (data == NULL) ERROR("Out of memory");  
-  data->F = F; //SB: Is this safe? should we alloc data->arrays and copy?
+  data->F = F; //SB: Or should we alloc data->arrays and copy?
   data->u = u;
   data->v = v;
   data->cf_v = cf_v;
@@ -374,7 +413,8 @@ void TwoPunctures_Cartesian_interpolation
 
   // TODO:
   // add safety check for null ini_data to make it
-
+  if (data == NULL) ERROR("No data to interpolate");
+  
   /* // unpack initial data structure */
   /* double *F = data.F; */
   /* // derivs *u = data.u; */
@@ -388,45 +428,27 @@ void TwoPunctures_Cartesian_interpolation
   derivs *cf_v = data->cf_v; 
   int ntotal = data->ntotal; 
   
-  /* // inspect struct */
-  /* printf("ntotal: %d\n", ntotal); */
-
-  /* int ix = 0; */
-  /* int ix_max = 10; */
-
-  /* for(ix=0; ix < ix_max; ix++){ */
-  /*   printf("(F[%d], v->d0[%d], cf_v->d0[%d])=(%lf,%lf,%lf)\n", */
-  /*          ix, ix, ix, */
-  /*          F[ix], v->d0[ix], cf_v->d0[ix]); */
-  /* } */
-
-  /* ************************************* */
-  /* INTERPOLATE ON CARTESIAN GRID - BEGIN */
-  /* ************************************* */
-
   // ---- prepare required parameters
-  double par_b = params_getd("par_b");
-  double mp = params_getd("par_m_plus"),
-    mm = params_getd("par_m_minus"); // Bare masses of the punctures
+  double par_b = params_get_real("par_b");
+  double mp = params_get_real("par_m_plus"),
+    mm = params_get_real("par_m_minus"); // Bare masses of the punctures
 
   double center_offset[3];
-  center_offset[0] = params_getd("center_offset1");
-  center_offset[1] = params_getd("center_offset2");
-  center_offset[2] = params_getd("center_offset3");
+  center_offset[0] = params_get_real("center_offset1");
+  center_offset[1] = params_get_real("center_offset2");
+  center_offset[2] = params_get_real("center_offset3");
 
   int const nvar = 1,
-    n1 = params_geti("npoints_A"),
-    n2 = params_geti("npoints_B"),
-    n3 = params_geti("npoints_phi");
+    n1 = params_get_int("npoints_A"),
+    n2 = params_get_int("npoints_B"),
+    n3 = params_get_int("npoints_phi");
 
-
-  const int verbose = params_geti("verbose");
+  const int verbose = params_get_int("verbose");
 
   enum GRID_SETUP_METHOD { GSM_Taylor_expansion, GSM_evaluation };
   enum GRID_SETUP_METHOD gsm;
 
-
-  switch (params_geti("grid_setup_method")) {
+  switch (params_get_int("grid_setup_method")) {
   case taylor_expansion:
     gsm = GSM_Taylor_expansion;
     break;
@@ -437,13 +459,11 @@ void TwoPunctures_Cartesian_interpolation
     ERROR("Something wrong setting parameter: grid_setup_method ");
   }
 
-  // ----
-
   int antisymmetric_lapse=0,
     averaged_lapse=0,
     pmn_lapse=0,
     brownsville_lapse=0;
-  switch (params_geti("initial_lapse")) {
+  switch (params_get_int("initial_lapse")) {
   case antisymmetric:
     antisymmetric_lapse = 1;
     break;
@@ -458,8 +478,7 @@ void TwoPunctures_Cartesian_interpolation
     break;
   }
 
-  const double initial_lapse_psi_exponent = params_getd
-    ("initial_lapse_psi_exponent");
+  const double initial_lapse_psi_exponent = params_get_real("initial_lapse_psi_exponent");
 
   if (verbose) {
     if (pmn_lapse)
@@ -471,30 +490,17 @@ void TwoPunctures_Cartesian_interpolation
 	     initial_lapse_psi_exponent);
   }
 
-  /*
-    if (CCTK_EQUALS(metric_type, "static conformal")) {
-    if (CCTK_EQUALS(conformal_storage, "factor")) {
-    *conformal_state = 1;
-    } else if (CCTK_EQUALS(conformal_storage, "factor+derivs")) {
-    *conformal_state = 2;
-    } else if (CCTK_EQUALS(conformal_storage, "factor+derivs+2nd derivs")) {
-    *conformal_state = 3;
-    }
-    } else {
-    conformal_state = 0;
-    }
-  */
-  // conformal_state  = 0, 1,2,3 -> NONSTATIC, FACTOR0,FACTOR1,FACTOR2
+  //SB: conformal_state  = 0, 1,2,3 -> NONSTATIC, FACTOR0,FACTOR1,FACTOR2
   //SB: check what to use here !!!
-  const int conformal_state = params_geti("conformal_state");
+  const int conformal_state = params_get_int("conformal_state");
 
 
-  const double TP_epsilon = params_getd("TP_epsilon");
-  const double TP_Tiny = params_getd("TP_Tiny");
-  const double TP_Extend_Radius = params_getd("TP_Extend_Radius");
+  const double TP_epsilon = params_get_real("TP_epsilon");
+  const double TP_Tiny = params_get_real("TP_Tiny");
+  const double TP_Extend_Radius = params_get_real("TP_Extend_Radius");
 
-  const int multiply_old_lapse = params_geti("multiply_old_lapse");
-  const int swap_xz = params_geti("swap_xz");
+  const int multiply_old_lapse = params_get_int("multiply_old_lapse");
+  const int swap_xz = params_get_int("swap_xz");
 
   if (verbose) printf ("Interpolating result");
 
@@ -535,12 +541,10 @@ void TwoPunctures_Cartesian_interpolation
         double U;
         switch (gsm) {
         case GSM_Taylor_expansion:
-          U = PunctTaylorExpandAtArbitPosition
-            (0, nvar, n1, n2, n3, v, xx, yy, zz);
+          U = PunctTaylorExpandAtArbitPosition(0, nvar, n1, n2, n3, v, xx, yy, zz);
           break;
         case GSM_evaluation:
-          U = PunctIntPolAtArbitPositionFast(0, nvar, n1, n2, n3, cf_v,
-                                             xx, yy, zz);
+          U = PunctIntPolAtArbitPositionFast(0, nvar, n1, n2, n3, cf_v,xx, yy, zz);
           break;
         default:
           assert (0);
@@ -739,10 +743,6 @@ void TwoPunctures_Cartesian_interpolation
       } /* for i */
     }   /* for j */
   }     /* for k */
-
-  /* ************************************* */
-  /* INTERPOLATE ON CARTESIAN GRID - END   */
-  /* ************************************* */
 
 };
 

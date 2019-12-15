@@ -5,24 +5,24 @@
 double BY_KKofxyz (double x, double y, double z)
 {
 
-  double par_b = params_getd("par_b");
+  double par_b = params_get_real("par_b");
 
   double par_P_plus[3], par_P_minus[3];
   double par_S_plus[3], par_S_minus[3];
 
-  par_P_plus[0] = params_getd("par_P_plus1");
-  par_P_plus[1] = params_getd("par_P_plus2");
-  par_P_plus[2] = params_getd("par_P_plus3");
-  par_P_minus[0] = params_getd("par_P_minus1");
-  par_P_minus[1] = params_getd("par_P_minus2");
-  par_P_minus[2] = params_getd("par_P_minus3");
+  par_P_plus[0] = params_get_real("par_P_plus1");
+  par_P_plus[1] = params_get_real("par_P_plus2");
+  par_P_plus[2] = params_get_real("par_P_plus3");
+  par_P_minus[0] = params_get_real("par_P_minus1");
+  par_P_minus[1] = params_get_real("par_P_minus2");
+  par_P_minus[2] = params_get_real("par_P_minus3");
   
-  par_S_plus[0] = params_getd("par_S_plus1");
-  par_S_plus[1] = params_getd("par_S_plus2");
-  par_S_plus[2] = params_getd("par_S_plus3");
-  par_S_minus[0] = params_getd("par_S_minus1");
-  par_S_minus[1] = params_getd("par_S_minus2");
-  par_S_minus[2] = params_getd("par_S_minus3");
+  par_S_plus[0] = params_get_real("par_S_plus1");
+  par_S_plus[1] = params_get_real("par_S_plus2");
+  par_S_plus[2] = params_get_real("par_S_plus3");
+  par_S_minus[0] = params_get_real("par_S_minus1");
+  par_S_minus[1] = params_get_real("par_S_minus2");
+  par_S_minus[2] = params_get_real("par_S_minus3");
   
   int i, j;
   double r_plus, r2_plus, r3_plus, r_minus, r2_minus, r3_minus, np_Pp, nm_Pm,
@@ -82,26 +82,26 @@ double BY_KKofxyz (double x, double y, double z)
 void BY_Aijofxyz (double x, double y, double z, double Aij[3][3])
 {
   
-  double par_b = params_getd("par_b");
-  double TP_epsilon = params_getd("TP_epsilon");
-  double TP_Tiny = params_getd("TP_Tiny");
+  double par_b = params_get_real("par_b");
+  double TP_epsilon = params_get_real("TP_epsilon");
+  double TP_Tiny = params_get_real("TP_Tiny");
 
   double par_P_plus[3], par_P_minus[3];
   double par_S_plus[3], par_S_minus[3];
 
-  par_P_plus[0] = params_getd("par_P_plus1");
-  par_P_plus[1] = params_getd("par_P_plus2");
-  par_P_plus[2] = params_getd("par_P_plus3");
-  par_P_minus[0] = params_getd("par_P_minus1");
-  par_P_minus[1] = params_getd("par_P_minus2");
-  par_P_minus[2] = params_getd("par_P_minus3");
+  par_P_plus[0] = params_get_real("par_P_plus1");
+  par_P_plus[1] = params_get_real("par_P_plus2");
+  par_P_plus[2] = params_get_real("par_P_plus3");
+  par_P_minus[0] = params_get_real("par_P_minus1");
+  par_P_minus[1] = params_get_real("par_P_minus2");
+  par_P_minus[2] = params_get_real("par_P_minus3");
   
-  par_S_plus[0] = params_getd("par_S_plus1");
-  par_S_plus[1] = params_getd("par_S_plus2");
-  par_S_plus[2] = params_getd("par_S_plus3");
-  par_S_minus[0] = params_getd("par_S_minus1");
-  par_S_minus[1] = params_getd("par_S_minus2");
-  par_S_minus[2] = params_getd("par_S_minus3");
+  par_S_plus[0] = params_get_real("par_S_plus1");
+  par_S_plus[1] = params_get_real("par_S_plus2");
+  par_S_plus[2] = params_get_real("par_S_plus3");
+  par_S_minus[0] = params_get_real("par_S_minus1");
+  par_S_minus[1] = params_get_real("par_S_minus2");
+  par_S_minus[2] = params_get_real("par_S_minus3");
   
   int i, j;
   double r_plus, r2_plus, r3_plus, r_minus, r2_minus, r3_minus, np_Pp, nm_Pm,
@@ -164,9 +164,9 @@ void NonLinEquations (double rho_adm,
 		      double x, double r, double phi,
 		      double y, double z, derivs *U, double *values)
 {
-  double par_b = params_getd("par_b");
-  double par_m_plus = params_getd("par_m_plus");
-  double par_m_minus = params_getd("par_m_minus");
+  double par_b = params_get_real("par_b");
+  double par_m_plus = params_get_real("par_m_plus");
+  double par_m_minus = params_get_real("par_m_minus");
 
   double r_plus, r_minus, psi, psi2, psi4, psi7;
   double mu;
@@ -187,9 +187,9 @@ void LinEquations (double A, double B, double X, double R,
 		   double x, double r, double phi,
 		   double y, double z, derivs *dU, derivs *U, double *values)
 {
-  double par_b = params_getd("par_b");
-  double par_m_plus = params_getd("par_m_plus");
-  double par_m_minus = params_getd("par_m_minus");
+  double par_b = params_get_real("par_b");
+  double par_m_plus = params_get_real("par_m_plus");
+  double par_m_minus = params_get_real("par_m_minus");
   
   double r_plus, r_minus, psi, psi2, psi4, psi8;
   

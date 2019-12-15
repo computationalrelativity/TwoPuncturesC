@@ -25,8 +25,13 @@ Main modifs from `Cactus`/`EinsteinToolkit`
  
 TODO
 
+ * Correct internal memory leaks (Valgrind)
  * Verify stand alone version against `Cactus`/`EinsteinToolkit`
  * Create lib 
  * Verify Cartesian grid interpolator against `Cactus`/`EinsteinToolkit` and/or the stand alone code
 
-SB 01/2019
+History
+
+ * SB 12/2019 changed the way 'derivs' data are allocated, deallocate, and passed around. Extended parameter functionality, added derivs and bam output.
+ * BD 09/2019 created lib
+ * SB 01/2019 started

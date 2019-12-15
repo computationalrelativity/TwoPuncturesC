@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
 #include <math.h>
 #include <ctype.h>
 #include <time.h>
@@ -49,6 +50,10 @@
 enum{
   taylor_expansion,// use a Taylor expansion about the nearest collocation point (fast, but might be inaccurate)
   evaluation, // evaluate using all spectral coefficients (slow)
+  N_interp_opt,
+};
+static const char* str_interp_opt[N_interp_opt] = {
+  "taylor", "spectral"
 };
 
 /* lapse options */
@@ -57,6 +62,10 @@ enum{
   averaged, // averaged lapse for two puncture black holes, 0 <= alpha <= +1"
   psin, // Based on the initial conformal factor
   brownsville, // See Phys. Rev. D 74, 041501 (2006)
+  N_lapse_opt,
+};
+static const char* str_lapse_opt[N_lapse_opt] = {
+  "antisymmetric", "averaged", "psin", "brownsville",
 };
 
 /* conformalfactor options */
@@ -65,11 +74,14 @@ enum{
   FACTOR0, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor")
   FACTOR1, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs")
   FACTOR2, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs+2nd derivs")
+  N_cf_opt,
+};
+static const char* str_cf_opt[N_cf_opt] = {
+  "nonstatic", "static0", "static01", "static012",
 };
 
 #define use_sources (0) //SB: do not add the source terms
 #define rescale_sources (1) // If sources are used - rescale them after solving?
-#define CARTESIAN_INTERP (0) // Turn on the interpolation ?
 
 /* Structure with field and derivatives */
 typedef struct DERIVS
@@ -87,12 +99,18 @@ typedef struct DERIVS
 enum{
   INTEGER,
   REAL,
-  PARAMSTYPES,
+  STRING,
+  N_PAR_TYPES,
 };
+static const char* str_par_type[N_PAR_TYPES] = {
+  "INTEGER", "REAL", "STRING", 
+};
+
 typedef struct {
   int type[NPARAMS];
   char key[NPARAMS][STRLEN];
-  double val[NPARAMS];
+  //double val[NPARAMS];
+  char val[NPARAMS][STRLEN];
   int n;
   //parameters *next;
 } parameters;
@@ -193,17 +211,26 @@ void params_alloc();
 void params_free();
 void params_read(char *fname);
 void params_write(char * fname);
-double params_getd(char * key);
-int params_geti(char * key);
-void params_setadd(char * key, int type, double val, int addpar);
-void params_set(char * key, double val);
-void params_add(char * key, int type, double val);
+double params_get_real(char * key);
+int params_get_int(char * key);
+char *params_get_str(char * key);
+void params_setadd(char * key, int type, char *val, int addpar);
+void params_set_int(char * key, int val);
+void params_set_bool(char * key, bool val);
+void params_set_real(char * key, double val);
+void params_set_str(char * key, char* val);
+void params_add_int(char * key, int val);
+void params_add_real(char * key, double val);
+void params_add_str(char * key, char *val);
 
+void make_output_dir();
 void write_derivs(derivs *u, const int n1, const int n2, const int n3,
 		  int include_derivatives_order, 
 		  const char *fname);
 void write_confact_atxyz(double x, double y, double z, double u,  
 			 const char *fname);
+void write_bam_inifile(derivs *u, const int n1, const int n2, const int n3,
+		       const char *fname);
 
 /* TwoPunctures.c */
 
@@ -226,7 +253,7 @@ extern "C" {
   // set based on input file
   void TwoPunctures_params_set_inputfile(char *inputfile);
   void TwoPunctures_params_set_Real(char *key, double value);
-  void TwoPunctures_params_set_int(char *key, int value);
+  void TwoPunctures_params_set_Int(char *key, int value);
   void TwoPunctures_params_set_Boolean(char *key, bool value);
 
   ini_data * TwoPunctures_make_initial_data();

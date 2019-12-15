@@ -3,10 +3,9 @@
 # - it will ignore lines starting with '#' , and 
 # - it will look for strings '<key>=<value>'
 # be sure not to format properly the parfile and do not leave spaces ...
+#
+# example for spherical puncture 
+#
 verbose=1
-par_b=1.
-par_m_plus=1.
-outputdir=test
-do_solution_file_output=1
-do_bam_file_output=1
+par_m_plus=0.9
 # be also sure not to leave blank lines after this.

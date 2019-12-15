@@ -21,8 +21,8 @@ int main(int argc, char* argv[]) {
     Test parameter injection.
   */
   TwoPunctures_params_set_Boolean("verbose", true);
-  TwoPunctures_params_set_Real("par_b", 1.0);
-  TwoPunctures_params_set_Real("par_m_plus", 1.0);
+  TwoPunctures_params_set_Real("par_b", 1.);
+  TwoPunctures_params_set_Real("par_m_plus", 1.2);
 #endif
 
   /*

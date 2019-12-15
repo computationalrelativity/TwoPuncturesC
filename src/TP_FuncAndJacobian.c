@@ -180,9 +180,9 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
      at interior points and at the boundaries "+/-" 
   */
 
-  double par_b = params_getd("par_b");
-  double par_m_plus = params_getd("par_m_plus");
-  double par_m_minus = params_getd("par_m_minus");
+  double par_b = params_get_real("par_b");
+  double par_m_plus = params_get_real("par_m_plus");
+  double par_m_minus = params_get_real("par_m_minus");
   
   int i, j, k, ivar, indx;
   double al, be, A, B, X, R, x, r, phi, y, z, Am1, *values;
@@ -255,9 +255,12 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
 
   double psi, psi2, psi4, psi7, r_plus, r_minus;
 
+  char fname[STRLEN];
   FILE *debugfile = NULL;
-  if (params_geti("do_residuum_debug_output")) {
-    debugfile = fopen("res.dat", "w");
+  if (params_get_int("do_residuum_debug_output")) {
+    strcpy(fname,params_get_str("outputdir"));
+    strcat (fname,"/res.dat");
+    debugfile = fopen(fname, "w");
     assert(debugfile);
   }
   
@@ -370,7 +373,7 @@ void J_times_dv (int nvar, int n1, int n2, int n3, derivs *dv,
      at interior points and at the boundaries "+/-" 
   */
 
-  double par_b = params_getd("par_b");
+  double par_b = params_get_real("par_b");
   
   int i, j, k, ivar, indx;
   double al, be, A, B, X, R, x, r, phi, y, z, Am1, *values;
@@ -455,7 +458,7 @@ void JFD_times_dv (int i, int j, int k, int nvar, int n1, int n2,
      Last  row to be calculated: row = Index(nvar-1, i, j, k; nvar, n1, n2, n3)
      These rows are stored in the vector JFDdv[0] ... JFDdv[nvar-1]. */
 
-  double par_b = params_getd("par_b");
+  double par_b = params_get_real("par_b");
   
   int ivar, indx;
   double al, be, A, B, X, R, x, r, phi, y, z, Am1;
@@ -768,7 +771,7 @@ double PunctTaylorExpandAtArbitPosition (int ivar, int nvar, int n1, int n2, int
 {
   /* Calculates the value of v at an arbitrary position (x,y,z)*/
   
-  double par_b = params_getd("par_b");
+  double par_b = params_get_real("par_b");
   
   double xs, ys, zs, rs2, phi, X, R, A, B, al, be, aux1, aux2, a, b, c,
     result, Ui;
@@ -829,7 +832,7 @@ double PunctIntPolAtArbitPosition (int ivar, int nvar,
 {
   /* Calculates the value of v at an arbitrary position (x,y,z)*/
   
-  double par_b = params_getd("par_b");
+  double par_b = params_get_real("par_b");
 
   double xs, ys, zs, rs2, phi, X, R, A, B, aux1, aux2, result, Ui;
 
@@ -915,7 +918,7 @@ double PunctIntPolAtArbitPositionFast (int ivar, int nvar,
 {
   
   /* Calculates the value of v at an arbitrary position (x,y,z) if the spectral coefficients are known */
-  double par_b = params_getd("par_b");
+  double par_b = params_get_real("par_b");
   
   double xs, ys, zs, rs2, phi, X, R, A, B, aux1, aux2, result, Ui;
   // VASILIS: Here the struct derivs v refers to the spectral coeffiecients of variable v not the variable v itself
@@ -1006,20 +1009,21 @@ void SpecCoef(int n1, int n2, int n3, int ivar, double *v, double *cf)
 void set_initial_guess(derivs *v)
 {
   int nvar = 1,
-    n1 = params_geti("npoints_A"),
-    n2 = params_geti("npoints_B"),
-    n3 = params_geti("npoints_phi");
+    n1 = params_get_int("npoints_A"),
+    n2 = params_get_int("npoints_B"),
+    n3 = params_get_int("npoints_phi");
 
-  double par_b = params_getd("par_b");
+  double par_b = params_get_real("par_b");
 
   double *s_x, *s_y, *s_z;
   double al, A, Am1, be, B, phi, R, r, X;
   int ivar, i, j, k, i3D, indx;
   derivs *U;
 
-  FILE *debug_file;
+  char fname[STRLEN];
+  FILE *debug_file =NULL;
   
-  if (params_geti("solve_momentum_constraint"))
+  if (params_get_int("solve_momentum_constraint"))
     nvar = 4;
   
   s_x = calloc(n1*n2*n3, sizeof(double));
@@ -1066,10 +1070,13 @@ void set_initial_guess(derivs *v)
   
   Derivatives_AB3 (nvar, n1, n2, n3, v);
   
-  if (params_geti("do_initial_debug_output")) {
-    
-    debug_file=fopen("initial.dat", "w");
+  if (params_get_int("do_initial_debug_output")) {
+
+    strcpy(fname,params_get_str("outputdir"));
+    strcat (fname,"/initial.dat");
+    debug_file=fopen(fname, "w");
     assert(debug_file);
+
     for (ivar = 0; ivar < nvar; ivar++)
       for (i = 0; i < n1; i++)
 	for (j = 0; j < n2; j++) {
