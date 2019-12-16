@@ -82,10 +82,10 @@ void TwoPunctures_params_set_default(){
 
   /* Add parameters here */
   params_add_real("par_b",1.0); // x coordinate of the m+ puncture; 1.0
-  params_add_real("par_m_plus",0.9); // mass of the m+ puncture; 1.0
-  params_add_real("par_m_minus",0.0); // mass of the m- puncture; 1.0
-  params_add_real("target_M_plus",1.0); // target ADM mass for m+; 0.5
-  params_add_real("target_M_minus",0.0); // target ADM mass for m-; 0.5
+  params_add_real("par_m_plus",1.0); // mass of the m+ puncture; 1.0
+  params_add_real("par_m_minus",0.0); // mass of the m- puncture; 0.0
+  params_add_real("target_M_plus",0.5); // target ADM mass for m+; 0.5
+  params_add_real("target_M_minus",0.5); // target ADM mass for m-; 0.5
   params_add_real("par_P_plus1",0.); // momentum of the m+ puncture
   params_add_real("par_P_plus2",0.);
   params_add_real("par_P_plus3",0.);
