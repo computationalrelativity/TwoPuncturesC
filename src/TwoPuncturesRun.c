@@ -16,15 +16,6 @@ int main(int argc, char* argv[]) {
     TwoPunctures_params_set_default();  // must be set initially
   }
 
-#if (0)
-  /*
-    Test parameter injection.
-  */
-  TwoPunctures_params_set_Boolean("verbose", true);
-  TwoPunctures_params_set_Real("par_b", 1.);
-  TwoPunctures_params_set_Real("par_m_plus", 1.2);
-#endif
-
   /*
     Sans parameter injection the following is equivalent to prior all NULL call
   */
