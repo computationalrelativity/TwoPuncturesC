@@ -109,7 +109,6 @@ static const char* str_par_type[N_PAR_TYPES] = {
 typedef struct {
   int type[NPARAMS];
   char key[NPARAMS][STRLEN];
-  //double val[NPARAMS];
   char val[NPARAMS][STRLEN];
   int n;
   //parameters *next;
