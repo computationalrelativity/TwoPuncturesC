@@ -12,8 +12,16 @@ OBJ=$(patsubst $(SRCD)/%.c,$(OBJD)/%.o,$(SRC))
 LIB=$(LIBD)/lib$(NAME).a
 
 CC=gcc
-CFLAGS=-g -std=c99 `gsl-config --cflags`
-#CFLAGS=-O3 -std=c99 `gsl-config --cflags`
+
+# mandatory flags
+CFLAGS= -std=c99 
+CFLAGS=-g # chose debug or ...
+##CFLAGS=-O3 # ... optim
+CFLAGS +=`gsl-config --cflags`# GSL
+
+# optional flags
+##CFLAGS += -fopenmp # activate OMP (opt)
+
 LFLAGS=`gsl-config --libs`
 LDLFLAGS=-lgsl -lgslcblas -lm
 
