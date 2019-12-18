@@ -788,8 +788,8 @@ void write_bam_inifile(derivs *u, const int n1, const int n2, const int n3,
   fprintf(fp, "# nz = %d\n",n3);
   fprintf(fp, "bhmass1 = %e\n",params_get_real("par_m_plus"));
   fprintf(fp, "bhx1 = %e\n",params_get_real("par_b")); // FIXME
-  fprintf(fp, "bhy1 = %e\n",params_get_real("par_b")); //
-  fprintf(fp, "bhz1 = %e\n",params_get_real("par_b")); //
+  fprintf(fp, "bhy1 = %e\n",0); //
+  fprintf(fp, "bhz1 = %e\n",0); //
   fprintf(fp, "bhpx1 = %e\n",params_get_real("par_P_plus1")); // FIXME: might need rotation
   fprintf(fp, "bhpy1 = %e\n",params_get_real("par_P_plus2"));
   fprintf(fp, "bhpz1 = %e\n",params_get_real("par_P_plus3"));
@@ -797,9 +797,9 @@ void write_bam_inifile(derivs *u, const int n1, const int n2, const int n3,
   fprintf(fp, "bhsy1 = %e\n",params_get_real("par_S_plus2"));
   fprintf(fp, "bhsz1 = %e\n",params_get_real("par_S_plus3"));
   fprintf(fp, "bhmass2 = %e\n",params_get_real("par_m_minus"));
-  fprintf(fp, "bhx2 = %e\n",params_get_real("par_b")); // FIXME
-  fprintf(fp, "bhy2 = %e\n",params_get_real("par_b")); //
-  fprintf(fp, "bhz2 = %e\n",params_get_real("par_b")); //
+  fprintf(fp, "bhx2 = -%e\n",params_get_real("par_b")); // FIXME
+  fprintf(fp, "bhy2 = %e\n",0); //
+  fprintf(fp, "bhz2 = %e\n",0); //
   fprintf(fp, "bhpx2 = %e\n",params_get_real("par_P_minus1")); // FIXME: might need rotation
   fprintf(fp, "bhpy2 = %e\n",params_get_real("par_P_minus2"));
   fprintf(fp, "bhpz2 = %e\n",params_get_real("par_P_minus3"));
