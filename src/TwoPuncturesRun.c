@@ -9,30 +9,22 @@ int main(int argc, char* argv[]) {
   char * inputfile = NULL;
   if(argc == 2){
     inputfile = argv[1];
+    printf("Input file: %s \n", inputfile);
     TwoPunctures_params_set_inputfile(inputfile);
   } else {
     // revert to defaults if no input file passed
     TwoPunctures_params_set_default();  // must be set initially
   }
 
-  printf("Input file: %s \n", inputfile);
-
-  /*
-    Test parameter injection.
-  */
-  TwoPunctures_params_set_Boolean("verbose", true);
-  TwoPunctures_params_set_Real("par_b", 1.0);
-  TwoPunctures_params_set_Real("par_m_plus", 2.0);
-
   /*
     Sans parameter injection the following is equivalent to prior all NULL call
   */
-  ini_data data = TwoPunctures_make_initial_data();
+  ini_data *data = TwoPunctures_make_initial_data();
 
   // inspect struct
   int ix=0;
   for(ix=0; ix < 20; ix++){
-    printf("data.F[%d]: %lf\n", ix, data.F[ix]);
+    printf("data.F[%d]: %lf\n", ix, data->F[ix]);
   }
 
   // example of interpolating gxx and psi to a few nodes

@@ -2,6 +2,11 @@
 # The file parser is very stupid:
 # - it will ignore lines starting with '#' , and 
 # - it will look for strings '<key>=<value>'
-# be sure to format properly the parfile and do not leave spaces ...
-verbose=0
+# be sure not to format properly the parfile and do not leave spaces ...
+#
+# example for spinning puncture 
+#
+verbose=1
+par_m_plus=0.9
+par_S_plus3=0.5
 # be also sure not to leave blank lines after this.
