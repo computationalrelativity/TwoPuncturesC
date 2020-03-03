@@ -80,6 +80,7 @@ enum{
   FACTOR1, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs")
   FACTOR2, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs+2nd derivs")
   N_cf_opt,
+};
 static const char* str_cf_opt[N_cf_opt] = {
   "nonstatic", "static0", "static01", "static012",
 };
