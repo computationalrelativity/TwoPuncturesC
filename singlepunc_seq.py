@@ -1,8 +1,10 @@
-# build a sequence of single spining punctures
+# Build a sequence of single spinning punctures
 
 import subprocess
 import numpy as np
 import os
+from multiprocessing import Pool
+
 
 steps=10
 
@@ -11,7 +13,7 @@ TEMPLATE = """\
 npoints_A=60
 npoints_B=60
 npoints_phi=40
-par_b=1.e-10
+par_b=1.e-5
 par_m_plus=1.
 par_P_plus1=0.
 par_P_plus2=0.
@@ -37,7 +39,7 @@ def run(spin):
     Run TwoPuncture.c
     """
     dir="SinglePuncture"
-    parfile = "singlepunc_S{0:.3f}.par".format(s)
+    parfile = "singlepunc_S{0:.3f}.par".format(spin)
     os.system("mkdir -p {}".format(dir))
     open("{}/".format(dir) + parfile, "w").write(TEMPLATE.format(spin=spin))
     cmd = "../TwoPuncturesRun.x " + parfile
@@ -46,5 +48,9 @@ def run(spin):
 
 if __name__ == '__main__':
 
-    spins = np.linspace(0.,0.9, steps)
-    for s in spins: run(s)
+    spins = np.unique(np.concatenate((np.linspace(0.3,0.4,5,endpoint=False)[1::], np.linspace(0.4,0.5,5,endpoint=False)[1::],np.linspace(0.5,0.6,10,endpoint=False)[1::],np.linspace(0.6,0.7,10,endpoint=False)[1::])))
+    spins = np.concatenate((np.array([0.59]), np.linspace(0.6,0.7,10,endpoint=False)[1::]))
+    spins = np.array([0.02,0.04,0.06,0.08,0.12,0.14,0.16,0.18,0.22,0.24,0.26,0.28])
+    pool = Pool(processes=4)
+    pool.map(run, spins)
+    #for s in spins: run(s)
