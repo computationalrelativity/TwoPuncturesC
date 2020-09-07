@@ -84,6 +84,10 @@ int main(int argc, char* argv[]) {
 
   // make sure to take care of any internal memory that must be freed!
   TwoPunctures_finalise(data);
+  
+  free(gxx);
+  free(psi);
+  free(tmp);
 
   return 0;
 }
