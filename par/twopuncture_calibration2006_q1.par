@@ -1,195 +1,39 @@
-############################################################################
-# Modules
-
-physics = adm z4 punctures Gauge Invariants ADM_mass AHmod # multigrid 
-
-# some extra pars for this code version
-conservative_amr = no
-
-############################################################################
-# Initial Data
-
-punctures_solver=spectral
-punctures_ps_file=/hppfs/work/pn56zo/di52gal3/Athena/BAM_runs/Comparison_Athena/order4/v.bamdata
-
-############################################################################
-# Checkpointing
-
-checkpoint                 = yes
-checkpoint_variables       = all
-
-checkpoint_dt_hours        = 11
-checkpoint_dt_hours_quit   = 23
-
-############################################################################
-# Evolution
-
-punctures_lapse      = psiBL^(-2)
-#bssn_initial_shift   = zero
-#
-#bssn_lapse           = 1+log withshift
-#
-#bssn_shift           = gamma0 withGadv withBadv withShiftadv
-#bssn_shiftalphapower = 0.0
-#bssn_shiftdriver     = 1.9999924302398926
-#
-#bssn_use_eta = yes
-#bssn_shiftdriver_time= 100000000
-#bssn_eta_useswitch = 10
-#
-#bssn_eta_width  = 50
-#bssn_eta_width1 = 4
-#bssn_eta_width2 = 4
-#bssn_eta_rpower = 2
-#
-#bssn_eta_eta0    = 1.
-#bssn_eta_eta1    = 1.
-#bssn_eta_rpower0 = 3
-
-z4_initial_shift   = zero
-
-z4_lapse           = 1+log withshift
-
-#z4_shift           = withGadv withBadv withShiftadv
-z4_shift           = withShiftadv
-#z4_shiftalphapower = 0.0
-z4_shiftdriver     = 2.0
-
-z4_kappa1          = 0.02
-z4_kappa2          = 0.00
-
-############################################################################
-# Moving Punctures
-
-adm_conformal              = no
-z4_moving_punctures      = yes
-z4_moving_punctures_type = chi
-z4_chi_div_floor              = 0.00001
-
-amr_lmax                   = 10
-amr_lmax2                  = 10
-amr_move_lcube             = 6
-amr_nxyz                   ={amr_nxyz}
-
-dxyz                       = {dxyz} 
-amr_bo_dxmax               = 0.75
-
-amr                        = bo newfmr move
-amr_fmr                    = nestedboxes
-grid                       = box
-
-############################################################################
-# Output
-
-finaltime        = 400
-
-0douttime        = 0.375
-0doutput         = ADM_mass ham
-0doutputmax      = bssn_eta
-0doutputmaxpos   = bssn_eta
-
-1douttime        = 0.5
-1doutput        = bssn_chi rpsi4 ipsi4 alpha betax betay #bssn_phi ham rpsi4 ipsi4
-#1doutputy        = bssn_eta # alpha betax betay bssn_phi ham rpsi4 ipsi4
-#1doutputz        = # bssn_eta alpha betax betay bssn_phi ham rpsi4 ipsi4
-1doutinterpolate = yes
-1doutputall      = yes
-
-2douttime        = 0.5
-#2doutputxy      = # bssn_eta alpha bssn_chi ham rpsi4
-#2doutputxz      = bssn_eta ham rpsi4 ipsi4
-2dformat         = vtk binary float
-#2doutinterpolate = yes
-2doutput                = bssn_eta ham rpsi4 ipsi4 
-2doutputmode            = xy xz
-2doutinterpolate        = no 
-2doutputall             = yes
-2doutputr               = rpsi4 ipsi4
-2doutputr_type          = SphericalDF
-
-
-############################################################################
-# Invariants
-
-ntheta = 47
-nphi   = 46
-
-invariants_compute_modes    = yes
-invariants_modes_r          = 40 60 80 100 120 140 
-invariants_modes_lmin       = 0
-invariants_modes_lmax       = 3
-invariants_energy_r         = 80 90 100 #120 140 160 180
-gauss_codacci_mainardi      = standard
-invariants_order            = 6
-
-
-############################################################################
-# ADM Integrals
-
-ADM_mass_ncircles  = 101
-ADM_mass_npoints   = 80
-ADM_mass_lmin      = 5
-ADM_mass_lmax      = 5
-ADM_mass_r         = 80 90 100 #120 140 160 180
-
-############################################################################
-# AH Finder
-
-AHmod_nhorizons   = 2
-AHmod_searchMTS   = 1 0 10000 0    1 0 10000 1
-
-AHmod_time        = 1.2
-
-AHmod_verbose     = yes
-AHmod_output      = yes
-AHmod_output_xyt  = no
-AHmod_output_lm   = no
-
-AHmod_LMAX        = 10
-AHmod_ntheta      = 50
-AHmod_nphi        = 50
-
-AHmod_uselast     = yes
-AHmod_initial_guess_expand = 1
-AHmod_LevelOffset  = 1
-
-AHmod_flow_iter   = 500
-AHmod_mass_tol    = 1.0e-04
-AHmod_hmean_tol   = 100.0
-
-############################################################################
-# Basic Setup
-
-order_centered          = 4
-order_advection         = 4
-advection_lopsided6     = 2
-advection_lopsided      = 1
-bampi_timer_on          = yes
-bampi_lowlatency        = yes
-bampi_nghosts           = 4
-order_RP                = 4
-amr_nbuffer             = 6
-
-evolution_method        = rk
-evolution_method_rk     = rk4
-
-# rk 4 needs these settings to control algebraic constraints
-z4_register_algcon    = yes store
-z4_normalizedetg      = yes
-z4_subtractA          = yes
-
-order_dissipation       = 6
-dissipation_factor      = 0.02
-
-# rk4 allows a larger time step
-dtfac = 0.5
-
-############################################################################
-# Boundary
-
-boundary = background radcentered
-
-############################################################################
-# Gauge
-
-Gauge = moving_puncture new
+# BBH q=1 nonspinning initial data
+# 
+par_b=3.257
+par_m_plus=0.483
+par_m_minus=0.483
+target_M_plus=0.505
+target_M_minus=0.505
+par_P_plus1=0.0
+par_P_plus2=0.133
+par_P_plus3=0.0
+par_P_minus1=0.0
+par_P_minus2=-0.133
+par_P_minus3=0.0
+par_S_plus1=0.0
+par_S_plus2=0.0
+par_S_plus3=0.0
+par_S_minus1=0.0
+par_S_minus2=0.0
+par_S_minus3=0.0
+center_offset1=0.0
+center_offset2=0.0
+center_offset3=0.0
+give_bare_mass=True
+npoints_A=30
+npoints_B=30
+npoints_phi=16
+Newton_tol=1e-10
+Newton_maxit=5
+TP_epsilon=0.0
+TP_Tiny=0.0
+TP_Extend_radius=0
+adm_tol=1e-10
+do_residuum_debug_output=0
+solve_momentum_constraint=0
+initial_lapse_psi_exponent=-2.0
+swap_xz=0
+do_solution_file_output=1
+do_bam_file_output=1
+verbose=1
