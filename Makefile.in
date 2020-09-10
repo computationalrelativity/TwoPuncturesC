@@ -11,38 +11,45 @@ SRC=$(wildcard $(SRCD)/*.c)
 OBJ=$(patsubst $(SRCD)/%.c,$(OBJD)/%.o,$(SRC))
 LIB=$(LIBD)/lib$(NAME).a
 
-CC=gcc
+REMOVE=$(OBJD)/TwoPuncturesRun.o
+OBJ2=$(subst $(REMOVE),,$(OBJ))
+
+CC=@COMPILER_COMMAND@
 
 # mandatory flags
-CFLAGS= -std=c99 
-CFLAGS=-g # chose debug or ...
-##CFLAGS=-O3 # ... optim
-CFLAGS +=`gsl-config --cflags`# GSL
+CFLAGS= -std=c99 -fPIC 
+CFLAGS+=-g # chose debug or ...
+CFLAGS+=-O3 # ... optim
+CFLAGS+=`gsl-config --cflags`# GSL
 
 # optional flags
 ##CFLAGS += -fopenmp # activate OMP (opt)
 
-LFLAGS=`gsl-config --libs`
-LDLFLAGS=-lgsl -lgslcblas -lm
+LDLFLAGS=@LDLFLAGS@
 
 all: $(EXE) # $(LIB)
 	@echo "All done"
 
 $(EXE): $(OBJ)
 	@echo "Building $@ ..."
+	@echo $(CC) $(CFLAGS) $(LFLAGS) $(OBJ) -o $@ $(LDLFLAGS)
 	@$(CC) $(CFLAGS) $(LFLAGS) $(OBJ) -o $@ $(LDLFLAGS)
-        # this doesn't need to be a shared object
-	rm $(OBJD)/TwoPuncturesRun.o > /dev/null 2>&1
+	@# this doesn't need to be a shared object
+	@rm $(OBJD)/TwoPuncturesRun.o > /dev/null 2>&1
 
 $(OBJD)/%.o: $(SRCD)/%.c
 	@mkdir -p $(dir $@)
 	@echo "Compiling $< ... -> $@"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
+install:
+	@mkdir -p $(LIBD)
+	@echo $(CC) -shared -o lib/libtwopunct_$(CC).so $(OBJ2)
+	@$(CC) -shared -o lib/libtwopunct_$(CC).so $(OBJ2)
+
 clean:
 	@echo "Cleaning ..."
 	@rm -vf $(OBJ)
-	@rm -vf $(LIB)
 	@echo "... done"
 
 new: clean $(EXE)
