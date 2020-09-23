@@ -27,10 +27,19 @@
 #include <gsl/gsl_complex.h>
 #include <gsl/gsl_complex_math.h>
 #include <gsl/gsl_linalg.h>
-#ifdef _OPENMP
-#include <omp.h>
-#define omp ignore // explicitely turn off OMP
-#endif
+
+//-----------------------------------------------------------------------------
+// If required explicitly disable OMP
+//
+// Original issue:
+// Threading problem when Athena++ was interfaced and computations
+// were performed at MeshBlock level.
+//
+//#ifdef _OPENMP
+//#include <omp.h>
+//#define omp ignore // explicitely turn off OMP
+//#endif
+//-----------------------------------------------------------------------------
 
 /* Macros */
 #define Pi  3.14159265358979323846264338328
