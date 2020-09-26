@@ -24,7 +24,10 @@ Main modifs from `Cactus`/`EinsteinToolkit`
  * Commented out the line calling `Set_Initial_Guess_for_u()`
  
 TODO
-
+ * WARNING: compilation with -fopenmp / -qopenmp leads to problems when linked against Athena++.
+            What works: use the Makefile here- as is.
+            Linking without omp suppression in the header and compile Athena++.
+            This behaviour should be cleaned up...
  * Correct internal memory leaks (Valgrind)
  * Verify stand alone version against `Cactus`/`EinsteinToolkit`
  * Verify Cartesian grid interpolator against `Cactus`/`EinsteinToolkit` 
