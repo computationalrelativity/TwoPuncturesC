@@ -32,7 +32,7 @@ This behaviour should be cleaned up...
  
 History
 
- * FZ 09/2018 checked mem leaks (`fb7d1c0`)
+ * FZ 09/2020 checked mem leaks (`fb7d1c0`)
  * SB 12/2019 changed the way `derivs` data are allocated, deallocate, and passed around. Extended parameter functionality, added output routines for derivs and bam's puncture_ps.
  * BD 09/2019 created lib
  * SB 01/2019 started
