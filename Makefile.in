@@ -15,6 +15,7 @@ REMOVE=$(OBJD)/TwoPuncturesRun.o
 OBJ2=$(subst $(REMOVE),,$(OBJ))
 
 CC=@COMPILER_COMMAND@
+AR=ar
 
 # mandatory flags
 CFLAGS= -std=c99 -fPIC 
@@ -25,7 +26,7 @@ CFLAGS+=`gsl-config --cflags`# GSL
 # optional flags
 ##CFLAGS += -fopenmp # activate OMP (opt)
 
-LDLFLAGS=@LDLFLAGS@
+LDLFLAGS=`gsl-config --libs` @LDLFLAGS@
 
 all: $(EXE) # $(LIB)
 	@echo "All done"
@@ -47,6 +48,11 @@ install:
 	@echo $(CC) -shared -o lib/libtwopunct_$(CC).so $(OBJ2)
 	@$(CC) -shared -o lib/libtwopunct_$(CC).so $(OBJ2)
 
+static:
+	@mkdir -p $(LIBD)
+	@echo $(AR) rcs lib/libtwopunct_$(CC).a $(OBJ2)
+	@$(AR) rcs lib/libtwopunct_$(CC).a $(OBJ2)
+
 clean:
 	@echo "Cleaning ..."
 	@rm -vf $(OBJ)
@@ -58,7 +64,7 @@ new: clean $(EXE)
 clearup: clean
 	@echo "Removing dirs and exe ..."
 	@rm -rvf $(OBJ)
-	@rm -rvf $(LIB)
+	@rm -rvf $(LIBD)
 	@rm -rvf $(EXE)
 	@echo "All done"
 
