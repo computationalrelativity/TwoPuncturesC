@@ -15,6 +15,13 @@ This is a stand-alone version of `Cactus`/`EinsteinToolkit` C code:
 https://bitbucket.org/einsteintoolkit/einsteininitialdata/src/master/TwoPunctures/
 ```
 
+Note:
+ * Compile (using `gcc`) with:
+ make clean && make
+ * Compile (using `icc`) with:
+ make clean && make CC=icc
+ * Additional flags may be similarily passed (see `Makefile`).
+
 Main modifs from `Cactus`/`EinsteinToolkit`
 
  * Switched off code for matter terms (`sources` array is always to 0)
