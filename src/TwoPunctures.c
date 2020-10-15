@@ -512,7 +512,9 @@ void TwoPunctures_Cartesian_interpolation
   const int xxx = nxyz[0];
   const int xxxyyy = nxyz[0]*nxyz[1];
 
+#ifdef TP_OMP
 #pragma omp parallel for
+#endif
   for (int k = imin[2]; k < imax[2]; ++k) {
     for (int j = imin[1]; j < imax[1]; ++j) {
       for (int i = imin[0]; i < imax[0]; ++i) {
@@ -747,7 +749,7 @@ void TwoPunctures_Cartesian_interpolation
     }   /* for j */
   }     /* for k */
 
-};
+}
 
 void TwoPunctures_finalise(ini_data *data){
   /*

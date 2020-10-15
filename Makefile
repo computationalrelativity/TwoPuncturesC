@@ -22,12 +22,14 @@ LIB=$(LIBD)/lib$(LIBNAME).so
 # mandatory flags
 
 CC = gcc
+LD = ld
+AR = ar
 
-CFLAGS = -std=c99 -fPIC
+CFLAGS = -std=c99 -fPIC -pedantic
 LFLAGS=
 LDLFLAGS=-lgsl -lgslcblas -lm
 
-CFLAGS += -O0
+CFLAGS += -O3
 
 # old flag information [Leave alone]
 ##CFLAGS + =`gsl-config --cflags`# GSL
@@ -56,11 +58,12 @@ $(OBJD)/%.o: $(SRCD)/%.c
 	$(CC) $(CFLAGS) $(INC_PARAMS) -c $< -o $@
 
 $(LIB): $(OBJ)
-	@echo "Making shared library $@... "
+	@echo "Making libraries $@... "
 	@echo
 
 	@mkdir -p $(LIBD)
-	$(CC) $(CFLAGS) -shared $(OBJ) -o lib/libTwoPunctures.so
+	$(CC) $(CFLAGS) -shared $(OBJ) -o $(LIBD)/lib$(LIBNAME).so
+#	$(AR) rcs $(LIBD)/libTwoPunctures_static.a $@ $^
 
 clean:
 	@echo "Cleaning ..."

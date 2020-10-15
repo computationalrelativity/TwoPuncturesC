@@ -22,6 +22,8 @@ Note:
  make clean && make CC=icc
  * Additional flags may be similarily passed (see `Makefile`).
 
+Shared library will automatically be generated.
+
 Main modifs from `Cactus`/`EinsteinToolkit`
 
  * Switched off code for matter terms (`sources` array is always to 0)

@@ -29,16 +29,19 @@
 #include <gsl/gsl_linalg.h>
 
 //-----------------------------------------------------------------------------
-// If required explicitly disable OMP
+// If required explicitly enable OMP within twopuncturesc itself:
+//
+// #define TP_OMP
 //
 // Original issue:
 // Threading problem when Athena++ was interfaced and computations
 // were performed at MeshBlock level.
 //
-//#ifdef _OPENMP
-//#include <omp.h>
-//#define omp ignore // explicitely turn off OMP
-//#endif
+// This pollutes namespace...
+// #ifdef _OPENMP
+// #include <omp.h>
+// #define omp ignore // explicitely turn off OMP
+// #endif
 //-----------------------------------------------------------------------------
 
 /* Macros */

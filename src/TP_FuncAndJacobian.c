@@ -381,7 +381,9 @@ void J_times_dv (int nvar, int n1, int n2, int n3, derivs *dv,
   
   Derivatives_AB3 (nvar, n1, n2, n3, dv);
   
+#ifdef TP_OMP
 #pragma omp parallel for private (values,dU,U,i,j,k,al,A,be,B,phi,X,R,x,r,y,z,Am1,ivar,indx,par_b) schedule(dynamic)
+#endif
   for (i = 0; i < n1; i++)
     {
       values = dvector (0, nvar - 1);
@@ -614,7 +616,9 @@ void SetMatrix_JFD (int nvar, int n1, int n2, int n3, derivs *u,
   N2 = n2 - 1;
   N3 = n3 - 1;
 
+#ifdef TP_OMP
 #pragma omp parallel for private (i,j,k,ivar,row) schedule(dynamic)
+#endif
   for (i = 0; i < n1; i++)
   {
     for (j = 0; j < n2; j++)
