@@ -58,11 +58,13 @@ $(OBJD)/%.o: $(SRCD)/%.c
 	$(CC) $(CFLAGS) $(INC_PARAMS) -c $< -o $@
 
 $(LIB): $(OBJ)
-	@echo "Making libraries $@... "
+	@echo "Making libraries... "
 	@echo
 
 	@mkdir -p $(LIBD)
 	$(CC) $(CFLAGS) -shared $(OBJ) -o $(LIBD)/lib$(LIBNAME).so
+
+	$(AR) rcs $(LIBD)/libTwoPunctures.a $(OBJ)
 #	$(AR) rcs $(LIBD)/libTwoPunctures_static.a $@ $^
 
 clean:
