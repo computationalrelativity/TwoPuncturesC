@@ -1,0 +1,64 @@
+# BBH q=15
+#
+# Adapting Nakano, Zlochower, Lousto, Campanelli
+# [arXiv:1108.4421v1,arXiv:1008.4360v2]
+#
+# Original params:
+# mp_1 = 0.057566227
+# mp_2 = 0.936224183
+# x_1 = 6.806172805
+# x_2 = -0.4438775230
+# P_t = 0.0290721     (tangential to co-orbit)
+# P_r = -0.000160518  (directed towards one another)
+#
+# M_ADM = 1.00005
+#
+# Derived (we also shift smaller to pos_1 for tracker-eta convenience)
+# D = 7.250050328
+# b = 3.625025164
+#
+#
+par_b=3.625025164
+par_m_minus=0.057566227
+par_m_plus=0.936224183
+target_M_minus=1.
+target_M_plus=1.
+par_P_minus1=0.000168519
+par_P_minus2=-0.0290721
+par_P_minus3=0.
+par_P_plus1=-0.000168519
+par_P_plus2=0.0290721
+par_P_plus3=0.
+par_S_minus1=0.
+par_S_minus2=0.
+par_S_minus3=0.
+par_S_plus1=0.
+par_S_plus2=0.
+par_S_plus3=0.
+center_offset1=0.0000000000000000e+00
+center_offset2=0.0000000000000000e+00
+center_offset3=0.0000000000000000e+00
+give_bare_mass=1
+# stdout gives the same for 48,48,32
+npoints_A=48
+npoints_B=48
+npoints_phi=32
+Newton_tol=1.0000000000000000e-10
+Newton_maxit=5
+TP_epsilon=0.0000000000000000e+00
+TP_Tiny=0.0000000000000000e+00
+TP_Extend_Radius=0.0000000000000000e+00
+adm_tol=1.0000000000000000e-10
+solve_momentum_constraint=0
+use_external_initial_guess=0
+do_residuum_debug_output=0
+do_initial_debug_output=0
+do_solution_file_output=1
+do_bam_file_output=1
+grid_setup_method=0
+initial_lapse=2
+initial_lapse_psi_exponent=-2.0000000000000000e+00
+conformal_state=1
+swap_xz=0
+multiply_old_lapse=0
+verbose=1

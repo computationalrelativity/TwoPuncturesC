@@ -1,0 +1,93 @@
+# BBH q=18
+#
+# Adapting Sascha Husa, Sebastian Khan, Mark Hannam,
+# Michael Pürrer, Frank Ohme, Xisco Jiménez Forteza, Alejandro Bohé
+# [arXiv:1508.07250v2]
+#
+# Parameters supplied courtesy of Christian Reisswig
+#
+# Pasted parameters from Sascha's ID generator
+#
+#
+# TwoPunctures::give_bare_mass = no
+#
+# TwoPunctures::target_M_plus      = 0.947368
+# TwoPunctures::target_M_minus     = 0.0526316
+#
+# TwoPunctures::par_m_plus         = 0.947368
+# TwoPunctures::par_m_minus        = 0.0526316
+#
+# TwoPunctures::par_b              = 3.79237
+# TwoPunctures::center_offset[0]   = -3.39318
+# TwoPunctures::center_offset[1]   = 0.
+# TwoPunctures::center_offset[2]   = 0.
+# TwoPunctures::par_P_plus[0]      = -0.000126132
+# TwoPunctures::par_P_minus[0]     = 0.000126132
+#
+# TwoPunctures::par_P_plus[1]      = 0.0237636
+# TwoPunctures::par_P_minus[1]     = -0.0237636
+#
+# TwoPunctures::par_P_plus[2]      = 0.
+# TwoPunctures::par_P_minus[2]     = 0.
+#
+# TwoPunctures::par_S_plus[0]      = 0.
+# TwoPunctures::par_S_plus[1]      = 0.
+# TwoPunctures::par_S_plus[2]      = 0.
+#
+# TwoPunctures::par_S_minus[0]     = 0.
+# TwoPunctures::par_S_minus[1]     = 0.
+# TwoPunctures::par_S_minus[2]     = 0.
+#
+# PunctureTracker::initial_x[0] = 0.399197
+# PunctureTracker::initial_x[1] = -7.18555
+#
+# PunctureTracker::initial_y[0] = 0.
+# PunctureTracker::initial_y[1] = 0.
+#
+# PunctureTracker::initial_z[0] = 0.
+# PunctureTracker::initial_z[1] = 0.
+#
+par_b=3.79237
+par_m_minus=0.0526316
+par_m_plus=0.947368
+target_M_minus=0.0526316
+target_M_plus=0.947368
+par_P_minus1=0.000126132
+par_P_minus2=-0.0237636
+par_P_minus3=0.
+par_P_plus1=-0.000126132
+par_P_plus2=0.0237636
+par_P_plus3=0.
+par_S_minus1=0.
+par_S_minus2=0.
+par_S_minus3=0.
+par_S_plus1=0.
+par_S_plus2=0.
+par_S_plus3=0.
+center_offset1=-3.39318
+center_offset2=0.0000000000000000e+00
+center_offset3=0.0000000000000000e+00
+give_bare_mass=0
+# stdout gives the same for 48,48,32
+npoints_A=48
+npoints_B=48
+npoints_phi=32
+Newton_tol=1.0000000000000000e-10
+Newton_maxit=5
+TP_epsilon=0.0000000000000000e+00
+TP_Tiny=0.0000000000000000e+00
+TP_Extend_Radius=0.0000000000000000e+00
+adm_tol=1.0000000000000000e-10
+solve_momentum_constraint=0
+use_external_initial_guess=0
+do_residuum_debug_output=0
+do_initial_debug_output=0
+do_solution_file_output=1
+do_bam_file_output=1
+grid_setup_method=0
+initial_lapse=2
+initial_lapse_psi_exponent=-2.0000000000000000e+00
+conformal_state=1
+swap_xz=0
+multiply_old_lapse=0
+verbose=1
