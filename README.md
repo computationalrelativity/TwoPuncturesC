@@ -29,7 +29,7 @@ HOWTO
    ```make clean && make```
    
  * Compile (using `icc`) with:
-   ```make clean && make CC=icc
+   ```make clean && make CC=icc```
  
  * Additional flags may be similarily passed (see `Makefile`).
 
