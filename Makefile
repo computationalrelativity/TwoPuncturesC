@@ -25,9 +25,8 @@ CC = gcc
 LD = ld
 AR = ar
 
-CFLAGS = -std=c99 -fPIC -pedantic
-LFLAGS=
-LDLFLAGS=-lgsl -lgslcblas -lm
+CFLAGS = -std=c99 -fPIC -pedantic $(shell gsl-config --cflags)
+LFLAGS = $(shell gsl-config --libs)
 
 CFLAGS += -O3
 
@@ -44,7 +43,7 @@ $(EXE): $(OBJ)
 	@echo "Building $@ ..."
 	@echo
 
-	$(CC) $(CFLAGS) $(LFLAGS) $(OBJ) -o $@ $(LDLFLAGS)
+	$(CC) $(CFLAGS) $(OBJ) $(LFLAGS) -o $@
         
 #	# this doesn't need to be a shared object
 #	@rm $(OBJD)/TwoPuncturesRun.o > /dev/null 2>&1
@@ -62,7 +61,7 @@ $(LIB): $(OBJ)
 	@echo
 
 	@mkdir -p $(LIBD)
-	$(CC) $(CFLAGS) -shared $(OBJ) -o $(LIBD)/lib$(LIBNAME).so
+	$(CC) $(CFLAGS) $(LFLAGS) -shared $(OBJ) -o $(LIBD)/lib$(LIBNAME).so
 
 	$(AR) rcs $(LIBD)/libTwoPunctures.a $(OBJ)
 #	$(AR) rcs $(LIBD)/libTwoPunctures_static.a $@ $^
