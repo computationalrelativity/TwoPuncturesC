@@ -356,43 +356,45 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
   r = dvector (0, ntotal - 1);
   p = dvector (0, ntotal - 1);
   allocate_derivs (&ph, ntotal);
-/*      ph  = dvector(0, ntotal-1);*/
+  /*ph  = dvector(0, ntotal-1);*/
   rt = dvector (0, ntotal - 1);
   s = dvector (0, ntotal - 1);
   allocate_derivs (&sh, ntotal);
-/*      sh  = dvector(0, ntotal-1);*/
+  /*sh  = dvector(0, ntotal-1);*/
   t = dvector (0, ntotal - 1);
   vv = dvector (0, ntotal - 1);
-
+  
   /* check */
   if (output == 1) {
     printf ("bicgstab:  itmax %d, tol %e\n", itmax, (double)tol);
     fflush(stdout);
   }
-
+  
   /* compute initial residual rt = r = F - J*dv */
   J_times_dv (nvar, n1, n2, n3, dv, r, u);
+  
 #ifdef TP_OMP
-  // #pragma omp parallel for
+  /* #pragma omp parallel for */
 #endif
   for (int j = 0; j < ntotal; j++)
     rt[j] = r[j] = F[j] - r[j];
-
+  
   *normres = norm2 (r, ntotal);
   if (output == 1) {
     printf ("bicgstab: %5d  %10.3e\n", 0, (double) *normres);
     fflush(stdout);
   }
-
+  
   /* cgs iteration */
   
-  if (*normres <= tol) {
+  if (*normres > tol) {
+    
     for (ii = 0; ii < itmax; ii++)
       {
 	rho = scalarproduct (rt, r, ntotal);
 	if (fabs (rho) < rhotol)
 	  break;
-
+	
 	/* compute direction vector p */
 	if (ii == 0)
 	  {
@@ -418,11 +420,13 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
 #endif
 	for (int j = 0; j < ntotal; j++)
 	  ph->d0[j] = 0;
-	for (int j = 0; j < NRELAX; j++)	/* solves JFD*ph = p by relaxation*/
+	
+	for (int j = 0; j < NRELAX; j++)	/* solves JFD*ph = p by relaxation */
 	  relax (ph->d0, nvar, n1, n2, n3, p, ncols, cols, JFD);
 	
-	J_times_dv (nvar, n1, n2, n3, ph, vv, u);	/* vv=J*ph*/
+	J_times_dv (nvar, n1, n2, n3, ph, vv, u);	/* vv=J*ph */
 	alpha = rho / scalarproduct (rt, vv, ntotal);
+
 #ifdef TP_OMP
 #pragma omp parallel for
 #endif
@@ -441,21 +445,21 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
 	    if (output == 1) {
 	      printf ("bicgstab: %5d  %10.3e  %10.3e  %10.3e  %10.3e\n",
 		      ii + 1, (double) *normres, (double)alpha, (double)beta, (double)omega);
-        fflush(stdout);
+	      fflush(stdout);
 	    }
 	    break;
 	  }
-
+	
 	/* compute stabilizer vector sh and scalar omega */
 #ifdef TP_OMP
 #pragma omp parallel for
 #endif
 	for (int j = 0; j < ntotal; j++)
 	  sh->d0[j] = 0;
-	for (int j = 0; j < NRELAX; j++)	/* solves JFD*sh = s by relaxation*/
+	for (int j = 0; j < NRELAX; j++)	/* solves JFD*sh = s by relaxation */
 	  relax (sh->d0, nvar, n1, n2, n3, s, ncols, cols, JFD);
 	
-	J_times_dv (nvar, n1, n2, n3, sh, t, u);	/* t=J*sh*/
+	J_times_dv (nvar, n1, n2, n3, sh, t, u);	/* t=J*sh */
 	omega = scalarproduct (t, s, ntotal) / scalarproduct (t, t, ntotal);
 	
 	/* compute new solution approximation */
@@ -467,6 +471,7 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
 	    dv->d0[j] += alpha * ph->d0[j] + omega * sh->d0[j];
 	    r[j] = s[j] - omega * t[j];
 	  }
+	
 	/* are we done? */
 	*normres = norm2 (r, ntotal);
 	if (output == 1) {
@@ -481,37 +486,39 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
 	  break;
 	
       }
-  }
-
+    
+  } //   if (*normres > tol) 
+  
   /* free temporary storage */
   free_dvector (r, 0, ntotal - 1);
   free_dvector (p, 0, ntotal - 1);
-/*      free_dvector(ph,  0, ntotal-1);*/
+  /*free_dvector(ph,  0, ntotal-1);*/
   free_derivs (ph);
   free_dvector (rt, 0, ntotal - 1);
   free_dvector (s, 0, ntotal - 1);
-/*      free_dvector(sh,  0, ntotal-1);*/
+  /*free_dvector(sh,  0, ntotal-1);*/
   free_derivs (sh);
   free_dvector (t, 0, ntotal - 1);
   free_dvector (vv, 0, ntotal - 1);
-
+  
   free_dvector (F, 0, ntotal - 1);
   free_derivs (u);
-
+  
   free_dmatrix (JFD, 0, ntotal - 1, 0, maxcol - 1);
   free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
   free_ivector (ncols, 0, ntotal - 1);
-
+  
   if (*normres <= tol)
     return 0;
   
   /* iteration failed */
   if (ii > itmax)
     return -1;
-
+  
   /* breakdown */
   if (fabs (rho) < rhotol)
     return -10;
+  
   if (fabs (omega) < omegatol)
     return -11;
 
