@@ -384,103 +384,103 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
     fflush(stdout);
   }
 
-  if (*normres <= tol)
-    return 0;
-
   /* cgs iteration */
-  for (ii = 0; ii < itmax; ii++)
-  {
-    rho = scalarproduct (rt, r, ntotal);
-    if (fabs (rho) < rhotol)
-      break;
+  
+  if (*normres <= tol) {
+    for (ii = 0; ii < itmax; ii++)
+      {
+	rho = scalarproduct (rt, r, ntotal);
+	if (fabs (rho) < rhotol)
+	  break;
 
-    /* compute direction vector p */
-    if (ii == 0)
-    {
+	/* compute direction vector p */
+	if (ii == 0)
+	  {
 #ifdef TP_OMP
 #pragma omp parallel for
 #endif
-      for (int j = 0; j < ntotal; j++)
-	p[j] = r[j];
-    }
-    else
-    {
-      beta = (rho / rho1) * (alpha / omega);
+	    for (int j = 0; j < ntotal; j++)
+	      p[j] = r[j];
+	  }
+	else
+	  {
+	    beta = (rho / rho1) * (alpha / omega);
 #ifdef TP_OMP
 #pragma omp parallel for
 #endif
-      for (int j = 0; j < ntotal; j++)
-	p[j] = r[j] + beta * (p[j] - omega * vv[j]);
-    }
-
-    /* compute direction adjusting vector ph and scalar alpha */
+	    for (int j = 0; j < ntotal; j++)
+	      p[j] = r[j] + beta * (p[j] - omega * vv[j]);
+	  }
+	
+	/* compute direction adjusting vector ph and scalar alpha */
 #ifdef TP_OMP
 #pragma omp parallel for
 #endif
-    for (int j = 0; j < ntotal; j++)
-      ph->d0[j] = 0;
-    for (int j = 0; j < NRELAX; j++)	/* solves JFD*ph = p by relaxation*/
-      relax (ph->d0, nvar, n1, n2, n3, p, ncols, cols, JFD);
-
-    J_times_dv (nvar, n1, n2, n3, ph, vv, u);	/* vv=J*ph*/
-    alpha = rho / scalarproduct (rt, vv, ntotal);
+	for (int j = 0; j < ntotal; j++)
+	  ph->d0[j] = 0;
+	for (int j = 0; j < NRELAX; j++)	/* solves JFD*ph = p by relaxation*/
+	  relax (ph->d0, nvar, n1, n2, n3, p, ncols, cols, JFD);
+	
+	J_times_dv (nvar, n1, n2, n3, ph, vv, u);	/* vv=J*ph*/
+	alpha = rho / scalarproduct (rt, vv, ntotal);
 #ifdef TP_OMP
 #pragma omp parallel for
 #endif
-    for (int j = 0; j < ntotal; j++)
-      s[j] = r[j] - alpha * vv[j];
-
-    /* early check of tolerance */
-    *normres = norm2 (s, ntotal);
-    if (*normres <= tol)
-    {
+	for (int j = 0; j < ntotal; j++)
+	  s[j] = r[j] - alpha * vv[j];
+	
+	/* early check of tolerance */
+	*normres = norm2 (s, ntotal);
+	if (*normres <= tol)
+	  {
 #ifdef TP_OMP
 #pragma omp parallel for
 #endif
-      for (int j = 0; j < ntotal; j++)
-	dv->d0[j] += alpha * ph->d0[j];
-      if (output == 1) {
-	printf ("bicgstab: %5d  %10.3e  %10.3e  %10.3e  %10.3e\n",
-		ii + 1, (double) *normres, (double)alpha, (double)beta, (double)omega);
+	    for (int j = 0; j < ntotal; j++)
+	      dv->d0[j] += alpha * ph->d0[j];
+	    if (output == 1) {
+	      printf ("bicgstab: %5d  %10.3e  %10.3e  %10.3e  %10.3e\n",
+		      ii + 1, (double) *normres, (double)alpha, (double)beta, (double)omega);
         fflush(stdout);
+	    }
+	    break;
+	  }
+
+	/* compute stabilizer vector sh and scalar omega */
+#ifdef TP_OMP
+#pragma omp parallel for
+#endif
+	for (int j = 0; j < ntotal; j++)
+	  sh->d0[j] = 0;
+	for (int j = 0; j < NRELAX; j++)	/* solves JFD*sh = s by relaxation*/
+	  relax (sh->d0, nvar, n1, n2, n3, s, ncols, cols, JFD);
+	
+	J_times_dv (nvar, n1, n2, n3, sh, t, u);	/* t=J*sh*/
+	omega = scalarproduct (t, s, ntotal) / scalarproduct (t, t, ntotal);
+	
+	/* compute new solution approximation */
+#ifdef TP_OMP
+#pragma omp parallel for
+#endif
+	for (int j = 0; j < ntotal; j++)
+	  {
+	    dv->d0[j] += alpha * ph->d0[j] + omega * sh->d0[j];
+	    r[j] = s[j] - omega * t[j];
+	  }
+	/* are we done? */
+	*normres = norm2 (r, ntotal);
+	if (output == 1) {
+	  printf ("bicgstab: %5d  %10.3e  %10.3e  %10.3e  %10.3e\n",
+		  ii + 1, (double) *normres, (double)alpha, (double)beta, (double)omega);
+	  fflush(stdout);
+	}
+	if (*normres <= tol)
+	  break;
+	rho1 = rho;
+	if (fabs (omega) < omegatol)
+	  break;
+	
       }
-      break;
-    }
-
-    /* compute stabilizer vector sh and scalar omega */
-#ifdef TP_OMP
-#pragma omp parallel for
-#endif
-    for (int j = 0; j < ntotal; j++)
-      sh->d0[j] = 0;
-    for (int j = 0; j < NRELAX; j++)	/* solves JFD*sh = s by relaxation*/
-      relax (sh->d0, nvar, n1, n2, n3, s, ncols, cols, JFD);
-
-    J_times_dv (nvar, n1, n2, n3, sh, t, u);	/* t=J*sh*/
-    omega = scalarproduct (t, s, ntotal) / scalarproduct (t, t, ntotal);
-
-    /* compute new solution approximation */
-#ifdef TP_OMP
-#pragma omp parallel for
-#endif
-    for (int j = 0; j < ntotal; j++)
-    {
-      dv->d0[j] += alpha * ph->d0[j] + omega * sh->d0[j];
-      r[j] = s[j] - omega * t[j];
-    }
-    /* are we done? */
-    *normres = norm2 (r, ntotal);
-    if (output == 1) {
-      printf ("bicgstab: %5d  %10.3e  %10.3e  %10.3e  %10.3e\n",
-	      ii + 1, (double) *normres, (double)alpha, (double)beta, (double)omega);
-      fflush(stdout);
-    }
-    if (*normres <= tol)
-      break;
-    rho1 = rho;
-    if (fabs (omega) < omegatol)
-      break;
-
   }
 
   /* free temporary storage */
@@ -502,6 +502,9 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
   free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
   free_ivector (ncols, 0, ntotal - 1);
 
+  if (*normres <= tol)
+    return 0;
+  
   /* iteration failed */
   if (ii > itmax)
     return -1;
