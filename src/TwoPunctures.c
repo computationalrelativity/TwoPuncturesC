@@ -307,8 +307,9 @@ ini_data* TwoPunctures_make_initial_data() {
 
     F_of_v (nvar, n1, n2, n3, v, F, u);
 
-    SpecCoef(n1, n2, n3, 0, v->d0, cf_v->d0);
-
+    /* SpecCoef(n1, n2, n3, 0, v->d0, cf_v->d0); */
+    SpecCoef(n1, n2, n3, nvar, v->d0, cf_v->d0);
+ 
     if (verbose) printf ("The two puncture masses are mp=%.17g and mm=%.17g\n", mp, mm);
 
     up = PunctIntPolAtArbitPosition(0, nvar, n1, n2, n3, v, par_b, 0., 0.);

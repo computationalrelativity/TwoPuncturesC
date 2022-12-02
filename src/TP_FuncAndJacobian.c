@@ -711,7 +711,8 @@ double PunctEvalAtArbitPosition (double *v, int ivar, double A, double B, double
       for (j = 0; j < n2; j++)
 	{
 	  for (i = 0; i < n1; i++)
-	    p[i] = v[ivar + nvar * (i + n1 * (j + n2 * k))];
+	    /* p[i] = v[ivar + nvar * (i + n1 * (j + n2 * k))]; */
+	    p[i] = v[Index (ivar, i, j, k, nvar, n1, n2, n3)];
 	  chebft_Zeros (p, n1, 0);
 	  values2[j][k] = chebev (-1, 1, p, n1, A);
 	}
@@ -890,7 +891,9 @@ double  PunctEvalAtArbitPositionFast (double *v, int ivar, double A, double B, d
   {
     for (j = 0; j < n2; j++)
     {
-      for (i = 0; i < n1; i++) p[i] = v[ivar + nvar * (i + n1 * (j + n2 * k))];
+      for (i = 0; i < n1; i++)
+	/* p[i] = v[ivar + nvar * (i + n1 * (j + n2 * k))]; */
+	p[i] = v[Index (ivar, i, j, k, nvar, n1, n2, n3)];
       //      chebft_Zeros (p, n1, 0);
       values2[j][k] = chebev (-1, 1, p, n1, A);
     }
@@ -952,7 +955,7 @@ double PunctIntPolAtArbitPositionFast (int ivar, int nvar,
   return Ui;
 }
 
-void SpecCoef(int n1, int n2, int n3, int ivar, double *v, double *cf)
+void SpecCoef(int n1, int n2, int n3, int nvar, double *v, double *cf)
 {
   /* Evaluates the spectral expansion coefficients of v   */
 
@@ -966,12 +969,16 @@ void SpecCoef(int n1, int n2, int n3, int ivar, double *v, double *cf)
   values3=d3tensor(0,n1,0,n2,0,n3);
   values4=d3tensor(0,n1,0,n2,0,n3);
 
+for (int ivar=0; ivar<nvar; ivar++){
+  
   // Caclulate values3[n,j,k] = a_n^{j,k} = (sum_i^(n1-1) f(A_i,B_j,phi_k) Tn(-A_i))/k_n , k_n = N/2 or N
   for(k=0;k<n3;k++) {
     for(j=0;j<n2;j++) {
 
-      for(i=0;i<n1;i++) p[i]=v[ivar + (i + n1 * (j + n2 * k))];
-
+      for(i=0;i<n1;i++)
+	/* p[i]=v[ivar + (i + n1 * (j + n2 * k))]; */
+	p[i]=v[Index (ivar, i, j, k, nvar, n1, n2, n3)];
+      
       chebft_Zeros(p,n1,0);
       for (n=0;n<n1;n++)	{
 	values3[n][j][k] = p[n];
@@ -997,10 +1004,13 @@ void SpecCoef(int n1, int n2, int n3, int ivar, double *v, double *cf)
       for(k=0;k<n3;k++) p[k]=values4[i][j][k];
       fourft(p,n3,0);
       for (k = 0; k<n3; k++){
-	cf[ivar + (i + n1 * (j + n2 * k))] = p[k];
+	/* cf[ivar + (i + n1 * (j + n2 * k))] = p[k]; */
+	cf[Index (ivar, i, j, k, nvar, n1, n2, n3)] = p[k];
       }
     }
   }
+
+}
 
   free_dvector(p,0,N);
   free_d3tensor(values3,0,n1,0,n2,0,n3);
