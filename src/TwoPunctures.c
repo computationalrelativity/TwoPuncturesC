@@ -297,6 +297,10 @@ ini_data* TwoPunctures_make_initial_data() {
         mp = (tmp + M_p - M_m)/(2.*(1 + up));
         mm = (tmp - M_p + M_m)/(2.*(1 + um));
 
+        /* this is used in the Newton function, interpolation, etc */
+        params_set_real("par_m_plus",mp);
+        params_set_real("par_m_minus",mm);
+        
       } while ( (mp_adm_err > params_get_real("adm_tol")) ||
                 (mm_adm_err > params_get_real("adm_tol")) );
 
