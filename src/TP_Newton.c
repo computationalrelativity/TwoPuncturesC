@@ -290,7 +290,7 @@ TestRelax (int nvar, int n1, int n2, int n3, derivs *v,
 
   JFD = dmatrix (0, ntotal - 1, 0, maxcol - 1);
   cols = imatrix (0, ntotal - 1, 0, maxcol - 1);
-  ncols = ivector (0, ntotal - 1);
+  ncols = TP_ivector (0, ntotal - 1);
 
   F_of_v (nvar, n1, n2, n3, v, F, u);
 
@@ -322,7 +322,7 @@ TestRelax (int nvar, int n1, int n2, int n3, derivs *v,
 
   free_dmatrix (JFD, 0, ntotal - 1, 0, maxcol - 1);
   free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
-  free_ivector (ncols, 0, ntotal - 1);
+  TP_free_ivector (ncols, 0, ntotal - 1);
 }
 
 /* --------------------------------------------------------------------------*/
@@ -347,7 +347,7 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
 
   JFD = dmatrix (0, ntotal - 1, 0, maxcol - 1);
   cols = imatrix (0, ntotal - 1, 0, maxcol - 1);
-  ncols = ivector (0, ntotal - 1);
+  ncols = TP_ivector (0, ntotal - 1);
 
   F_of_v (nvar, n1, n2, n3, v, F, u);
   SetMatrix_JFD (nvar, n1, n2, n3, u, ncols, cols, JFD);
@@ -506,7 +506,7 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
   
   free_dmatrix (JFD, 0, ntotal - 1, 0, maxcol - 1);
   free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
-  free_ivector (ncols, 0, ntotal - 1);
+  TP_free_ivector (ncols, 0, ntotal - 1);
   
   if (*normres <= tol)
     return 0;

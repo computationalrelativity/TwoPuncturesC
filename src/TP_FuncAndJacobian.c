@@ -78,7 +78,7 @@ void Derivatives_AB3 (int nvar, int n1, int n2, int n3, derivs *v)
   dq = dvector (0, N);
   r = dvector (0, N);
   dr = dvector (0, N);
-  indx = ivector (0, N);
+  indx = TP_ivector (0, N);
 
   for (ivar = 0; ivar < nvar; ivar++)
   {
@@ -168,7 +168,7 @@ void Derivatives_AB3 (int nvar, int n1, int n2, int n3, derivs *v)
   free_dvector (dq, 0, N);
   free_dvector (r, 0, N);
   free_dvector (dr, 0, N);
-  free_ivector (indx, 0, N);
+  TP_free_ivector (indx, 0, N);
 }
 
 void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,

@@ -9,14 +9,14 @@
 /* -------------------------------------------------------------------------*/
 
 int *
-ivector (long nl, long nh)
+TP_ivector (long nl, long nh)
 /* allocate an int vector with subscript range v[nl..nh] */
 {
   int *retval;
 
   retval = malloc(sizeof(int)*(nh-nl+1));
   if(retval == NULL)
-    ERROR ("allocation failure in ivector()");
+    ERROR ("allocation failure in TP_ivector()");
   return retval - nl;
 }
 
@@ -135,8 +135,8 @@ d3tensor (long nrl, long nrh, long ncl, long nch, long ndl, long ndh)
 }
 
 void
-free_ivector (int *v, long nl, long nh)
-/* free an int vector allocated with ivector() */
+TP_free_ivector (int *v, long nl, long nh)
+/* free an int vector allocated with TP_ivector() */
 {
   free(v+nl);
 }

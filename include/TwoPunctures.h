@@ -191,13 +191,13 @@ void Newton (int nvar, int n1, int n2, int n3, derivs *v,
 
 /* TP_Utilies.c */
 void nrerror (char error_text[]);
-int *ivector (long nl, long nh);
+int *TP_ivector (long nl, long nh);
 double *dvector (long nl, long nh);
 int **imatrix (long nrl, long nrh, long ncl, long nch);
 double **dmatrix (long nrl, long nrh, long ncl, long nch);
 double ***d3tensor (long nrl, long nrh, long ncl, long nch, long ndl,
 		    long ndh);
-void free_ivector (int *v, long nl, long nh);
+void TP_free_ivector (int *v, long nl, long nh);
 void free_dvector (double *v, long nl, long nh);
 void free_imatrix (int **m, long nrl, long nrh, long ncl, long nch);
 void free_dmatrix (double **m, long nrl, long nrh, long ncl, long nch);
