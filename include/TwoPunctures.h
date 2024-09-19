@@ -275,6 +275,7 @@ extern "C" {
   void TwoPunctures_params_set_Real(char *key, double value);
   void TwoPunctures_params_set_Int(char *key, int value);
   void TwoPunctures_params_set_Boolean(char *key, bool value);
+  void TwoPunctures_params_set_String(char *key, char * value);
 
   ini_data * TwoPunctures_make_initial_data();
 

@@ -124,6 +124,7 @@ void TwoPunctures_params_set_default(){
   params_add_int("do_initial_debug_output",0); // Output debug information about initial guess
   params_add_int("do_solution_file_output",0); // output .data files
   params_add_int("do_bam_file_output",0); // output input files for bam's puncture_ps
+  params_add_int("output_derivatives_order",0); // include 0,1,2 derivatives with do_solution_file_output
   
   // Interpolation
   params_add_int("grid_setup_method",taylor_expansion); // How to fill the 3D grid from the spectral grid ?
@@ -339,15 +340,16 @@ ini_data* TwoPunctures_make_initial_data() {
   }
 
   if (params_get_int("do_solution_file_output")) {
+    int output_derivatives_order = params_get_int("output_derivatives_order");
     /* Output the solution */    
     write_derivs( u, n1,n2,n3, 
-		  0, // =0,1,2 derivatives to output
+		  output_derivatives_order, // =0,1,2 derivatives to output
 		  "u.data");
     write_derivs( v, n1,n2,n3, 
-		  0, // =0,1,2 derivatives to output
+		  output_derivatives_order, // =0,1,2 derivatives to output
 		  "v.data");
     write_derivs( cf_v, n1,n2,n3, 
-		  0, // =0,1,2 derivatives to output
+		  output_derivatives_order, // =0,1,2 derivatives to output
 		  "cf_v.data");
   }
 
