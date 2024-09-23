@@ -387,6 +387,7 @@ ini_data* TwoPunctures_make_initial_data() {
   return data;
 }
 
+/* Given nx,ny,nz Cartesian axis offsets, interpolate data to each of the nx*ny*nz points in the grid. */
 void TwoPunctures_Cartesian_interpolation
 (ini_data *data,     // struct containing the previously calculated solution
  int *imin,         // min, max idxs of Cartesian Grid in the three directions
@@ -395,6 +396,85 @@ void TwoPunctures_Cartesian_interpolation
  double *x,         // Cartesian coordinates
  double *y,
  double *z,
+ double *alp,       // lapse
+ double *psi,       // conformal factor and derivatives
+ double *psix,
+ double *psiy,
+ double *psiz,
+ double *psixx,
+ double *psixy,
+ double *psixz,
+ double *psiyy,
+ double *psiyz,
+ double *psizz,
+ double *gxx,       // metric components
+ double *gxy,
+ double *gxz,
+ double *gyy,
+ double *gyz,
+ double *gzz,
+ double *kxx,       // extrinsic curvature components
+ double *kxy,
+ double *kxz,
+ double *kyy,
+ double *kyz,
+ double *kzz){
+
+  // This function builds a list of points from the given Cartesian cordinates
+  // and then calls TwoPunctures_Cartesian_interpolation_list.
+
+  double center_offset[3];
+  center_offset[0] = params_get_real("center_offset1");
+  center_offset[1] = params_get_real("center_offset2");
+  center_offset[2] = params_get_real("center_offset3");
+
+  const int xxx = nxyz[0];
+  const int xxxyyy = nxyz[0]*nxyz[1];
+  const int np = nxyz[0]*nxyz[1]*nxyz[2];
+
+  double *px = malloc(np * sizeof(double));
+  double *py = malloc(np * sizeof(double));
+  double *pz = malloc(np * sizeof(double));
+
+  for (int k = imin[2]; k < imax[2]; ++k) {
+    for (int j = imin[1]; j < imax[1]; ++j) {
+      for (int i = imin[0]; i < imax[0]; ++i) {
+
+        //const int ind = GFINDEX3D (i, j, k, nshift, mshift);
+        const int ind = i + xxx * j + xxxyyy* k;
+
+        double xx, yy, zz;
+        px[ind] = x[i] - center_offset[0];
+        py[ind] = y[j] - center_offset[1];
+        pz[ind] = z[k] - center_offset[2];
+
+      } /* for i */
+    }   /* for j */
+  }     /* for k */
+
+  TwoPunctures_Cartesian_interpolation_list
+    (data,
+     np, x, y, z,
+     /* outputs */
+     alp,
+     psi, 
+     psix, psiy, psiz,
+     psixx, psixy, psixz, psiyy, psiyz, psizz,
+     gxx, gxy, gxz, gyy, gyz, gzz,
+     kxx, kxy, kxz, kyy, kyz, kzz);
+
+  free(px);
+  free(py);
+  free(pz);
+ }
+ 
+/* Given a list of ntotal interpolation points, interpolate data to each listed point. */
+void TwoPunctures_Cartesian_interpolation_list
+(ini_data *data,    // struct containing the previously calculated solution
+ int np,            // number of elements in each array that follows...
+ const double *px,  // coordinates of interpolation points
+ const double *py,
+ const double *pz,
  double *alp,       // lapse
  double *psi,       // conformal factor and derivatives
  double *psix,
@@ -440,11 +520,6 @@ void TwoPunctures_Cartesian_interpolation
   double par_b = params_get_real("par_b");
   double mp = params_get_real("par_m_plus"),
     mm = params_get_real("par_m_minus"); // Bare masses of the punctures
-
-  double center_offset[3];
-  center_offset[0] = params_get_real("center_offset1");
-  center_offset[1] = params_get_real("center_offset2");
-  center_offset[2] = params_get_real("center_offset3");
 
   int const nvar = 1,
     n1 = params_get_int("npoints_A"),
@@ -516,23 +591,15 @@ void TwoPunctures_Cartesian_interpolation
 
   // Cartesian grid parameters
 
-  const int xxx = nxyz[0];
-  const int xxxyyy = nxyz[0]*nxyz[1];
-
 #ifdef TP_OMP
 #pragma omp parallel for
 #endif
-  for (int k = imin[2]; k < imax[2]; ++k) {
-    for (int j = imin[1]; j < imax[1]; ++j) {
-      for (int i = imin[0]; i < imax[0]; ++i) {
-
-        //const int ind = GFINDEX3D (i, j, k, nshift, mshift);
-	const int ind = i + xxx * j + xxxyyy* k;
+  for (int ind = 0; ind < np; ind++) {
 
         double xx, yy, zz;
-        xx = x[i] - center_offset[0];
-        yy = y[j] - center_offset[1];
-        zz = z[k] - center_offset[2];
+        xx = px[ind];
+        yy = py[ind];
+        zz = pz[ind];
 
         /* We implement swapping the x and z coordinates as follows.
            The bulk of the code that performs the actual calculations
@@ -752,9 +819,7 @@ void TwoPunctures_Cartesian_interpolation
           SWAP (kxy[ind], kyz[ind]);
         } /* if swap_xz */
 
-      } /* for i */
-    }   /* for j */
-  }     /* for k */
+  } /* for ind */
 
 }
 

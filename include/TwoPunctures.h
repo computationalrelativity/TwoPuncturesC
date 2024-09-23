@@ -311,6 +311,36 @@ extern "C" {
    double *kyz,
    double *kzz);
 
+  void TwoPunctures_Cartesian_interpolation_list
+  (ini_data *data,    // struct containing the previously calculated solution
+   int np,            // number of elements in each array that follows...
+   const double *px,  // coordinates of interpolation points
+   const double *py,
+   const double *pz,
+   double *alp,       // lapse
+   double *psi,       // conformal factor and derivatives
+   double *psix,
+   double *psiy,
+   double *psiz,
+   double *psixx,
+   double *psixy,
+   double *psixz,
+   double *psiyy,
+   double *psiyz,
+   double *psizz,
+   double *gxx,       // metric components
+   double *gxy,
+   double *gxz,
+   double *gyy,
+   double *gyz,
+   double *gzz,
+   double *kxx,       // extrinsic curvature components
+   double *kxy,
+   double *kxz,
+   double *kyy,
+   double *kyz,
+   double *kzz);
+
   // for cleanup purposes
   void TwoPunctures_finalise(ini_data *data);
 
