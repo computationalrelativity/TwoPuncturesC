@@ -423,10 +423,11 @@ void TwoPunctures_Cartesian_interpolation
   // This function builds a list of points from the given Cartesian cordinates
   // and then calls TwoPunctures_Cartesian_interpolation_list.
 
-  double center_offset[3];
-  center_offset[0] = params_get_real("center_offset1");
-  center_offset[1] = params_get_real("center_offset2");
-  center_offset[2] = params_get_real("center_offset3");
+  const double center_offset[3] ={
+    params_get_real("center_offset1"),
+    params_get_real("center_offset2"),
+    params_get_real("center_offset3")
+  };
 
   const int xxx = nxyz[0];
   const int xxxyyy = nxyz[0]*nxyz[1];
@@ -444,9 +445,9 @@ void TwoPunctures_Cartesian_interpolation
         const int ind = i + xxx * j + xxxyyy* k;
 
         double xx, yy, zz;
-        px[ind] = x[i] - center_offset[0];
-        py[ind] = y[j] - center_offset[1];
-        pz[ind] = z[k] - center_offset[2];
+        px[ind] = x[i];
+        py[ind] = y[j];
+        pz[ind] = z[k];
 
       } /* for i */
     }   /* for j */
@@ -454,6 +455,7 @@ void TwoPunctures_Cartesian_interpolation
 
   TwoPunctures_Cartesian_interpolation_list
     (data,
+     center_offset,
      np, x, y, z,
      /* outputs */
      alp,
@@ -471,6 +473,7 @@ void TwoPunctures_Cartesian_interpolation
 /* Given a list of ntotal interpolation points, interpolate data to each listed point. */
 void TwoPunctures_Cartesian_interpolation_list
 (ini_data *data,    // struct containing the previously calculated solution
+ const double* center_offset, // offset b=0 to position (x,y,z)
  int np,            // number of elements in each array that follows...
  const double *px,  // coordinates of interpolation points
  const double *py,
@@ -597,9 +600,9 @@ void TwoPunctures_Cartesian_interpolation_list
   for (int ind = 0; ind < np; ind++) {
 
         double xx, yy, zz;
-        xx = px[ind];
-        yy = py[ind];
-        zz = pz[ind];
+        xx = px[ind] - center_offset[0];
+        yy = py[ind] - center_offset[1];
+        zz = pz[ind] - center_offset[2];
 
         /* We implement swapping the x and z coordinates as follows.
            The bulk of the code that performs the actual calculations

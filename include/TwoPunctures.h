@@ -313,6 +313,7 @@ extern "C" {
 
   void TwoPunctures_Cartesian_interpolation_list
   (ini_data *data,    // struct containing the previously calculated solution
+   const double* center_offset, // offset b=0 to position (x,y,z)
    int np,            // number of elements in each array that follows...
    const double *px,  // coordinates of interpolation points
    const double *py,
