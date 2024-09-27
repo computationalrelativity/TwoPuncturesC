@@ -253,7 +253,7 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
     
   Derivatives_AB3 (nvar, n1, n2, n3, v);
 
-  double psi, psi2, psi4, psi7, r_plus, r_minus;
+  double psi, psi2, /*psi4, psi7,*/ r_plus, r_minus;
 
   char fname[STRLEN];
   FILE *debugfile = NULL;
@@ -333,8 +333,8 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
 		  0.5 * par_m_minus / r_minus +
 		  U->d0[0];
 		psi2 = psi * psi;
-		psi4 = psi2 * psi2;
-		psi7 = psi * psi2 * psi4;
+		// psi4 = psi2 * psi2;
+		// psi7 = psi * psi2 * psi4;
 		fprintf(debugfile,
 			"%.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g\n",
 			(double)x, (double)y, (double)A, (double)B,
@@ -604,7 +604,7 @@ void SetMatrix_JFD (int nvar, int n1, int n2, int n3, derivs *u,
 		    int *ncols, int **cols, double **Matrix)
 {
   int column, row, mcol;
-  int i, i1, i_0, i_1, j, j1, j_0, j_1, k, k1, k_0, k_1, N1, N2, N3,
+  int i, i1, i_0, i_1, j, j1, j_0, j_1, k, k1, k_0, k_1, N1, N2, /*N3,*/
     ivar, ivar1, ntotal = nvar * n1 * n2 * n3;
   double *values;
   derivs *dv;
@@ -614,7 +614,7 @@ void SetMatrix_JFD (int nvar, int n1, int n2, int n3, derivs *u,
 
   N1 = n1 - 1;
   N2 = n2 - 1;
-  N3 = n3 - 1;
+  // N3 = n3 - 1;
 
 #ifdef TP_OMP
 #pragma omp parallel for private (i,j,k,ivar,row) schedule(dynamic)
@@ -961,7 +961,7 @@ void SpecCoef(int n1, int n2, int n3, int nvar, double *v, double *cf)
 
   // VASILIS: Here v is a pointer to the values of the variable v at the collocation points and cf_v a pointer to the spectral coefficients that this routine calculates
 
-  int i, j, k, N, n, l, m;
+  int i, j, k, N, n, l; //, m;
   double *p, ***values3, ***values4;
 
   N=maximum3(n1,n2,n3);
