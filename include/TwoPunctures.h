@@ -69,9 +69,6 @@ enum{
   evaluation, // evaluate using all spectral coefficients (slow)
   N_interp_opt,
 };
-static const char* str_interp_opt[N_interp_opt] = {
-  "taylor", "spectral"
-};
 
 /* lapse options */
 enum{
@@ -81,9 +78,6 @@ enum{
   brownsville, // See Phys. Rev. D 74, 041501 (2006)
   N_lapse_opt,
 };
-static const char* str_lapse_opt[N_lapse_opt] = {
-  "antisymmetric", "averaged", "psin", "brownsville",
-};
 
 /* conformalfactor options */
 enum{
@@ -92,9 +86,6 @@ enum{
   FACTOR1, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs")
   FACTOR2, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs+2nd derivs")
   N_cf_opt,
-};
-static const char* str_cf_opt[N_cf_opt] = {
-  "nonstatic", "static0", "static01", "static012",
 };
 
 #define use_sources (0) //SB: do not add the source terms
@@ -118,9 +109,6 @@ enum{
   REAL,
   STRING,
   N_PAR_TYPES,
-};
-static const char* str_par_type[N_PAR_TYPES] = {
-  "INTEGER", "REAL", "STRING", 
 };
 
 typedef struct {

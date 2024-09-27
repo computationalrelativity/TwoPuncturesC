@@ -6,6 +6,22 @@
 
 #include "TwoPunctures.h"
 
+// static const char* str_interp_opt[N_interp_opt] = {
+//   "taylor", "spectral"
+// };
+
+// static const char* str_lapse_opt[N_lapse_opt] = {
+//   "antisymmetric", "averaged", "psin", "brownsville",
+// };
+
+// static const char* str_cf_opt[N_cf_opt] = {
+//   "nonstatic", "static0", "static01", "static012",
+// };
+
+static const char* str_par_type[N_PAR_TYPES] = {
+  "INTEGER", "REAL", "STRING", 
+};
+
 /* -------------------------------------------------------------------------*/
 
 int *
