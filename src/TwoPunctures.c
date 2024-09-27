@@ -156,7 +156,7 @@ ini_data* TwoPunctures_make_initial_data() {
 
   const int verbose = params_get_int("verbose");
 
-  char outdir[STRLEN];
+  // char outdir[STRLEN];
   if (params_get_int("do_residuum_debug_output")+
       params_get_int("do_initial_debug_output")+
       params_get_int("do_solution_file_output")+
@@ -164,33 +164,33 @@ ini_data* TwoPunctures_make_initial_data() {
     make_output_dir();
   }
   
-  double par_P_plus[3], par_P_minus[3];
-  par_P_plus[0] = params_get_real("par_P_plus1");
-  par_P_plus[1] = params_get_real("par_P_plus2");
-  par_P_plus[2] = params_get_real("par_P_plus3");
-  par_P_minus[0] = params_get_real("par_P_minus1");
-  par_P_minus[1] = params_get_real("par_P_minus2");
-  par_P_minus[2] = params_get_real("par_P_minus3");
+  // double par_P_plus[3], par_P_minus[3];
+  // par_P_plus[0] = params_get_real("par_P_plus1");
+  // par_P_plus[1] = params_get_real("par_P_plus2");
+  // par_P_plus[2] = params_get_real("par_P_plus3");
+  // par_P_minus[0] = params_get_real("par_P_minus1");
+  // par_P_minus[1] = params_get_real("par_P_minus2");
+  // par_P_minus[2] = params_get_real("par_P_minus3");
 
-  double par_S_plus[3], par_S_minus[3];
-  par_S_plus[0] = params_get_real("par_S_plus1");
-  par_S_plus[1] = params_get_real("par_S_plus2");
-  par_S_plus[2] = params_get_real("par_S_plus3");
-  par_S_minus[0] = params_get_real("par_S_minus1");
-  par_S_minus[1] = params_get_real("par_S_minus2");
-  par_S_minus[2] = params_get_real("par_S_minus3");
+  // double par_S_plus[3], par_S_minus[3];
+  // par_S_plus[0] = params_get_real("par_S_plus1");
+  // par_S_plus[1] = params_get_real("par_S_plus2");
+  // par_S_plus[2] = params_get_real("par_S_plus3");
+  // par_S_minus[0] = params_get_real("par_S_minus1");
+  // par_S_minus[1] = params_get_real("par_S_minus2");
+  // par_S_minus[2] = params_get_real("par_S_minus3");
 
   double par_b = params_get_real("par_b");
 
-  double center_offset[3];
-  center_offset[0] = params_get_real("center_offset1");
-  center_offset[1] = params_get_real("center_offset2");
-  center_offset[2] = params_get_real("center_offset3");
+  // double center_offset[3];
+  // center_offset[0] = params_get_real("center_offset1");
+  // center_offset[1] = params_get_real("center_offset2");
+  // center_offset[2] = params_get_real("center_offset3");
 
   // ---------------------------------------------------
 
-  double E; // ADM energy of the Bowen-York spacetime"
-  double J1, J2, J3; // Angular momentum of the Bowen-York spacetime"
+  // double E; // ADM energy of the Bowen-York spacetime"
+  // double J1, J2, J3; // Angular momentum of the Bowen-York spacetime"
   double mp = params_get_real("par_m_plus"), mm = params_get_real("par_m_minus"); // Bare masses of the punctures
   double mp_adm, mm_adm; // ADM masses of the punctures (measured at the other spatial infinities
   double admMass;
@@ -331,11 +331,11 @@ ini_data* TwoPunctures_make_initial_data() {
     admMass = (mp + mm - 4*par_b*PunctEvalAtArbitPosition(v->d0, 0, 1, 0, 0, nvar, n1, n2, n3));
     if (verbose) printf ("The total ADM mass is %g\n", admMass);
 
-    E = admMass;
+    // E = admMass;
 
-    J1 = -(center_offset[2]*par_P_minus[1]) + center_offset[1]*par_P_minus[2] - center_offset[2]*par_P_plus[1] + center_offset[1]*par_P_plus[2] + par_S_minus[0] + par_S_plus[0];
-    J2 = center_offset[2]*par_P_minus[0] - center_offset[0]*par_P_minus[2] + par_b*par_P_minus[2] + center_offset[2]*par_P_plus[0] - center_offset[0]*par_P_plus[2] - par_b*par_P_plus[2] + par_S_minus[1] + par_S_plus[1];
-    J3 = -(center_offset[1]*par_P_minus[0]) + center_offset[0]*par_P_minus[1] - par_b*par_P_minus[1] - center_offset[1]*par_P_plus[0] + center_offset[0]*par_P_plus[1] + par_b*par_P_plus[1] + par_S_minus[2] + par_S_plus[2];
+    // J1 = -(center_offset[2]*par_P_minus[1]) + center_offset[1]*par_P_minus[2] - center_offset[2]*par_P_plus[1] + center_offset[1]*par_P_plus[2] + par_S_minus[0] + par_S_plus[0];
+    // J2 = center_offset[2]*par_P_minus[0] - center_offset[0]*par_P_minus[2] + par_b*par_P_minus[2] + center_offset[2]*par_P_plus[0] - center_offset[0]*par_P_plus[2] - par_b*par_P_plus[2] + par_S_minus[1] + par_S_plus[1];
+    // J3 = -(center_offset[1]*par_P_minus[0]) + center_offset[0]*par_P_minus[1] - par_b*par_P_minus[1] - center_offset[1]*par_P_plus[0] + center_offset[0]*par_P_plus[1] + par_b*par_P_plus[1] + par_S_minus[2] + par_S_plus[2];
 
   }
 
@@ -444,7 +444,7 @@ void TwoPunctures_Cartesian_interpolation
         //const int ind = GFINDEX3D (i, j, k, nshift, mshift);
         const int ind = i + xxx * j + xxxyyy* k;
 
-        double xx, yy, zz;
+        // double xx, yy, zz;
         px[ind] = x[i];
         py[ind] = y[j];
         pz[ind] = z[k];
@@ -513,11 +513,11 @@ void TwoPunctures_Cartesian_interpolation_list
   /* derivs cf_v = *(data.cf_v); */
   /* int ntotal = data.ntotal; */
   //SB:
-  double *F = data->F; 
-  derivs *u = data->u; 
+  // double *F = data->F; 
+  // derivs *u = data->u; 
   derivs *v = data->v;
   derivs *cf_v = data->cf_v; 
-  int ntotal = data->ntotal; 
+  // int ntotal = data->ntotal; 
   
   // ---- prepare required parameters
   double par_b = params_get_real("par_b");
