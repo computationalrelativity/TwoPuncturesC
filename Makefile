@@ -29,6 +29,7 @@ CFLAGS = -std=c99 -fPIC -pedantic $(shell gsl-config --cflags)
 LFLAGS = $(shell gsl-config --libs)
 
 CFLAGS += -O3
+CFLAGS += -Wall
 
 # old flag information [Leave alone]
 ##CFLAGS + =`gsl-config --cflags`# GSL
