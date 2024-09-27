@@ -534,7 +534,7 @@ Newton (int const nvar, int const n1, int const n2, int const n3,
 {
   int verbose = params_get_int("verbose");
   
-  int ntotal = n1 * n2 * n3 * nvar, ii, it;
+  int ntotal = n1 * n2 * n3 * nvar, /*ii,*/ it;
   double *F, dmax, normres;
   derivs *u, *dv;
   
@@ -565,7 +565,7 @@ Newton (int const nvar, int const n1, int const n2, int const n3,
       }
       
       fflush(stdout);
-      ii =
+      // ii =
 	bicgstab (nvar, n1, n2, n3, v, dv, verbose, 100, dmax * 1.e-3, &normres);
 #ifdef TP_OMP
 #pragma omp parallel for
