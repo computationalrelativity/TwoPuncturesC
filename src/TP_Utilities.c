@@ -370,6 +370,9 @@ fourft (double *u, int N, int inv)
   int l, k, iy, M;
   double x, x1, fac, Pi_fac, *a, *b;
   
+  // this check resolves warning that ‘a[0]’ and ‘a[M]’ may be used uninitialized in the inv==0 code block
+  if (N < 0) ERROR("fourft: number of points must be >= 0");
+
   M = N / 2;
   a = dvector (0, M);
   b = dvector (1, M);		/* Actually: b=vector(1,M-1) but this is problematic if M=1*/
