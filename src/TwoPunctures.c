@@ -67,7 +67,7 @@ void TwoPunctures_params_set_inputfile(char* inputfile){
     char od[STRLEN];//SB: this can be improved.
     int n = strlen(inputfile);
     if (STREQL(inputfile+(n-4),".par")) {
-      strncpy (od,inputfile,n-4);
+      strncpy (od,inputfile,STRLEN);
       od[n-4] = '\0';
       //printf("%s\n",s);
       params_set_str("outputdir",od); 
