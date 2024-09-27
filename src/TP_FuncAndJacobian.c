@@ -385,7 +385,7 @@ void J_times_dv (int nvar, int n1, int n2, int n3, derivs *dv,
   Derivatives_AB3 (nvar, n1, n2, n3, dv);
   
 #ifdef TP_OMP
-#pragma omp parallel for private (values,dU,U,i,j,k,al,A,be,B,phi,X,R,x,r,y,z,Am1,ivar,indx,par_b) schedule(dynamic)
+#pragma omp parallel for private (values,dU,U,i,j,k,al,A,be,B,phi,X,R,x,r,y,z,Am1,ivar,indx) firstprivate(par_b) schedule(dynamic)
 #endif
   for (i = 0; i < n1; i++)
     {
