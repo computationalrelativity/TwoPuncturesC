@@ -180,6 +180,9 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
      at interior points and at the boundaries "+/-" 
   */
 
+  // this check resolves warning that ‘indx’ may be used uninitialized in fprintf(debugfile,...,sources[indx])
+  if (nvar <= 0) ERROR("F_of_v: nvar must be > 0");
+
   double par_b = params_get_real("par_b");
   double par_m_plus = params_get_real("par_m_plus");
   double par_m_minus = params_get_real("par_m_minus");
@@ -1025,6 +1028,11 @@ void set_initial_guess(derivs *v)
     n1 = params_get_int("npoints_A"),
     n2 = params_get_int("npoints_B"),
     n3 = params_get_int("npoints_phi");
+
+  // this check resolves warnings that ‘i3D’ and ‘phi’ may be used uninitialized in calls to rx3_To_xyz in debug output code block
+  if (n1 <= 0) ERROR("set_initial_guess: nPoints_A must be > 0");
+  if (n2 <= 0) ERROR("set_initial_guess: npoints_B must be > 0");
+  if (n3 <= 0) ERROR("set_initial_guess: npoints_phi must be > 0");
 
   double par_b = params_get_real("par_b");
 
