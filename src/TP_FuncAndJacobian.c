@@ -37,31 +37,31 @@ void allocate_derivs (derivs **v, const int n)
   if (v == NULL) ERROR("Out of memory");
   const int m = n - 1;
   (*v)->size = n;
-  (*v)->d0 = dvector (0, m);
-  (*v)->d1 = dvector (0, m);
-  (*v)->d2 = dvector (0, m);
-  (*v)->d3 = dvector (0, m);
-  (*v)->d11 = dvector (0, m);
-  (*v)->d12 = dvector (0, m);
-  (*v)->d13 = dvector (0, m);
-  (*v)->d22 = dvector (0, m);
-  (*v)->d23 = dvector (0, m);
-  (*v)->d33 = dvector (0, m);
+  (*v)->d0 = TP_dvector (0, m);
+  (*v)->d1 = TP_dvector (0, m);
+  (*v)->d2 = TP_dvector (0, m);
+  (*v)->d3 = TP_dvector (0, m);
+  (*v)->d11 = TP_dvector (0, m);
+  (*v)->d12 = TP_dvector (0, m);
+  (*v)->d13 = TP_dvector (0, m);
+  (*v)->d22 = TP_dvector (0, m);
+  (*v)->d23 = TP_dvector (0, m);
+  (*v)->d33 = TP_dvector (0, m);
 }
 
 void free_derivs (derivs * v)
 {
   const int m = v->size;
-  free_dvector (v->d0, 0, m);
-  free_dvector (v->d1, 0, m);
-  free_dvector (v->d2, 0, m);
-  free_dvector (v->d3, 0, m);
-  free_dvector (v->d11, 0, m);
-  free_dvector (v->d12, 0, m);
-  free_dvector (v->d13, 0, m);
-  free_dvector (v->d22, 0, m);
-  free_dvector (v->d23, 0, m);
-  free_dvector (v->d33, 0, m);
+  TP_free_dvector (v->d0, 0, m);
+  TP_free_dvector (v->d1, 0, m);
+  TP_free_dvector (v->d2, 0, m);
+  TP_free_dvector (v->d3, 0, m);
+  TP_free_dvector (v->d11, 0, m);
+  TP_free_dvector (v->d12, 0, m);
+  TP_free_dvector (v->d13, 0, m);
+  TP_free_dvector (v->d22, 0, m);
+  TP_free_dvector (v->d23, 0, m);
+  TP_free_dvector (v->d33, 0, m);
   free(v);
 }
 
@@ -71,13 +71,13 @@ void Derivatives_AB3 (int nvar, int n1, int n2, int n3, derivs *v)
   double *p, *dp, *d2p, *q, *dq, *r, *dr;
 
   N = maximum3 (n1, n2, n3);
-  p = dvector (0, N);
-  dp = dvector (0, N);
-  d2p = dvector (0, N);
-  q = dvector (0, N);
-  dq = dvector (0, N);
-  r = dvector (0, N);
-  dr = dvector (0, N);
+  p = TP_dvector (0, N);
+  dp = TP_dvector (0, N);
+  d2p = TP_dvector (0, N);
+  q = TP_dvector (0, N);
+  dq = TP_dvector (0, N);
+  r = TP_dvector (0, N);
+  dr = TP_dvector (0, N);
   indx = TP_ivector (0, N);
 
   for (ivar = 0; ivar < nvar; ivar++)
@@ -161,13 +161,13 @@ void Derivatives_AB3 (int nvar, int n1, int n2, int n3, derivs *v)
       }
     }
   }
-  free_dvector (p, 0, N);
-  free_dvector (dp, 0, N);
-  free_dvector (d2p, 0, N);
-  free_dvector (q, 0, N);
-  free_dvector (dq, 0, N);
-  free_dvector (r, 0, N);
-  free_dvector (dr, 0, N);
+  TP_free_dvector (p, 0, N);
+  TP_free_dvector (dp, 0, N);
+  TP_free_dvector (d2p, 0, N);
+  TP_free_dvector (q, 0, N);
+  TP_free_dvector (dq, 0, N);
+  TP_free_dvector (r, 0, N);
+  TP_free_dvector (dr, 0, N);
   TP_free_ivector (indx, 0, N);
 }
 
@@ -191,7 +191,7 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
   double al, be, A, B, X, R, x, r, phi, y, z, Am1, *values;
   derivs *U;
 
-  values = dvector (0, nvar - 1);
+  values = TP_dvector (0, nvar - 1);
   allocate_derivs (&U, nvar);
 
   double *sources;  
@@ -363,7 +363,7 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
     fclose(debugfile);
   
   free(sources);
-  free_dvector (values, 0, nvar - 1);
+  TP_free_dvector (values, 0, nvar - 1);
   free_derivs (U);
 }
 
@@ -389,7 +389,7 @@ void J_times_dv (int nvar, int n1, int n2, int n3, derivs *dv,
 #endif
   for (i = 0; i < n1; i++)
     {
-      values = dvector (0, nvar - 1);
+      values = TP_dvector (0, nvar - 1);
       allocate_derivs (&dU, nvar);
       allocate_derivs (&U, nvar);
       for (j = 0; j < n2; j++)
@@ -449,7 +449,7 @@ void J_times_dv (int nvar, int n1, int n2, int n3, derivs *dv,
 	    }
 	}
       
-      free_dvector (values, 0, nvar - 1);
+      TP_free_dvector (values, 0, nvar - 1);
       free_derivs (dU);
       free_derivs (U);
     }
@@ -612,7 +612,7 @@ void SetMatrix_JFD (int nvar, int n1, int n2, int n3, derivs *u,
   double *values;
   derivs *dv;
 
-  values = dvector (0, nvar - 1);
+  values = TP_dvector (0, nvar - 1);
   allocate_derivs (&dv, ntotal);
 
   N1 = n1 - 1;
@@ -692,7 +692,7 @@ void SetMatrix_JFD (int nvar, int n1, int n2, int n3, derivs *u,
 	}
     }
   free_derivs (dv);
-  free_dvector (values, 0, nvar - 1);
+  TP_free_dvector (values, 0, nvar - 1);
 }
 
 double PunctEvalAtArbitPosition (double *v, int ivar, double A, double B, double phi,
@@ -705,9 +705,9 @@ double PunctEvalAtArbitPosition (double *v, int ivar, double A, double B, double
   double *p, *values1, **values2, result;
   
   N = maximum3 (n1, n2, n3);
-  p = dvector (0, N);
-  values1 = dvector (0, N);
-  values2 = dmatrix (0, N, 0, N);
+  p = TP_dvector (0, N);
+  values1 = TP_dvector (0, N);
+  values2 = TP_dmatrix (0, N, 0, N);
   
   for (k = 0; k < n3; k++)
     {
@@ -732,9 +732,9 @@ double PunctEvalAtArbitPosition (double *v, int ivar, double A, double B, double
   fourft (values1, n3, 0);
   result = fourev (values1, n3, phi);
   
-  free_dvector (p, 0, N);
-  free_dvector (values1, 0, N);
-  free_dmatrix (values2, 0, N, 0, N);
+  TP_free_dvector (p, 0, N);
+  TP_free_dvector (values1, 0, N);
+  TP_free_dmatrix (values2, 0, N, 0, N);
   
   return result;
 }
@@ -886,9 +886,9 @@ double  PunctEvalAtArbitPositionFast (double *v, int ivar, double A, double B, d
 
   N = maximum3 (n1, n2, n3);
 
-  p = dvector (0, N);
-  values1 = dvector (0, N);
-  values2 = dmatrix (0, N, 0, N);
+  p = TP_dvector (0, N);
+  values1 = TP_dvector (0, N);
+  values2 = TP_dmatrix (0, N, 0, N);
 
   for (k = 0; k < n3; k++)
   {
@@ -912,9 +912,9 @@ double  PunctEvalAtArbitPositionFast (double *v, int ivar, double A, double B, d
   //  fourft (values1, n3, 0);
   result = fourev (values1, n3, phi);
 
-  free_dvector (p, 0, N);
-  free_dvector (values1, 0, N);
-  free_dmatrix (values2, 0, N, 0, N);
+  TP_free_dvector (p, 0, N);
+  TP_free_dvector (values1, 0, N);
+  TP_free_dmatrix (values2, 0, N, 0, N);
 
   return result;
   //  */
@@ -968,7 +968,7 @@ void SpecCoef(int n1, int n2, int n3, int nvar, double *v, double *cf)
   double *p, ***values3, ***values4;
 
   N=maximum3(n1,n2,n3);
-  p=dvector(0,N);
+  p=TP_dvector(0,N);
   values3=d3tensor(0,n1,0,n2,0,n3);
   values4=d3tensor(0,n1,0,n2,0,n3);
 
@@ -1015,7 +1015,7 @@ for (int ivar=0; ivar<nvar; ivar++){
 
 }
 
-  free_dvector(p,0,N);
+  TP_free_dvector(p,0,N);
   free_d3tensor(values3,0,n1,0,n2,0,n3);
   free_d3tensor(values4,0,n1,0,n2,0,n3);
 

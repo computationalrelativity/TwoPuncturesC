@@ -37,31 +37,31 @@ TP_ivector (long nl, long nh)
 }
 
 double *
-dvector (long nl, long nh)
+TP_dvector (long nl, long nh)
 /* allocate a double vector with subscript range v[nl..nh] */
 {
   double *retval;
 
   retval = malloc(sizeof(double)*(nh-nl+1));
   if(retval == NULL)
-    ERROR ("allocation failure in dvector()");
+    ERROR ("allocation failure in TP_dvector()");
   return retval - nl;
 }
 
 int **
-imatrix (long nrl, long nrh, long ncl, long nch)
+TP_imatrix (long nrl, long nrh, long ncl, long nch)
 /* allocate a int matrix with subscript range m[nrl..nrh][ncl..nch] */
 {
   int **retval;
 
   retval = malloc(sizeof(int *)*(nrh-nrl+1));
   if(retval == NULL)
-    ERROR ("allocation failure (1) in imatrix()");
+    ERROR ("allocation failure (1) in TP_imatrix()");
   
   /* get all memory for the matrix in on chunk */
   retval[0] = malloc(sizeof(int)*(nrh-nrl+1)*(nch-ncl+1));
   if(retval[0] == NULL)
-    ERROR ("allocation failure (2) in imatrix()");
+    ERROR ("allocation failure (2) in TP_imatrix()");
 
   /* apply column and row offsets */
   retval[0] -= ncl;
@@ -77,19 +77,19 @@ imatrix (long nrl, long nrh, long ncl, long nch)
 }
 
 double **
-dmatrix (long nrl, long nrh, long ncl, long nch)
+TP_dmatrix (long nrl, long nrh, long ncl, long nch)
 /* allocate a double matrix with subscript range m[nrl..nrh][ncl..nch] */
 {
   double **retval;
 
   retval = malloc(sizeof(double *)*(nrh-nrl+1));
   if(retval == NULL)
-    ERROR ("allocation failure (1) in dmatrix()");
+    ERROR ("allocation failure (1) in TP_dmatrix()");
 
   /* get all memory for the matrix in on chunk */
   retval[0] = malloc(sizeof(double)*(nrh-nrl+1)*(nch-ncl+1));
   if(retval[0] == NULL)
-    ERROR ("allocation failure (2) in dmatrix()");
+    ERROR ("allocation failure (2) in TP_dmatrix()");
 
   /* apply column and row offsets */
   retval[0] -= ncl;
@@ -158,23 +158,23 @@ TP_free_ivector (int *v, long nl, long nh)
 }
 
 void
-free_dvector (double *v, long nl, long nh)
-/* free an double vector allocated with dvector() */
+TP_free_dvector (double *v, long nl, long nh)
+/* free an double vector allocated with TP_dvector() */
 {
   free(v+nl);
 }
 
 void
-free_imatrix (int **m, long nrl, long nrh, long ncl, long nch)
-/* free an int matrix allocated by imatrix() */
+TP_free_imatrix (int **m, long nrl, long nrh, long ncl, long nch)
+/* free an int matrix allocated by TP_imatrix() */
 {
   free(m[nrl]+ncl);
   free(m+nrl);
 }
 
 void
-free_dmatrix (double **m, long nrl, long nrh, long ncl, long nch)
-/* free a double matrix allocated by dmatrix() */
+TP_free_dmatrix (double **m, long nrl, long nrh, long ncl, long nch)
+/* free a double matrix allocated by TP_dmatrix() */
 {
   free(m[nrl]+ncl);
   free(m+nrl);
@@ -248,7 +248,7 @@ chebft_Zeros (double u[], int n, int inv)
   int k, j, isignum;
   double fac, sum, Pion, *c;
   
-  c = dvector (0, n);
+  c = TP_dvector (0, n);
   Pion = Pi / n;
   if (inv == 0)
     {
@@ -284,7 +284,7 @@ chebft_Zeros (double u[], int n, int inv)
     else
 #endif
       u[j] = c[j];
-  free_dvector (c, 0, n);
+  TP_free_dvector (c, 0, n);
 }
 
 void
@@ -294,7 +294,7 @@ chebft_Extremes (double u[], int n, int inv)
   int k, j, isignum, N = n - 1;
   double fac, sum, PioN, *c;
 
-  c = dvector (0, N);
+  c = TP_dvector (0, N);
   PioN = Pi / N;
   if (inv == 0)
   {
@@ -326,7 +326,7 @@ chebft_Extremes (double u[], int n, int inv)
   }
   for (j = 0; j < n; j++)
     u[j] = c[j];
-  free_dvector (c, 0, N);
+  TP_free_dvector (c, 0, N);
 }
 
 void
@@ -374,8 +374,8 @@ fourft (double *u, int N, int inv)
   if (N < 0) ERROR("fourft: number of points must be >= 0");
 
   M = N / 2;
-  a = dvector (0, M);
-  b = dvector (1, M);		/* Actually: b=vector(1,M-1) but this is problematic if M=1*/
+  a = TP_dvector (0, M);
+  b = TP_dvector (1, M);		/* Actually: b=vector(1,M-1) but this is problematic if M=1*/
   fac = 1. / M;
   Pi_fac = Pi * fac;
   if (inv == 0)
@@ -424,8 +424,8 @@ fourft (double *u, int N, int inv)
       iy = -iy;
     }
   }
-  free_dvector (a, 0, M);
-  free_dvector (b, 1, M);
+  TP_free_dvector (a, 0, M);
+  TP_free_dvector (b, 1, M);
 }
 
 void

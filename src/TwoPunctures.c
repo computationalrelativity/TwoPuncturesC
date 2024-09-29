@@ -213,7 +213,7 @@ ini_data* TwoPunctures_make_initial_data() {
     double up, um;
 
     /* Solve only when called for the first time */
-    F = dvector (0, ntotal - 1);
+    F = TP_dvector (0, ntotal - 1);
     allocate_derivs (&u, ntotal);
     allocate_derivs (&v, ntotal);
     allocate_derivs (&cf_v, ntotal);
@@ -361,7 +361,7 @@ ini_data* TwoPunctures_make_initial_data() {
   }
   
   /*
-    free_dvector (F, 0, ntotal - 1);
+    TP_free_dvector (F, 0, ntotal - 1);
     free_derivs (u);
     free_derivs (v);
     free_derivs (cf_v);
