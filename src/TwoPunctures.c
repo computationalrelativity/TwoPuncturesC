@@ -456,7 +456,7 @@ void TwoPunctures_Cartesian_interpolation
   TwoPunctures_Cartesian_interpolation_list
     (data,
      center_offset,
-     np, x, y, z,
+     np, px, py, pz,
      /* outputs */
      alp,
      psi, 
