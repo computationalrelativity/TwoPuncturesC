@@ -24,28 +24,28 @@ static void _dealloc_params_mem_if_req(){
 
 /* Control interaction with internal parameters in the following */ //
 
-void TwoPunctures_params_set_Real(char *key, double value){
+void TwoPunctures_params_set_Real(const char *key, double value){
   /*
     Set parameters according to input.
   */
   params_set_real(key, value);       // replace, don't append new
 }
 
-void TwoPunctures_params_set_Int(char *key, int value){
+void TwoPunctures_params_set_Int(const char *key, int value){
   /*
     Set parameters according to input.
   */
   params_set_int(key, value);   // replace, don't append new
 }
 
-void TwoPunctures_params_set_Boolean(char *key, bool value){
+void TwoPunctures_params_set_Boolean(const char *key, bool value){
   /*
     Set parameters according to input.
   */
   params_set_bool(key, value);   // replace, don't append new
 }
 
-void TwoPunctures_params_set_String(char *key, char * value){
+void TwoPunctures_params_set_String(const char *key, const char * value){
   /*
     Set parameters according to input.
   */

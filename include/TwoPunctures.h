@@ -260,10 +260,10 @@ extern "C" {
 
   // set based on input file
   void TwoPunctures_params_set_inputfile(char *inputfile);
-  void TwoPunctures_params_set_Real(char *key, double value);
-  void TwoPunctures_params_set_Int(char *key, int value);
-  void TwoPunctures_params_set_Boolean(char *key, bool value);
-  void TwoPunctures_params_set_String(char *key, char * value);
+  void TwoPunctures_params_set_Real(const char *key, double value);
+  void TwoPunctures_params_set_Int(const char *key, int value);
+  void TwoPunctures_params_set_Boolean(const char *key, bool value);
+  void TwoPunctures_params_set_String(const char *key, const char * value);
 
   ini_data * TwoPunctures_make_initial_data();
 
