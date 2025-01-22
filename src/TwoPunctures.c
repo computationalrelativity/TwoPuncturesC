@@ -475,9 +475,9 @@ void TwoPunctures_Cartesian_interpolation_list
 (ini_data *data,    // struct containing the previously calculated solution
  const double* center_offset, // offset b=0 to position (x,y,z)
  int np,            // number of elements in each array that follows...
- const double *px,  // coordinates of interpolation points
- const double *py,
- const double *pz,
+ const double *x,  // coordinates of interpolation points
+ const double *y,
+ const double *z,
  double *alp,       // lapse
  double *psi,       // conformal factor and derivatives
  double *psix,
@@ -600,9 +600,9 @@ void TwoPunctures_Cartesian_interpolation_list
   for (int ind = 0; ind < np; ind++) {
 
         double xx, yy, zz;
-        xx = px[ind] - center_offset[0];
-        yy = py[ind] - center_offset[1];
-        zz = pz[ind] - center_offset[2];
+        xx = x[ind] - center_offset[0];
+        yy = y[ind] - center_offset[1];
+        zz = z[ind] - center_offset[2];
 
         /* We implement swapping the x and z coordinates as follows.
            The bulk of the code that performs the actual calculations
