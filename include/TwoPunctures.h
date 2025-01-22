@@ -219,17 +219,17 @@ void params_alloc();
 void params_free();
 void params_read(char *fname);
 void params_write(char * fname);
-double params_get_real(char * key);
-int params_get_int(char * key);
-char *params_get_str(char * key);
-void params_setadd(char * key, int type, char *val, int addpar);
-void params_set_int(char * key, int val);
-void params_set_bool(char * key, bool val);
-void params_set_real(char * key, double val);
-void params_set_str(char * key, char* val);
-void params_add_int(char * key, int val);
-void params_add_real(char * key, double val);
-void params_add_str(char * key, char *val);
+double params_get_real(const char * key);
+int params_get_int(const char * key);
+char *params_get_str(const char * key);
+void params_setadd(const char * key, int type, const char *val, int addpar);
+void params_set_int(const char * key, int val);
+void params_set_bool(const char * key, bool val);
+void params_set_real(const char * key, double val);
+void params_set_str(const char * key, const char* val);
+void params_add_int(const char * key, int val);
+void params_add_real(const char * key, double val);
+void params_add_str(const char * key, const char *val);
 
 void make_output_dir();
 void write_derivs(derivs *u, const int n1, const int n2, const int n3,

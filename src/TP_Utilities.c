@@ -585,7 +585,7 @@ void params_write(char * fname)
 }
 
 /* get double */
-double params_get_real(char * key)
+double params_get_real(const char * key)
 {
   for (int i =0; i < params->n; i++)  {
     if (STREQL(key,params->key[i])) {
@@ -599,7 +599,7 @@ double params_get_real(char * key)
 }
 
 /* get int */
-int params_get_int(char * key) 
+int params_get_int(const char * key) 
 {
   for (int i =0; i < params->n; i++)  {
     if (STREQL(key,params->key[i])) {
@@ -613,7 +613,7 @@ int params_get_int(char * key)
 }
 
 /* get string */
-char * params_get_str(char * key)
+char * params_get_str(const char * key)
 {
   for (int i =0; i < params->n; i++)  {
     if (STREQL(key,params->key[i])) {
@@ -627,7 +627,7 @@ char * params_get_str(char * key)
 }
 
 /* set parameter */
-void params_setadd(char * key, int type, char* val, int addpar)
+void params_setadd(const char * key, int type, const char* val, int addpar)
 {
 #define check_unique (0) // addpar=1 assumes parameter is not there,
 			 // activate this if you need to enforce this.
@@ -665,25 +665,25 @@ void params_setadd(char * key, int type, char* val, int addpar)
    Note: addpar=0 does not set the type
 */
 
-void params_set_int(char * key, int val) {
+void params_set_int(const char * key, int val) {
   char cval[STRLEN];
   sprintf(cval, "%d", val);
   params_setadd(key, INTEGER, cval, 0); 
 }
  
-void params_set_bool(char * key, bool val) {
+void params_set_bool(const char * key, bool val) {
   char cval[STRLEN];
   sprintf(cval, "%d", val?1:0);
   params_setadd(key, INTEGER, cval, 0); 
 }
 
-void params_set_real(char * key, double val) {
+void params_set_real(const char * key, double val) {
   char cval[STRLEN];
   sprintf(cval, "%.16e", val);
   params_setadd(key, REAL, cval, 0); 
 }
 
-void params_set_str(char * key, char *val) {
+void params_set_str(const char * key, const char *val) {
   params_setadd(key, STRING, val, 0);
 }
 
@@ -691,7 +691,7 @@ void params_set_str(char * key, char *val) {
    New parameter, append
  */
 
-void params_add_int(char * key, int val) {
+void params_add_int(const char * key, int val) {
   char cval[STRLEN];
   sprintf(cval, "%d", val);
   params_setadd(key, INTEGER, cval, 1);
@@ -703,13 +703,13 @@ void params_add_bool(char * key, bool val) {
   params_setadd(key, INTEGER, cval, 1); 
 }
 
-void params_add_real(char * key, double val) {
+void params_add_real(const char * key, double val) {
   char cval[STRLEN];
   sprintf(cval, "%.16e", val);
   params_setadd(key, REAL, cval, 1);
 }
 
-void params_add_str(char * key, char *val) {
+void params_add_str(const char * key, const char *val) {
   params_setadd(key, STRING, val, 1);
 }
 
