@@ -69,9 +69,6 @@ enum{
   evaluation, // evaluate using all spectral coefficients (slow)
   N_interp_opt,
 };
-static const char* str_interp_opt[N_interp_opt] = {
-  "taylor", "spectral"
-};
 
 /* lapse options */
 enum{
@@ -81,9 +78,6 @@ enum{
   brownsville, // See Phys. Rev. D 74, 041501 (2006)
   N_lapse_opt,
 };
-static const char* str_lapse_opt[N_lapse_opt] = {
-  "antisymmetric", "averaged", "psin", "brownsville",
-};
 
 /* conformalfactor options */
 enum{
@@ -92,9 +86,6 @@ enum{
   FACTOR1, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs")
   FACTOR2, // CCTK_EQUALS(metric_type, "static conformal") && CCTK_EQUALS(conformal_storage, "factor+derivs+2nd derivs")
   N_cf_opt,
-};
-static const char* str_cf_opt[N_cf_opt] = {
-  "nonstatic", "static0", "static01", "static012",
 };
 
 #define use_sources (0) //SB: do not add the source terms
@@ -118,9 +109,6 @@ enum{
   REAL,
   STRING,
   N_PAR_TYPES,
-};
-static const char* str_par_type[N_PAR_TYPES] = {
-  "INTEGER", "REAL", "STRING", 
 };
 
 typedef struct {
@@ -190,17 +178,17 @@ void Newton (int nvar, int n1, int n2, int n3, derivs *v,
 	     double tol, int itmax);
 
 /* TP_Utilies.c */
-void nrerror (char error_text[]);
-int *ivector (long nl, long nh);
-double *dvector (long nl, long nh);
-int **imatrix (long nrl, long nrh, long ncl, long nch);
-double **dmatrix (long nrl, long nrh, long ncl, long nch);
+// void nrerror (char error_text[]);
+int *TP_ivector (long nl, long nh);
+double *TP_dvector (long nl, long nh);
+int **TP_imatrix (long nrl, long nrh, long ncl, long nch);
+double **TP_dmatrix (long nrl, long nrh, long ncl, long nch);
 double ***d3tensor (long nrl, long nrh, long ncl, long nch, long ndl,
 		    long ndh);
-void free_ivector (int *v, long nl, long nh);
-void free_dvector (double *v, long nl, long nh);
-void free_imatrix (int **m, long nrl, long nrh, long ncl, long nch);
-void free_dmatrix (double **m, long nrl, long nrh, long ncl, long nch);
+void TP_free_ivector (int *v, long nl, long nh);
+void TP_free_dvector (double *v, long nl, long nh);
+void TP_free_imatrix (int **m, long nrl, long nrh, long ncl, long nch);
+void TP_free_dmatrix (double **m, long nrl, long nrh, long ncl, long nch);
 void free_d3tensor (double ***t, long nrl, long nrh, long ncl, long nch,
 		    long ndl, long ndh);
 
@@ -231,17 +219,17 @@ void params_alloc();
 void params_free();
 void params_read(char *fname);
 void params_write(char * fname);
-double params_get_real(char * key);
-int params_get_int(char * key);
-char *params_get_str(char * key);
-void params_setadd(char * key, int type, char *val, int addpar);
-void params_set_int(char * key, int val);
-void params_set_bool(char * key, bool val);
-void params_set_real(char * key, double val);
-void params_set_str(char * key, char* val);
-void params_add_int(char * key, int val);
-void params_add_real(char * key, double val);
-void params_add_str(char * key, char *val);
+double params_get_real(const char * key);
+int params_get_int(const char * key);
+char *params_get_str(const char * key);
+void params_setadd(const char * key, int type, const char *val, int addpar);
+void params_set_int(const char * key, int val);
+void params_set_bool(const char * key, bool val);
+void params_set_real(const char * key, double val);
+void params_set_str(const char * key, const char* val);
+void params_add_int(const char * key, int val);
+void params_add_real(const char * key, double val);
+void params_add_str(const char * key, const char *val);
 
 void make_output_dir();
 void write_derivs(derivs *u, const int n1, const int n2, const int n3,
@@ -272,9 +260,10 @@ extern "C" {
 
   // set based on input file
   void TwoPunctures_params_set_inputfile(char *inputfile);
-  void TwoPunctures_params_set_Real(char *key, double value);
-  void TwoPunctures_params_set_Int(char *key, int value);
-  void TwoPunctures_params_set_Boolean(char *key, bool value);
+  void TwoPunctures_params_set_Real(const char *key, double value);
+  void TwoPunctures_params_set_Int(const char *key, int value);
+  void TwoPunctures_params_set_Boolean(const char *key, bool value);
+  void TwoPunctures_params_set_String(const char *key, const char * value);
 
   ini_data * TwoPunctures_make_initial_data();
 
@@ -286,6 +275,37 @@ extern "C" {
    double *x,         // Cartesian coordinates
    double *y,
    double *z,
+   double *alp,       // lapse
+   double *psi,       // conformal factor and derivatives
+   double *psix,
+   double *psiy,
+   double *psiz,
+   double *psixx,
+   double *psixy,
+   double *psixz,
+   double *psiyy,
+   double *psiyz,
+   double *psizz,
+   double *gxx,       // metric components
+   double *gxy,
+   double *gxz,
+   double *gyy,
+   double *gyz,
+   double *gzz,
+   double *kxx,       // extrinsic curvature components
+   double *kxy,
+   double *kxz,
+   double *kyy,
+   double *kyz,
+   double *kzz);
+
+  void TwoPunctures_Cartesian_interpolation_list
+  (ini_data *data,    // struct containing the previously calculated solution
+   const double* center_offset, // offset b=0 to position (x,y,z)
+   int np,            // number of elements in each array that follows...
+   const double *px,  // coordinates of interpolation points
+   const double *py,
+   const double *pz,
    double *alp,       // lapse
    double *psi,       // conformal factor and derivatives
    double *psix,

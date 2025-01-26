@@ -37,31 +37,31 @@ void allocate_derivs (derivs **v, const int n)
   if (v == NULL) ERROR("Out of memory");
   const int m = n - 1;
   (*v)->size = n;
-  (*v)->d0 = dvector (0, m);
-  (*v)->d1 = dvector (0, m);
-  (*v)->d2 = dvector (0, m);
-  (*v)->d3 = dvector (0, m);
-  (*v)->d11 = dvector (0, m);
-  (*v)->d12 = dvector (0, m);
-  (*v)->d13 = dvector (0, m);
-  (*v)->d22 = dvector (0, m);
-  (*v)->d23 = dvector (0, m);
-  (*v)->d33 = dvector (0, m);
+  (*v)->d0 = TP_dvector (0, m);
+  (*v)->d1 = TP_dvector (0, m);
+  (*v)->d2 = TP_dvector (0, m);
+  (*v)->d3 = TP_dvector (0, m);
+  (*v)->d11 = TP_dvector (0, m);
+  (*v)->d12 = TP_dvector (0, m);
+  (*v)->d13 = TP_dvector (0, m);
+  (*v)->d22 = TP_dvector (0, m);
+  (*v)->d23 = TP_dvector (0, m);
+  (*v)->d33 = TP_dvector (0, m);
 }
 
 void free_derivs (derivs * v)
 {
   const int m = v->size;
-  free_dvector (v->d0, 0, m);
-  free_dvector (v->d1, 0, m);
-  free_dvector (v->d2, 0, m);
-  free_dvector (v->d3, 0, m);
-  free_dvector (v->d11, 0, m);
-  free_dvector (v->d12, 0, m);
-  free_dvector (v->d13, 0, m);
-  free_dvector (v->d22, 0, m);
-  free_dvector (v->d23, 0, m);
-  free_dvector (v->d33, 0, m);
+  TP_free_dvector (v->d0, 0, m);
+  TP_free_dvector (v->d1, 0, m);
+  TP_free_dvector (v->d2, 0, m);
+  TP_free_dvector (v->d3, 0, m);
+  TP_free_dvector (v->d11, 0, m);
+  TP_free_dvector (v->d12, 0, m);
+  TP_free_dvector (v->d13, 0, m);
+  TP_free_dvector (v->d22, 0, m);
+  TP_free_dvector (v->d23, 0, m);
+  TP_free_dvector (v->d33, 0, m);
   free(v);
 }
 
@@ -71,14 +71,14 @@ void Derivatives_AB3 (int nvar, int n1, int n2, int n3, derivs *v)
   double *p, *dp, *d2p, *q, *dq, *r, *dr;
 
   N = maximum3 (n1, n2, n3);
-  p = dvector (0, N);
-  dp = dvector (0, N);
-  d2p = dvector (0, N);
-  q = dvector (0, N);
-  dq = dvector (0, N);
-  r = dvector (0, N);
-  dr = dvector (0, N);
-  indx = ivector (0, N);
+  p = TP_dvector (0, N);
+  dp = TP_dvector (0, N);
+  d2p = TP_dvector (0, N);
+  q = TP_dvector (0, N);
+  dq = TP_dvector (0, N);
+  r = TP_dvector (0, N);
+  dr = TP_dvector (0, N);
+  indx = TP_ivector (0, N);
 
   for (ivar = 0; ivar < nvar; ivar++)
   {
@@ -161,14 +161,14 @@ void Derivatives_AB3 (int nvar, int n1, int n2, int n3, derivs *v)
       }
     }
   }
-  free_dvector (p, 0, N);
-  free_dvector (dp, 0, N);
-  free_dvector (d2p, 0, N);
-  free_dvector (q, 0, N);
-  free_dvector (dq, 0, N);
-  free_dvector (r, 0, N);
-  free_dvector (dr, 0, N);
-  free_ivector (indx, 0, N);
+  TP_free_dvector (p, 0, N);
+  TP_free_dvector (dp, 0, N);
+  TP_free_dvector (d2p, 0, N);
+  TP_free_dvector (q, 0, N);
+  TP_free_dvector (dq, 0, N);
+  TP_free_dvector (r, 0, N);
+  TP_free_dvector (dr, 0, N);
+  TP_free_ivector (indx, 0, N);
 }
 
 void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
@@ -180,6 +180,9 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
      at interior points and at the boundaries "+/-" 
   */
 
+  // this check resolves warning that ‘indx’ may be used uninitialized in fprintf(debugfile,...,sources[indx])
+  if (nvar <= 0) ERROR("F_of_v: nvar must be > 0");
+
   double par_b = params_get_real("par_b");
   double par_m_plus = params_get_real("par_m_plus");
   double par_m_minus = params_get_real("par_m_minus");
@@ -188,7 +191,7 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
   double al, be, A, B, X, R, x, r, phi, y, z, Am1, *values;
   derivs *U;
 
-  values = dvector (0, nvar - 1);
+  values = TP_dvector (0, nvar - 1);
   allocate_derivs (&U, nvar);
 
   double *sources;  
@@ -253,7 +256,7 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
     
   Derivatives_AB3 (nvar, n1, n2, n3, v);
 
-  double psi, psi2, psi4, psi7, r_plus, r_minus;
+  double psi, psi2, /*psi4, psi7,*/ r_plus, r_minus;
 
   char fname[STRLEN];
   FILE *debugfile = NULL;
@@ -333,8 +336,8 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
 		  0.5 * par_m_minus / r_minus +
 		  U->d0[0];
 		psi2 = psi * psi;
-		psi4 = psi2 * psi2;
-		psi7 = psi * psi2 * psi4;
+		// psi4 = psi2 * psi2;
+		// psi7 = psi * psi2 * psi4;
 		fprintf(debugfile,
 			"%.16g %.16g %.16g %.16g %.16g %.16g %.16g %.16g\n",
 			(double)x, (double)y, (double)A, (double)B,
@@ -360,7 +363,7 @@ void F_of_v (int nvar, int n1, int n2, int n3, derivs *v, double *F,
     fclose(debugfile);
   
   free(sources);
-  free_dvector (values, 0, nvar - 1);
+  TP_free_dvector (values, 0, nvar - 1);
   free_derivs (U);
 }
 
@@ -382,11 +385,11 @@ void J_times_dv (int nvar, int n1, int n2, int n3, derivs *dv,
   Derivatives_AB3 (nvar, n1, n2, n3, dv);
   
 #ifdef TP_OMP
-#pragma omp parallel for private (values,dU,U,i,j,k,al,A,be,B,phi,X,R,x,r,y,z,Am1,ivar,indx,par_b) schedule(dynamic)
+#pragma omp parallel for private (values,dU,U,i,j,k,al,A,be,B,phi,X,R,x,r,y,z,Am1,ivar,indx) firstprivate(par_b) schedule(dynamic)
 #endif
   for (i = 0; i < n1; i++)
     {
-      values = dvector (0, nvar - 1);
+      values = TP_dvector (0, nvar - 1);
       allocate_derivs (&dU, nvar);
       allocate_derivs (&U, nvar);
       for (j = 0; j < n2; j++)
@@ -446,7 +449,7 @@ void J_times_dv (int nvar, int n1, int n2, int n3, derivs *dv,
 	    }
 	}
       
-      free_dvector (values, 0, nvar - 1);
+      TP_free_dvector (values, 0, nvar - 1);
       free_derivs (dU);
       free_derivs (U);
     }
@@ -604,17 +607,17 @@ void SetMatrix_JFD (int nvar, int n1, int n2, int n3, derivs *u,
 		    int *ncols, int **cols, double **Matrix)
 {
   int column, row, mcol;
-  int i, i1, i_0, i_1, j, j1, j_0, j_1, k, k1, k_0, k_1, N1, N2, N3,
+  int i, i1, i_0, i_1, j, j1, j_0, j_1, k, k1, k_0, k_1, N1, N2, /*N3,*/
     ivar, ivar1, ntotal = nvar * n1 * n2 * n3;
   double *values;
   derivs *dv;
 
-  values = dvector (0, nvar - 1);
+  values = TP_dvector (0, nvar - 1);
   allocate_derivs (&dv, ntotal);
 
   N1 = n1 - 1;
   N2 = n2 - 1;
-  N3 = n3 - 1;
+  // N3 = n3 - 1;
 
 #ifdef TP_OMP
 #pragma omp parallel for private (i,j,k,ivar,row) schedule(dynamic)
@@ -689,7 +692,7 @@ void SetMatrix_JFD (int nvar, int n1, int n2, int n3, derivs *u,
 	}
     }
   free_derivs (dv);
-  free_dvector (values, 0, nvar - 1);
+  TP_free_dvector (values, 0, nvar - 1);
 }
 
 double PunctEvalAtArbitPosition (double *v, int ivar, double A, double B, double phi,
@@ -702,9 +705,9 @@ double PunctEvalAtArbitPosition (double *v, int ivar, double A, double B, double
   double *p, *values1, **values2, result;
   
   N = maximum3 (n1, n2, n3);
-  p = dvector (0, N);
-  values1 = dvector (0, N);
-  values2 = dmatrix (0, N, 0, N);
+  p = TP_dvector (0, N);
+  values1 = TP_dvector (0, N);
+  values2 = TP_dmatrix (0, N, 0, N);
   
   for (k = 0; k < n3; k++)
     {
@@ -729,9 +732,9 @@ double PunctEvalAtArbitPosition (double *v, int ivar, double A, double B, double
   fourft (values1, n3, 0);
   result = fourev (values1, n3, phi);
   
-  free_dvector (p, 0, N);
-  free_dvector (values1, 0, N);
-  free_dmatrix (values2, 0, N, 0, N);
+  TP_free_dvector (p, 0, N);
+  TP_free_dvector (values1, 0, N);
+  TP_free_dmatrix (values2, 0, N, 0, N);
   
   return result;
 }
@@ -883,9 +886,9 @@ double  PunctEvalAtArbitPositionFast (double *v, int ivar, double A, double B, d
 
   N = maximum3 (n1, n2, n3);
 
-  p = dvector (0, N);
-  values1 = dvector (0, N);
-  values2 = dmatrix (0, N, 0, N);
+  p = TP_dvector (0, N);
+  values1 = TP_dvector (0, N);
+  values2 = TP_dmatrix (0, N, 0, N);
 
   for (k = 0; k < n3; k++)
   {
@@ -909,9 +912,9 @@ double  PunctEvalAtArbitPositionFast (double *v, int ivar, double A, double B, d
   //  fourft (values1, n3, 0);
   result = fourev (values1, n3, phi);
 
-  free_dvector (p, 0, N);
-  free_dvector (values1, 0, N);
-  free_dmatrix (values2, 0, N, 0, N);
+  TP_free_dvector (p, 0, N);
+  TP_free_dvector (values1, 0, N);
+  TP_free_dmatrix (values2, 0, N, 0, N);
 
   return result;
   //  */
@@ -961,11 +964,11 @@ void SpecCoef(int n1, int n2, int n3, int nvar, double *v, double *cf)
 
   // VASILIS: Here v is a pointer to the values of the variable v at the collocation points and cf_v a pointer to the spectral coefficients that this routine calculates
 
-  int i, j, k, N, n, l, m;
+  int i, j, k, N, n, l; //, m;
   double *p, ***values3, ***values4;
 
   N=maximum3(n1,n2,n3);
-  p=dvector(0,N);
+  p=TP_dvector(0,N);
   values3=d3tensor(0,n1,0,n2,0,n3);
   values4=d3tensor(0,n1,0,n2,0,n3);
 
@@ -1012,7 +1015,7 @@ for (int ivar=0; ivar<nvar; ivar++){
 
 }
 
-  free_dvector(p,0,N);
+  TP_free_dvector(p,0,N);
   free_d3tensor(values3,0,n1,0,n2,0,n3);
   free_d3tensor(values4,0,n1,0,n2,0,n3);
 
@@ -1025,6 +1028,11 @@ void set_initial_guess(derivs *v)
     n1 = params_get_int("npoints_A"),
     n2 = params_get_int("npoints_B"),
     n3 = params_get_int("npoints_phi");
+
+  // this check resolves warnings that ‘i3D’ and ‘phi’ may be used uninitialized in calls to rx3_To_xyz in debug output code block
+  if (n1 <= 0) ERROR("set_initial_guess: nPoints_A must be > 0");
+  if (n2 <= 0) ERROR("set_initial_guess: npoints_B must be > 0");
+  if (n3 <= 0) ERROR("set_initial_guess: npoints_phi must be > 0");
 
   double par_b = params_get_real("par_b");
 

@@ -24,28 +24,28 @@ static void _dealloc_params_mem_if_req(){
 
 /* Control interaction with internal parameters in the following */ //
 
-void TwoPunctures_params_set_Real(char *key, double value){
+void TwoPunctures_params_set_Real(const char *key, double value){
   /*
     Set parameters according to input.
   */
   params_set_real(key, value);       // replace, don't append new
 }
 
-void TwoPunctures_params_set_Int(char *key, int value){
+void TwoPunctures_params_set_Int(const char *key, int value){
   /*
     Set parameters according to input.
   */
   params_set_int(key, value);   // replace, don't append new
 }
 
-void TwoPunctures_params_set_Boolean(char *key, bool value){
+void TwoPunctures_params_set_Boolean(const char *key, bool value){
   /*
     Set parameters according to input.
   */
   params_set_bool(key, value);   // replace, don't append new
 }
 
-void TwoPunctures_params_set_String(char *key, char * value){
+void TwoPunctures_params_set_String(const char *key, const char * value){
   /*
     Set parameters according to input.
   */
@@ -67,7 +67,7 @@ void TwoPunctures_params_set_inputfile(char* inputfile){
     char od[STRLEN];//SB: this can be improved.
     int n = strlen(inputfile);
     if (STREQL(inputfile+(n-4),".par")) {
-      strncpy (od,inputfile,n-4);
+      strncpy (od,inputfile,STRLEN);
       od[n-4] = '\0';
       //printf("%s\n",s);
       params_set_str("outputdir",od); 
@@ -124,6 +124,7 @@ void TwoPunctures_params_set_default(){
   params_add_int("do_initial_debug_output",0); // Output debug information about initial guess
   params_add_int("do_solution_file_output",0); // output .data files
   params_add_int("do_bam_file_output",0); // output input files for bam's puncture_ps
+  params_add_int("output_derivatives_order",0); // include 0,1,2 derivatives with do_solution_file_output
   
   // Interpolation
   params_add_int("grid_setup_method",taylor_expansion); // How to fill the 3D grid from the spectral grid ?
@@ -155,7 +156,7 @@ ini_data* TwoPunctures_make_initial_data() {
 
   const int verbose = params_get_int("verbose");
 
-  char outdir[STRLEN];
+  // char outdir[STRLEN];
   if (params_get_int("do_residuum_debug_output")+
       params_get_int("do_initial_debug_output")+
       params_get_int("do_solution_file_output")+
@@ -163,33 +164,33 @@ ini_data* TwoPunctures_make_initial_data() {
     make_output_dir();
   }
   
-  double par_P_plus[3], par_P_minus[3];
-  par_P_plus[0] = params_get_real("par_P_plus1");
-  par_P_plus[1] = params_get_real("par_P_plus2");
-  par_P_plus[2] = params_get_real("par_P_plus3");
-  par_P_minus[0] = params_get_real("par_P_minus1");
-  par_P_minus[1] = params_get_real("par_P_minus2");
-  par_P_minus[2] = params_get_real("par_P_minus3");
+  // double par_P_plus[3], par_P_minus[3];
+  // par_P_plus[0] = params_get_real("par_P_plus1");
+  // par_P_plus[1] = params_get_real("par_P_plus2");
+  // par_P_plus[2] = params_get_real("par_P_plus3");
+  // par_P_minus[0] = params_get_real("par_P_minus1");
+  // par_P_minus[1] = params_get_real("par_P_minus2");
+  // par_P_minus[2] = params_get_real("par_P_minus3");
 
-  double par_S_plus[3], par_S_minus[3];
-  par_S_plus[0] = params_get_real("par_S_plus1");
-  par_S_plus[1] = params_get_real("par_S_plus2");
-  par_S_plus[2] = params_get_real("par_S_plus3");
-  par_S_minus[0] = params_get_real("par_S_minus1");
-  par_S_minus[1] = params_get_real("par_S_minus2");
-  par_S_minus[2] = params_get_real("par_S_minus3");
+  // double par_S_plus[3], par_S_minus[3];
+  // par_S_plus[0] = params_get_real("par_S_plus1");
+  // par_S_plus[1] = params_get_real("par_S_plus2");
+  // par_S_plus[2] = params_get_real("par_S_plus3");
+  // par_S_minus[0] = params_get_real("par_S_minus1");
+  // par_S_minus[1] = params_get_real("par_S_minus2");
+  // par_S_minus[2] = params_get_real("par_S_minus3");
 
   double par_b = params_get_real("par_b");
 
-  double center_offset[3];
-  center_offset[0] = params_get_real("center_offset1");
-  center_offset[1] = params_get_real("center_offset2");
-  center_offset[2] = params_get_real("center_offset3");
+  // double center_offset[3];
+  // center_offset[0] = params_get_real("center_offset1");
+  // center_offset[1] = params_get_real("center_offset2");
+  // center_offset[2] = params_get_real("center_offset3");
 
   // ---------------------------------------------------
 
-  double E; // ADM energy of the Bowen-York spacetime"
-  double J1, J2, J3; // Angular momentum of the Bowen-York spacetime"
+  // double E; // ADM energy of the Bowen-York spacetime"
+  // double J1, J2, J3; // Angular momentum of the Bowen-York spacetime"
   double mp = params_get_real("par_m_plus"), mm = params_get_real("par_m_minus"); // Bare masses of the punctures
   double mp_adm, mm_adm; // ADM masses of the punctures (measured at the other spatial infinities
   double admMass;
@@ -212,7 +213,7 @@ ini_data* TwoPunctures_make_initial_data() {
     double up, um;
 
     /* Solve only when called for the first time */
-    F = dvector (0, ntotal - 1);
+    F = TP_dvector (0, ntotal - 1);
     allocate_derivs (&u, ntotal);
     allocate_derivs (&v, ntotal);
     allocate_derivs (&cf_v, ntotal);
@@ -330,24 +331,25 @@ ini_data* TwoPunctures_make_initial_data() {
     admMass = (mp + mm - 4*par_b*PunctEvalAtArbitPosition(v->d0, 0, 1, 0, 0, nvar, n1, n2, n3));
     if (verbose) printf ("The total ADM mass is %g\n", admMass);
 
-    E = admMass;
+    // E = admMass;
 
-    J1 = -(center_offset[2]*par_P_minus[1]) + center_offset[1]*par_P_minus[2] - center_offset[2]*par_P_plus[1] + center_offset[1]*par_P_plus[2] + par_S_minus[0] + par_S_plus[0];
-    J2 = center_offset[2]*par_P_minus[0] - center_offset[0]*par_P_minus[2] + par_b*par_P_minus[2] + center_offset[2]*par_P_plus[0] - center_offset[0]*par_P_plus[2] - par_b*par_P_plus[2] + par_S_minus[1] + par_S_plus[1];
-    J3 = -(center_offset[1]*par_P_minus[0]) + center_offset[0]*par_P_minus[1] - par_b*par_P_minus[1] - center_offset[1]*par_P_plus[0] + center_offset[0]*par_P_plus[1] + par_b*par_P_plus[1] + par_S_minus[2] + par_S_plus[2];
+    // J1 = -(center_offset[2]*par_P_minus[1]) + center_offset[1]*par_P_minus[2] - center_offset[2]*par_P_plus[1] + center_offset[1]*par_P_plus[2] + par_S_minus[0] + par_S_plus[0];
+    // J2 = center_offset[2]*par_P_minus[0] - center_offset[0]*par_P_minus[2] + par_b*par_P_minus[2] + center_offset[2]*par_P_plus[0] - center_offset[0]*par_P_plus[2] - par_b*par_P_plus[2] + par_S_minus[1] + par_S_plus[1];
+    // J3 = -(center_offset[1]*par_P_minus[0]) + center_offset[0]*par_P_minus[1] - par_b*par_P_minus[1] - center_offset[1]*par_P_plus[0] + center_offset[0]*par_P_plus[1] + par_b*par_P_plus[1] + par_S_minus[2] + par_S_plus[2];
 
   }
 
   if (params_get_int("do_solution_file_output")) {
+    int output_derivatives_order = params_get_int("output_derivatives_order");
     /* Output the solution */    
     write_derivs( u, n1,n2,n3, 
-		  0, // =0,1,2 derivatives to output
+		  output_derivatives_order, // =0,1,2 derivatives to output
 		  "u.data");
     write_derivs( v, n1,n2,n3, 
-		  0, // =0,1,2 derivatives to output
+		  output_derivatives_order, // =0,1,2 derivatives to output
 		  "v.data");
     write_derivs( cf_v, n1,n2,n3, 
-		  0, // =0,1,2 derivatives to output
+		  output_derivatives_order, // =0,1,2 derivatives to output
 		  "cf_v.data");
   }
 
@@ -359,7 +361,7 @@ ini_data* TwoPunctures_make_initial_data() {
   }
   
   /*
-    free_dvector (F, 0, ntotal - 1);
+    TP_free_dvector (F, 0, ntotal - 1);
     free_derivs (u);
     free_derivs (v);
     free_derivs (cf_v);
@@ -385,6 +387,7 @@ ini_data* TwoPunctures_make_initial_data() {
   return data;
 }
 
+/* Given nx,ny,nz Cartesian axis offsets, interpolate data to each of the nx*ny*nz points in the grid. */
 void TwoPunctures_Cartesian_interpolation
 (ini_data *data,     // struct containing the previously calculated solution
  int *imin,         // min, max idxs of Cartesian Grid in the three directions
@@ -393,6 +396,88 @@ void TwoPunctures_Cartesian_interpolation
  double *x,         // Cartesian coordinates
  double *y,
  double *z,
+ double *alp,       // lapse
+ double *psi,       // conformal factor and derivatives
+ double *psix,
+ double *psiy,
+ double *psiz,
+ double *psixx,
+ double *psixy,
+ double *psixz,
+ double *psiyy,
+ double *psiyz,
+ double *psizz,
+ double *gxx,       // metric components
+ double *gxy,
+ double *gxz,
+ double *gyy,
+ double *gyz,
+ double *gzz,
+ double *kxx,       // extrinsic curvature components
+ double *kxy,
+ double *kxz,
+ double *kyy,
+ double *kyz,
+ double *kzz){
+
+  // This function builds a list of points from the given Cartesian cordinates
+  // and then calls TwoPunctures_Cartesian_interpolation_list.
+
+  const double center_offset[3] ={
+    params_get_real("center_offset1"),
+    params_get_real("center_offset2"),
+    params_get_real("center_offset3")
+  };
+
+  const int xxx = nxyz[0];
+  const int xxxyyy = nxyz[0]*nxyz[1];
+  const int np = nxyz[0]*nxyz[1]*nxyz[2];
+
+  double *px = malloc(np * sizeof(double));
+  double *py = malloc(np * sizeof(double));
+  double *pz = malloc(np * sizeof(double));
+
+  for (int k = imin[2]; k < imax[2]; ++k) {
+    for (int j = imin[1]; j < imax[1]; ++j) {
+      for (int i = imin[0]; i < imax[0]; ++i) {
+
+        //const int ind = GFINDEX3D (i, j, k, nshift, mshift);
+        const int ind = i + xxx * j + xxxyyy* k;
+
+        // double xx, yy, zz;
+        px[ind] = x[i];
+        py[ind] = y[j];
+        pz[ind] = z[k];
+
+      } /* for i */
+    }   /* for j */
+  }     /* for k */
+
+  TwoPunctures_Cartesian_interpolation_list
+    (data,
+     center_offset,
+     np, px, py, pz,
+     /* outputs */
+     alp,
+     psi, 
+     psix, psiy, psiz,
+     psixx, psixy, psixz, psiyy, psiyz, psizz,
+     gxx, gxy, gxz, gyy, gyz, gzz,
+     kxx, kxy, kxz, kyy, kyz, kzz);
+
+  free(px);
+  free(py);
+  free(pz);
+ }
+ 
+/* Given a list of ntotal interpolation points, interpolate data to each listed point. */
+void TwoPunctures_Cartesian_interpolation_list
+(ini_data *data,    // struct containing the previously calculated solution
+ const double* center_offset, // offset b=0 to position (x,y,z)
+ int np,            // number of elements in each array that follows...
+ const double *x,  // coordinates of interpolation points
+ const double *y,
+ const double *z,
  double *alp,       // lapse
  double *psi,       // conformal factor and derivatives
  double *psix,
@@ -428,21 +513,16 @@ void TwoPunctures_Cartesian_interpolation
   /* derivs cf_v = *(data.cf_v); */
   /* int ntotal = data.ntotal; */
   //SB:
-  double *F = data->F; 
-  derivs *u = data->u; 
+  // double *F = data->F; 
+  // derivs *u = data->u; 
   derivs *v = data->v;
   derivs *cf_v = data->cf_v; 
-  int ntotal = data->ntotal; 
+  // int ntotal = data->ntotal; 
   
   // ---- prepare required parameters
   double par_b = params_get_real("par_b");
   double mp = params_get_real("par_m_plus"),
     mm = params_get_real("par_m_minus"); // Bare masses of the punctures
-
-  double center_offset[3];
-  center_offset[0] = params_get_real("center_offset1");
-  center_offset[1] = params_get_real("center_offset2");
-  center_offset[2] = params_get_real("center_offset3");
 
   int const nvar = 1,
     n1 = params_get_int("npoints_A"),
@@ -514,23 +594,15 @@ void TwoPunctures_Cartesian_interpolation
 
   // Cartesian grid parameters
 
-  const int xxx = nxyz[0];
-  const int xxxyyy = nxyz[0]*nxyz[1];
-
 #ifdef TP_OMP
 #pragma omp parallel for
 #endif
-  for (int k = imin[2]; k < imax[2]; ++k) {
-    for (int j = imin[1]; j < imax[1]; ++j) {
-      for (int i = imin[0]; i < imax[0]; ++i) {
-
-        //const int ind = GFINDEX3D (i, j, k, nshift, mshift);
-	const int ind = i + xxx * j + xxxyyy* k;
+  for (int ind = 0; ind < np; ind++) {
 
         double xx, yy, zz;
-        xx = x[i] - center_offset[0];
-        yy = y[j] - center_offset[1];
-        zz = z[k] - center_offset[2];
+        xx = x[ind] - center_offset[0];
+        yy = y[ind] - center_offset[1];
+        zz = z[ind] - center_offset[2];
 
         /* We implement swapping the x and z coordinates as follows.
            The bulk of the code that performs the actual calculations
@@ -750,9 +822,7 @@ void TwoPunctures_Cartesian_interpolation
           SWAP (kxy[ind], kyz[ind]);
         } /* if swap_xz */
 
-      } /* for i */
-    }   /* for j */
-  }     /* for k */
+  } /* for ind */
 
 }
 

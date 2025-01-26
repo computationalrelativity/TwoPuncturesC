@@ -25,10 +25,12 @@ CC = gcc
 LD = ld
 AR = ar
 
-CFLAGS = -std=c99 -fPIC -pedantic $(shell gsl-config --cflags)
+CFLAGS = -std=c11 -fPIC -pedantic $(shell gsl-config --cflags)
 LFLAGS = $(shell gsl-config --libs)
 
 CFLAGS += -O3
+CFLAGS += -Wall -Wwrite-strings -Wshadow
+CFLAGS += -Wpointer-arith -Wcast-qual -Wcast-align -Wnested-externs -fshort-enums -fno-common
 
 # old flag information [Leave alone]
 ##CFLAGS + =`gsl-config --cflags`# GSL

@@ -284,13 +284,13 @@ TestRelax (int nvar, int n1, int n2, int n3, derivs *v,
   double *F, *res, **JFD;
   derivs *u;
 
-  F = dvector (0, ntotal - 1);
-  res = dvector (0, ntotal - 1);
+  F = TP_dvector (0, ntotal - 1);
+  res = TP_dvector (0, ntotal - 1);
   allocate_derivs (&u, ntotal);
 
-  JFD = dmatrix (0, ntotal - 1, 0, maxcol - 1);
-  cols = imatrix (0, ntotal - 1, 0, maxcol - 1);
-  ncols = ivector (0, ntotal - 1);
+  JFD = TP_dmatrix (0, ntotal - 1, 0, maxcol - 1);
+  cols = TP_imatrix (0, ntotal - 1, 0, maxcol - 1);
+  ncols = TP_ivector (0, ntotal - 1);
 
   F_of_v (nvar, n1, n2, n3, v, F, u);
 
@@ -316,13 +316,13 @@ TestRelax (int nvar, int n1, int n2, int n3, derivs *v,
   printf ("After: |F|=%20.15e\n", (double) norm1 (res, ntotal));
   fflush(stdout);
 
-  free_dvector (F, 0, ntotal - 1);
-  free_dvector (res, 0, ntotal - 1);
+  TP_free_dvector (F, 0, ntotal - 1);
+  TP_free_dvector (res, 0, ntotal - 1);
   free_derivs (u);
 
-  free_dmatrix (JFD, 0, ntotal - 1, 0, maxcol - 1);
-  free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
-  free_ivector (ncols, 0, ntotal - 1);
+  TP_free_dmatrix (JFD, 0, ntotal - 1, 0, maxcol - 1);
+  TP_free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
+  TP_free_ivector (ncols, 0, ntotal - 1);
 }
 
 /* --------------------------------------------------------------------------*/
@@ -342,27 +342,27 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
   double *F;
   derivs *u, *ph, *sh;
 
-  F = dvector (0, ntotal - 1);
+  F = TP_dvector (0, ntotal - 1);
   allocate_derivs (&u, ntotal);
 
-  JFD = dmatrix (0, ntotal - 1, 0, maxcol - 1);
-  cols = imatrix (0, ntotal - 1, 0, maxcol - 1);
-  ncols = ivector (0, ntotal - 1);
+  JFD = TP_dmatrix (0, ntotal - 1, 0, maxcol - 1);
+  cols = TP_imatrix (0, ntotal - 1, 0, maxcol - 1);
+  ncols = TP_ivector (0, ntotal - 1);
 
   F_of_v (nvar, n1, n2, n3, v, F, u);
   SetMatrix_JFD (nvar, n1, n2, n3, u, ncols, cols, JFD);
 
   /* temporary storage */
-  r = dvector (0, ntotal - 1);
-  p = dvector (0, ntotal - 1);
+  r = TP_dvector (0, ntotal - 1);
+  p = TP_dvector (0, ntotal - 1);
   allocate_derivs (&ph, ntotal);
-  /*ph  = dvector(0, ntotal-1);*/
-  rt = dvector (0, ntotal - 1);
-  s = dvector (0, ntotal - 1);
+  /*ph  = TP_dvector(0, ntotal-1);*/
+  rt = TP_dvector (0, ntotal - 1);
+  s = TP_dvector (0, ntotal - 1);
   allocate_derivs (&sh, ntotal);
-  /*sh  = dvector(0, ntotal-1);*/
-  t = dvector (0, ntotal - 1);
-  vv = dvector (0, ntotal - 1);
+  /*sh  = TP_dvector(0, ntotal-1);*/
+  t = TP_dvector (0, ntotal - 1);
+  vv = TP_dvector (0, ntotal - 1);
   
   /* check */
   if (output == 1) {
@@ -490,23 +490,23 @@ bicgstab (int const nvar, int const n1, int const n2, int const n3,
   } //   if (*normres > tol) 
   
   /* free temporary storage */
-  free_dvector (r, 0, ntotal - 1);
-  free_dvector (p, 0, ntotal - 1);
-  /*free_dvector(ph,  0, ntotal-1);*/
+  TP_free_dvector (r, 0, ntotal - 1);
+  TP_free_dvector (p, 0, ntotal - 1);
+  /*TP_free_dvector(ph,  0, ntotal-1);*/
   free_derivs (ph);
-  free_dvector (rt, 0, ntotal - 1);
-  free_dvector (s, 0, ntotal - 1);
-  /*free_dvector(sh,  0, ntotal-1);*/
+  TP_free_dvector (rt, 0, ntotal - 1);
+  TP_free_dvector (s, 0, ntotal - 1);
+  /*TP_free_dvector(sh,  0, ntotal-1);*/
   free_derivs (sh);
-  free_dvector (t, 0, ntotal - 1);
-  free_dvector (vv, 0, ntotal - 1);
+  TP_free_dvector (t, 0, ntotal - 1);
+  TP_free_dvector (vv, 0, ntotal - 1);
   
-  free_dvector (F, 0, ntotal - 1);
+  TP_free_dvector (F, 0, ntotal - 1);
   free_derivs (u);
   
-  free_dmatrix (JFD, 0, ntotal - 1, 0, maxcol - 1);
-  free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
-  free_ivector (ncols, 0, ntotal - 1);
+  TP_free_dmatrix (JFD, 0, ntotal - 1, 0, maxcol - 1);
+  TP_free_imatrix (cols, 0, ntotal - 1, 0, maxcol - 1);
+  TP_free_ivector (ncols, 0, ntotal - 1);
   
   if (*normres <= tol)
     return 0;
@@ -534,11 +534,11 @@ Newton (int const nvar, int const n1, int const n2, int const n3,
 {
   int verbose = params_get_int("verbose");
   
-  int ntotal = n1 * n2 * n3 * nvar, ii, it;
+  int ntotal = n1 * n2 * n3 * nvar, /*ii,*/ it;
   double *F, dmax, normres;
   derivs *u, *dv;
   
-  F = dvector (0, ntotal - 1);
+  F = TP_dvector (0, ntotal - 1);
   allocate_derivs (&dv, ntotal);
   allocate_derivs (&u, ntotal);
   
@@ -565,7 +565,7 @@ Newton (int const nvar, int const n1, int const n2, int const n3,
       }
       
       fflush(stdout);
-      ii =
+      // ii =
 	bicgstab (nvar, n1, n2, n3, v, dv, verbose, 100, dmax * 1.e-3, &normres);
 #ifdef TP_OMP
 #pragma omp parallel for
@@ -587,7 +587,7 @@ Newton (int const nvar, int const n1, int const n2, int const n3,
   
   fflush(stdout);
   
-  free_dvector (F, 0, ntotal - 1);
+  TP_free_dvector (F, 0, ntotal - 1);
   free_derivs (dv);
   free_derivs (u);
 }

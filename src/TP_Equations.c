@@ -169,7 +169,7 @@ void NonLinEquations (double rho_adm,
   double par_m_minus = params_get_real("par_m_minus");
 
   double r_plus, r_minus, psi, psi2, psi4, psi7;
-  double mu;
+  // double mu;
 
   r_plus = sqrt ((x - par_b) * (x - par_b) + y * y + z * z);
   r_minus = sqrt ((x + par_b) * (x + par_b) + y * y + z * z);
