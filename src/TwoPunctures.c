@@ -323,12 +323,12 @@ ini_data* TwoPunctures_make_initial_data() {
     mp_adm = (1 + up) * mp + mp * mm / (4. * par_b);
     mm_adm = (1 + um) * mm + mp * mm / (4. * par_b);
 
-    if (verbose) printf ("Puncture 1 ADM mass is %g\n", mp_adm);
-    if (verbose) printf ("Puncture 2 ADM mass is %g\n", mm_adm);
+    if (verbose) printf ("Puncture 1 ADM mass is %.15g\n", mp_adm);
+    if (verbose) printf ("Puncture 2 ADM mass is %.15g\n", mm_adm);
 
     /* print out ADM mass, eq.: \Delta M_ADM=2*r*u=4*b*V for A=1,B=0,phi=0 */
     admMass = (mp + mm - 4*par_b*PunctEvalAtArbitPosition(v->d0, 0, 1, 0, 0, nvar, n1, n2, n3));
-    if (verbose) printf ("The total ADM mass is %g\n", admMass);
+    if (verbose) printf ("The total ADM mass is %.15g\n", admMass);
 
     E = admMass;
 
